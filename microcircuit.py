@@ -88,13 +88,17 @@ matrix_shape    = np.shape(net.conn_probs)  # shape of connection probability ma
 if net.scale_K_linearly:
     n_outer_full    = np.outer(net.full_scale_n_neurons, net.full_scale_n_neurons)
     K_full_scale    = np.log(1. - net.conn_probs   ) / np.log(1. - 1. / n_outer_full)
-    K_th_full_scale = np.log(1. - net.conn_probs_th) / np.log(1. - 1. / (net.n_th * net.full_scale_n_neurons))
     K_scaled        = np.int_(K_full_scale * net.area)
-    K_th_scaled     = np.int_(K_th_full_scale * net.area)
+    if not net.n_th == 0:
+        K_th_full_scale = np.log(1. - net.conn_probs_th) / \
+            np.log(1. - 1. / (net.n_th * net.full_scale_n_neurons))
+        K_th_scaled     = np.int_(K_th_full_scale * net.area)
 else:
     n_outer         = np.outer(n_neurons, n_neurons)
     K_scaled        = np.int_(np.log(1. - net.conn_probs   ) / np.log(1. - 1. / n_outer))
-    K_th_scaled     = np.int_(np.log(1. - net.conn_probs_th) / np.log(1. - 1. / (net.n_th * n_neurons)))
+    if not net.n_th == 0:
+        K_th_scaled = np.int_(np.log(1. - net.conn_probs_th) / \
+            np.log(1. - 1. / (net.n_th * n_neurons)))
 
 
 # numbers of neurons from which to record spikes and membrane potentials
@@ -167,8 +171,6 @@ GID0        = neurons[0]
 upper_GIDs  = GID0 + np.cumsum(n_neurons) - 1
 lower_GIDs  = np.insert((upper_GIDs[:-1] + 1), 0, GID0) 
 neuron_GIDs = np.array([range(*boundary) for boundary in zip(lower_GIDs, upper_GIDs)])
-np.save(data_path + 'lower_GIDs.npy', lower_GIDs)
-np.save(data_path + 'upper_GIDs.npy', upper_GIDs)
 
 # External input
 # One poisson generator per population. 

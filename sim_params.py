@@ -16,7 +16,7 @@ run_mode = 'production'   # 'test' for writing files to
                     # 'production' for writing files
                     # to a chosen absolute path. 
 
-t_sim = 1e3      # simulated time 'ms'
+t_sim = 2e3      # simulated time 'ms'
 dt = 0.1            # simulation step 'ms'. default is 0.1 ms. (resolution of kernel)
 allgather = True    # communication protocol
 
@@ -24,11 +24,11 @@ allgather = True    # communication protocol
 # actual seeds will be master_seed ... master_seed + 2*n_vp
 #  ==>> different master seeds must be spaced by at least 2*n_vp + 1
 # see Gewaltig et al. '2012' for details       
-master_seed = 0    # changes rng_seeds and grng_seed
+master_seed = 123456    # changes rng_seeds and grng_seed
 
 n_mpi_procs = 1         # number of MPI processes
 
-n_threads_per_proc = 2 	# number of threads per MPI process
+n_threads_per_proc = 8 	# number of threads per MPI process
                             # use for instance 24 for a full-scale simulation
 
 
