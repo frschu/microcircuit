@@ -41,13 +41,8 @@ rcParams['axes.labelcolor'] = "0.3"
 rcParams['axes.edgecolor'] = "0.8"
 rcParams['axes.grid'] = True
 
-xfactor = 2
+xfactor = 3
 rcParams['figure.figsize'] = (xfactor*6.2, xfactor*3.83)  
-
-save_fig = True
-if not save_fig:
-        rcParams['figure.figsize'] = (13, 8) 
-fig_dir = "./figures/"  # directory of figures
 
 def fixticks(ax):    
     for t in ax.xaxis.get_ticklines(): t.set_color('0.8')

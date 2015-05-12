@@ -16,7 +16,7 @@ run_mode = 'production'   # 'test' for writing files to
                     # 'production' for writing files
                     # to a chosen absolute path. 
 
-t_sim = 2e3      # simulated time 'ms'
+t_sim = 20e3      # simulated time 'ms'
 dt = 0.1            # simulation step 'ms'. default is 0.1 ms. (resolution of kernel)
 allgather = True    # communication protocol
 
@@ -45,17 +45,20 @@ memory = '500mb' 	    # total memory
 ###     	Recording parameters		###        
 ################################################### 
 
-overwrite_existing_files = True 
+overwrite_existing_files = False
 
 # whether to record spikes from a fixed fraction of neurons in each population
 # If false, a fixed number of neurons is recorded in each population.
-# record_fraction_neurons_spikes = True with f_rec_spikes 1. records all spikes
-record_fraction_neurons_spikes = True 
-frac_rec_spikes = 0.1
-n_rec_spikes = 100 
+# record_fraction_neurons_spike = True with frac_rec_spike 1: records all spikes
+record_fraction_neurons_spike = True 
+rand_rec_spike = False  # whether to chose neurons to record from randomly
+frac_rec_spike = 0.1
+n_rec_spike = 100 
 
 # whether to record voltage from a fixed fraction of neurons in each population
-record_fraction_neurons_voltage = True 
+record_voltage = True
+record_fraction_neurons_voltage = True
+rand_rec_voltage = False    # whether to chose neurons to record from randomly
 frac_rec_voltage = 0.02 
 n_rec_voltage = 20 
 

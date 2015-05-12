@@ -41,6 +41,7 @@ if net.neuron_model != 'iaf_psc_exp':
 if len(net.types) != 2:
     raise Exception('Unexpected neuron types: script is tuned to (\'e\', \'i\')-neurons')
 
+
 ######################################################
 # Prepare simulation
 ######################################################
@@ -55,8 +56,6 @@ elif sim.run_mode == 'production':
         os.makedirs(data_path)
 else: 
     raise Exception('Unexpected sim_params.run_mode: expects \'test\' or \'production\'')
-np.save('data_path', np.array([data_path]))
-
 
 nest.ResetKernel()
 # set global kernel parameters
@@ -65,12 +64,23 @@ nest.SetKernelStatus(
     'overwrite_files': True,
     'resolution': sim.dt,
     'total_num_virtual_procs': sim.n_vp})
-
 if sim.run_mode:
     nest.SetKernelStatus({'data_path': data_path})
-pyrngs = [np.random.RandomState(s) for s in range(sim.master_seed, sim.master_seed + sim.n_vp)]
-nest.SetKernelStatus({'grng_seed' : sim.master_seed + sim.n_vp})
-nest.SetKernelStatus({'rng_seeds' : range(sim.master_seed + sim.n_vp + 1, sim.master_seed + 2 * sim.n_vp + 1)})
+
+# Set random seeds
+nest.SetKernelStatus({'grng_seed' : sim.master_seed})
+nest.SetKernelStatus({'rng_seeds' : range(sim.master_seed + 1, sim.master_seed + sim.n_vp + 1)})
+pyrngs = [np.random.RandomState(s) for s in 
+            range(sim.master_seed + sim.n_vp + 1, sim.master_seed + 2 * sim.n_vp + 1)]
+pyrngs_rec_spike = [np.random.RandomState(s) for s in 
+            range(sim.master_seed + 2 * sim.n_vp + 1, 
+                  sim.master_seed + 2 * sim.n_vp + 1 + len(net.populations))]
+pyrngs_rec_voltage = [np.random.RandomState(s) for s in 
+            range(sim.master_seed + 2 * sim.n_vp + 1 + len(net.populations), 
+                  sim.master_seed + 2 * sim.n_vp + 1 + 2 * len(net.populations))]
+np.save(data_path + 'seed_numbers.npy', 
+            np.array([sim.master_seed, 
+                      sim.master_seed + 2 * sim.n_vp + 1 + 2 * len(net.populations)]))
 
 ######################################################
 # Derive parameters
@@ -78,9 +88,9 @@ nest.SetKernelStatus({'rng_seeds' : range(sim.master_seed + sim.n_vp + 1, sim.ma
 
 # Scale size of network
 n_neurons       = np.rint(net.full_scale_n_neurons * net.area).astype(int)
-n_populations   = np.size(n_neurons)
-n_layers        = np.size(net.layers)
-n_types         = np.size(net.types)
+n_populations   = len(net.populations)
+n_layers        = len(net.layers)
+n_types         = len(net.types)
 n_total         = np.sum(n_neurons)
 matrix_shape    = np.shape(net.conn_probs)  # shape of connection probability matrix
 
@@ -103,11 +113,11 @@ else:
 
 # numbers of neurons from which to record spikes and membrane potentials
 # either rate of population or simply a fixed number regardless of population size
-if sim.record_fraction_neurons_spikes:
-    n_neurons_rec_spikes = np.rint(n_neurons * sim.frac_rec_spikes).astype(int)
+if sim.record_fraction_neurons_spike:
+    n_neurons_rec_spike = np.rint(n_neurons * sim.frac_rec_spike).astype(int)
 else:
-    n_neurons_rec_spikes = (np.ones_like(n_neurons) * n_rec_spikes).astype(int)
-np.save(data_path + 'n_neurons_rec_spikes.npy', n_neurons_rec_spikes)
+    n_neurons_rec_spike = (np.ones_like(n_neurons) * n_rec_spike).astype(int)
+np.save(data_path + 'n_neurons_rec_spike.npy', n_neurons_rec_spike)
 
 if sim.record_fraction_neurons_voltage:
     n_neurons_rec_voltage = np.rint(n_neurons * sim.frac_rec_voltage).astype(int)
@@ -301,14 +311,22 @@ for target_index, target_pop in enumerate(net.populations):
     # ...to spike detector
     print('\tspike detector')
     # Choose only a fixed fraction/number of neurons to record spikes from
-    rec_spikes_GIDs = np.sort(np.random.choice(target_GIDs, n_neurons_rec_spikes[target_index], replace=False))
-    nest.Connect(list(rec_spikes_GIDs), [spike_detectors[target_index]], 'all_to_all')
-    np.save(data_path + 'rec_spikes_GIDs_' + target_pop + '.npy', rec_spikes_GIDs)
+    if sim.rand_rec_spike:
+        rec_spike_GIDs = np.sort(pyrngs_rec_spike[i].choice(target_GIDs,
+            n_neurons_rec_spike[target_index], replace=False))
+    else:
+        rec_spike_GIDs = target_GIDs[:n_neurons_rec_spike[target_index]]
+    nest.Connect(list(rec_spike_GIDs), [spike_detectors[target_index]], 'all_to_all')
+    np.save(data_path + 'rec_spike_GIDs_' + target_pop + '.npy', rec_spike_GIDs)
 
     # ...to multimeter
     print('\tmultimeter')
     # Choose only a fixed fraction/number of neurons to record membrane voltage from
-    rec_voltage_GIDs = np.sort(np.random.choice(target_GIDs, n_neurons_rec_voltage[target_index], replace=False))
+    if sim.rand_rec_voltage:
+        rec_voltage_GIDs = np.sort(pyrngs_rec_voltage[i].choice(target_GIDs,
+            n_neurons_rec_voltage[target_index], replace=False))
+    else:
+        rec_voltage_GIDs = target_GIDs[:n_neurons_rec_voltage[target_index]]
     nest.Connect([multimeters[target_index]], list(rec_voltage_GIDs), 'all_to_all')
     np.save(data_path + 'rec_voltage_GIDs_' + target_pop + '.npy', rec_voltage_GIDs)
 
