@@ -45,35 +45,30 @@ memory = '500mb' 	    # total memory
 ###     	Recording parameters		###        
 ################################################### 
 
+# Recordables: Cortical spikes and voltages, thalamic spikes
+# For cortical spikes and voltages, you can choose to measured at all
+# and, if so, whether to measure a fixed fraction or a fixed number of each population
+# For recording all cortical neurons, set frac_rec_spike == 1.
+
 overwrite_existing_files = False
 
-# whether to record spikes from a fixed fraction of neurons in each population
-# If false, a fixed number of neurons is recorded in each population.
-# record_fraction_neurons_spike = True with frac_rec_spike 1: records all spikes
+# Cortical spikes
+record_cortical_spikes = True 
 record_fraction_neurons_spike = True 
-rand_rec_spike = False  # whether to chose neurons to record from randomly
 frac_rec_spike = 0.1
 n_rec_spike = 100 
+rand_rec_spike = False  # whether to chose neurons to record from randomly
 
-# whether to record voltage from a fixed fraction of neurons in each population
-record_voltage = True
+# Cortical voltages
+record_voltage = False
 record_fraction_neurons_voltage = True
-rand_rec_voltage = False    # whether to chose neurons to record from randomly
 frac_rec_voltage = 0.02 
 n_rec_voltage = 20 
+rand_rec_voltage = False    # whether to chose neurons to record from randomly
 
-# whether to write any recorded cortical spikes to file
-save_cortical_spikes = True 
-
-# whether to write any recorded membrane potentials to file
-save_voltages = True 
-
-# whether to record thalamic spikes 'only used when n_thal in
-# network_params.sli is nonzero'
+# Thalamic spikes
+# Relevant only if network_params.n_thal > 0
 record_thalamic_spikes = True 
-
-# whether to write any recorded thalamic spikes to file
-save_thalamic_spikes = True 
 
 # stem for spike detector file labels
 spike_detector_label = 'spikes_' 

@@ -203,19 +203,19 @@ if not net.n_th == 0:
             'stop': net.th_start + net.th_duration})
 
 # Devices
-spike_detector_dict = [{'label': sim.spike_detector_label + population + '_', 
-                        'to_file': sim.save_cortical_spikes} for population in net.populations]
-spike_detectors = nest.Create('spike_detector', n_populations, 
-    params=spike_detector_dict)
-multimeter_dict = [{'label': sim.multimeter_label + population + '_', 
-                    'to_file': sim.save_cortical_spikes, 
-                    'record_from': ['V_m']} for population in net.populations]
-multimeters     = nest.Create('multimeter', n_populations, 
-    params=multimeter_dict)
+if sim.record_cortical_spikes:
+    spike_detector_dict = [{'label': sim.spike_detector_label + population + '_', 
+                            'to_file': True} for population in net.populations]
+    spike_detectors = nest.Create('spike_detector', n_populations, params=spike_detector_dict)
+if sim.record_voltage:
+    multimeter_dict = [{'label': sim.multimeter_label + population + '_', 
+                        'to_file': True, 
+                        'record_from': ['V_m']} for population in net.populations]
+    multimeters     = nest.Create('multimeter', n_populations, params=multimeter_dict)
 if sim.record_thalamic_spikes:
-    th_spike_detector  = nest.Create('spike_detector', 1, 
-    params={'label': sim.th_spike_detector_label, 
-            'to_file': sim.save_thalamic_spikes})
+    th_spike_detector_dict = {'label': sim.th_spike_detector_label, 
+                            'to_file': True}
+    th_spike_detector  = nest.Create('spike_detector', 1, params=th_spike_detector_dict)
 
 
 ###################################################
@@ -309,26 +309,28 @@ for target_index, target_pop in enumerate(net.populations):
             nest.Connect(th_GIDs, target_GIDs, conn_dict_th, syn_dict_th)
 
     # ...to spike detector
-    print('\tspike detector')
-    # Choose only a fixed fraction/number of neurons to record spikes from
-    if sim.rand_rec_spike:
-        rec_spike_GIDs = np.sort(pyrngs_rec_spike[i].choice(target_GIDs,
-            n_neurons_rec_spike[target_index], replace=False))
-    else:
-        rec_spike_GIDs = target_GIDs[:n_neurons_rec_spike[target_index]]
-    nest.Connect(list(rec_spike_GIDs), [spike_detectors[target_index]], 'all_to_all')
-    np.save(data_path + 'rec_spike_GIDs_' + target_pop + '.npy', rec_spike_GIDs)
+    if sim.record_cortical_spikes:
+        print('\tspike detector')
+        # Choose only a fixed fraction/number of neurons to record spikes from
+        if sim.rand_rec_spike:
+            rec_spike_GIDs = np.sort(pyrngs_rec_spike[i].choice(target_GIDs,
+                n_neurons_rec_spike[target_index], replace=False))
+        else:
+            rec_spike_GIDs = target_GIDs[:n_neurons_rec_spike[target_index]]
+        nest.Connect(list(rec_spike_GIDs), [spike_detectors[target_index]], 'all_to_all')
+        np.save(data_path + 'rec_spike_GIDs_' + target_pop + '.npy', rec_spike_GIDs)
 
     # ...to multimeter
-    print('\tmultimeter')
-    # Choose only a fixed fraction/number of neurons to record membrane voltage from
-    if sim.rand_rec_voltage:
-        rec_voltage_GIDs = np.sort(pyrngs_rec_voltage[i].choice(target_GIDs,
-            n_neurons_rec_voltage[target_index], replace=False))
-    else:
-        rec_voltage_GIDs = target_GIDs[:n_neurons_rec_voltage[target_index]]
-    nest.Connect([multimeters[target_index]], list(rec_voltage_GIDs), 'all_to_all')
-    np.save(data_path + 'rec_voltage_GIDs_' + target_pop + '.npy', rec_voltage_GIDs)
+    if sim.record_voltage:
+        print('\tmultimeter')
+        # Choose only a fixed fraction/number of neurons to record membrane voltage from
+        if sim.rand_rec_voltage:
+            rec_voltage_GIDs = np.sort(pyrngs_rec_voltage[i].choice(target_GIDs,
+                n_neurons_rec_voltage[target_index], replace=False))
+        else:
+            rec_voltage_GIDs = target_GIDs[:n_neurons_rec_voltage[target_index]]
+        nest.Connect([multimeters[target_index]], list(rec_voltage_GIDs), 'all_to_all')
+        np.save(data_path + 'rec_voltage_GIDs_' + target_pop + '.npy', rec_voltage_GIDs)
 
 t_connect = time.time() - t_connect_0
 
