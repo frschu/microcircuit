@@ -85,6 +85,5 @@ docs/_build/
 *.ipynb_checkpoints/
 
 # data
-data/*
 *.gdf
 *.dat
