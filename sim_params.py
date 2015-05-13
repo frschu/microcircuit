@@ -16,7 +16,7 @@ run_mode = 'production'   # 'test' for writing files to
                     # 'production' for writing files
                     # to a chosen absolute path. 
 
-t_sim = 20e3      # simulated time 'ms'
+t_sim = 300e3      # simulated time 'ms'
 dt = 0.1            # simulation step 'ms'. default is 0.1 ms. (resolution of kernel)
 allgather = True    # communication protocol
 
