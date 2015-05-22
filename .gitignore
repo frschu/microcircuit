@@ -90,4 +90,4 @@ data/
 *.dat
 
 # PDF
-#.pdf
+*.pdf

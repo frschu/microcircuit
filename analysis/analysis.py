@@ -72,7 +72,7 @@ n_rec_spike = np.load(pynest_path + 'n_neurons_rec_spike.npy')
 # labels & colors: need to be adapted if n_types != (e, i)
 layer_colors = style.colors[:n_layers]
 colors = np.array([color for color in layer_colors for i in range(n_types)])
-colors[1::2] = colors[1::2] * 0.4
+colors[1::2] = colors[1::2] * 0.4   #### adapt for more than two types!
 if reverse_order:
     n_rec_spike = n_rec_spike[::-1]
     populations = populations[::-1]
