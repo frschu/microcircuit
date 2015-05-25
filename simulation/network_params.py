@@ -55,6 +55,7 @@ g   = -4.
 
 # probabilities for >=1 connection between neurons in the given populations
 # columns correspond to source populations; rows to target populations
+# i. e. conn_probs[post, pre] = conn_prob[target, source]
 # source      2/3e    2/3i    4e      4i      5e      5i      6e      6i       
 conn_probs = np.array(
             [[0.1009, 0.1689, 0.0437, 0.0818, 0.0323, 0.    , 0.0076, 0.    ],
@@ -116,14 +117,15 @@ PSP_ext = 0.15      # mean EPSP amplitude (mV) for external input
 # This is relevant for reproducing Potjans & Diesmann (2012) Fig. 7.
 dc_amplitude = 0. 
 # in-degrees for background input
-K_bg = [1600,   # 2/3e
+K_bg = np.array([
+        1600,   # 2/3e
         1500,   # 2/3i
         2100,   # 4e
         1900,   # 4i
         2000,   # 5e
         1900,   # 5i
         2900,   # 6e
-        2100]   # 6i
+        2100])   # 6i
         
 
 # optional additional thalamic input (Poisson)

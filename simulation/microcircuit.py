@@ -131,9 +131,9 @@ np.save(data_path + 'n_neurons_rec_voltge.npy', n_neurons_rec_voltage)
 def PSC(PSP, tau_m, tau_syn, C_m):
     # specify PSP and tau_syn_{ex, in}
     delta_tau   = tau_syn - tau_m
-    rate_tau    = tau_m / tau_syn
+    ratio_tau    = tau_m / tau_syn
     PSC_over_PSP = C_m * delta_tau / (tau_m * tau_syn * \
-        (rate_tau**(tau_m / delta_tau) - rate_tau**(tau_syn / delta_tau)))
+        (ratio_tau**(tau_m / delta_tau) - ratio_tau**(tau_syn / delta_tau)))
     return PSP * PSC_over_PSP
 tau_m, tau_syn_ex, tau_syn_in, C_m = \
     [net.model_params[key] for key in ['tau_m', 'tau_syn_ex', 'tau_syn_in', 'C_m']]
@@ -254,7 +254,7 @@ for target_index, target_pop in enumerate(net.populations):
                 weight_dict = net.weight_dict_inh.copy()
                 mean_delay  = net.delay_i
             else:
-                print('No weight dictionary for this neuron type defined.')
+                print('No weight dictionary defined for this neuron type!')
 
             mean_weight             = PSC_neurons[target_index, source_index]
             std_weight              = abs(mean_weight * net.PSC_rel_sd)
