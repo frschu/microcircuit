@@ -36,7 +36,7 @@
                       % to a chosen absolute path. 
 
 /t_trans 200.0 def    % transitional period in order to reach equilibrium
-/t_measure 300000.0 def % measured time 'ms' 
+/t_measure 1000.0 def % measured time 'ms' 
 /t_sim 
 t_measure t_trans add 
 def                   % simulated time (ms)

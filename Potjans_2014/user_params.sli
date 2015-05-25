@@ -29,7 +29,7 @@
 run_mode (production) eq
 {
     % absolute path to which the output files should be written
-    /output_sup_path (/users/schuessler/uni/microcircuit/data/)
+    /output_sup_path (/home/fs/uni/microcircuit/data/)
     def
     
     % add simulation specifications to data file

@@ -40,7 +40,7 @@ import functions_analysis as functions; reload(functions)
 
 # Data path
 data_sup_path = user.data_dir
-file_name = 'a1.0_t20.0_00/'
+file_name = 'a0.1_t1.2_00/'
 print(file_name)
 
 simulation_path = data_sup_path + file_name
