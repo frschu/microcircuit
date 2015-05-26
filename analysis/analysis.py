@@ -39,11 +39,11 @@ import functions_analysis as functions; reload(functions)
 reverse_order = True # do analysis such that plots resemble those of the paper (starting with L6i)
 plotting = True
 choose_population = 'all'
-choose_population = 'L4e' # 'all' or [names]
+#choose_population = 'L4e' # 'all' or [names]
 
 # Data path
 data_sup_path = user.data_dir
-file_name = 'a1.0_t20.0_00/'
+file_name = 'a0.1_t1.2_00/'
 print(file_name)
 
 simulation_path = data_sup_path + file_name
@@ -179,7 +179,7 @@ for i, population in enumerate(populations):
             no_isi.append(population + '_' + str(j))
         if plotting:
             ax0.plot(times*1e-3, [j + lower_GIDs[i]]*n_spikes[j], 
-                '.', ms=1.5, color=colors[i], label=population)
+                '.', ms=3, color=colors[i], label=population)
 
     # Means
     rates_mean[i] = np.mean(rates)
