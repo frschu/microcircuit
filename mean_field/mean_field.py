@@ -19,7 +19,7 @@ if 'c' in sys.argv:
     plt.close('all')
 picture_format = '.pdf'
 figure_path = './'
-plotting = False
+plotting = True
 # Import specific moduls
 from mean_field_params import *
 from mean_field_functions import *
@@ -28,8 +28,8 @@ from mean_field_functions import *
 # Plotting
 ######################################################
 colors = style.colors[:n_pop]
-mu_plot = lambda v: tau_m * (np.dot(mat1, v) + mu_ext[:,None])    
-sd_plot = lambda v: np.sqrt(tau_m * (np.dot(mat2, v) + sd_ext[:,None]))    
+mu_plot = lambda v: np.dot(mat1, v) + mu_ext[:,None]    
+sd_plot = lambda v: np.sqrt(np.dot(mat2, v) + var_ext[:,None])    
 if plotting:
     fig = plt.figure()
     suptitle = "Mean field approach: model: " + choose_params 
@@ -90,7 +90,7 @@ if plotting:
     ax3.set_xlim(v_min, v_max)
     ax4.set_ylabel("up($\\nu$) - low($\\nu$)")
     ax5.set_xlabel("reduced voltage $u = \\frac{V - \mu}{\sigma}$")
-    ax5.set_ylabel("$e^{u^2} (1 - \mathrm{erf(u)})$")
+    ax5.set_ylabel("$e^{u^2} (1 + \mathrm{erf(u)})$")
     for ax in fig.axes:
         style.fixticks(ax)
 

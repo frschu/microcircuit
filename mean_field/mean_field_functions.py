@@ -5,8 +5,8 @@ from scipy.integrate import quad
 from mean_field_params import *
 
 # Mean and deviations of synaptic current of one neuron
-mu  = lambda v: tau_m * (np.dot(mat1, v) + mu_ext)
-sd  = lambda v: np.sqrt(tau_m * (np.dot(mat2, v) + sd_ext))    
+mu  = lambda v: np.dot(mat1, v) + mu_ext
+sd  = lambda v: np.sqrt(np.dot(mat2, v) + var_ext)    
 
 # The derived integrand of the integral equation
 integrand   = lambda u: np.exp(u**2) * (1. + erf(u))
@@ -42,3 +42,17 @@ if choose_params == 'brunel':
     #v0 for g > 4, low-activity regime
     v0_g_gt_4 = lambda g: (v_ext - v_thr) / (g * gamma - 1.)
 
+def get_contour_verts(cn):
+    contours = []
+    # for each contour line
+    for cc in cn.collections:
+        paths = []
+        # for each separate section of the contour line
+        for pp in cc.get_paths():
+            xy = []
+            # for each segment of that section
+            for vv in pp.iter_segments():
+                xy.append(vv[0])
+            paths.append(np.vstack(xy))
+        contours.append(paths)
+    return contours

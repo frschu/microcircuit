@@ -9,7 +9,7 @@ import sim_params as sim; reload(sim)
 ######################################################
 
 # Global parameters
-choose_params = ['microcircuit', 'brunel'][0]
+choose_params = ['microcircuit', 'brunel'][1]
 n_pop = 2
 # Initial guess
 v_guess = np.array([2, 2, 2, 2, 2, 2, 1, 2])
@@ -42,7 +42,7 @@ if choose_params == 'microcircuit':
     J_ab, J_ext = get_J()
     # Synapse numbers
     n_neurons   = net.full_scale_n_neurons
-    K_ab        = np.log(1. - net.conn_probs   ) / np.log(1. - 1. / np.outer(n_neurons, n_neurons))
+    K_ab        = np.log(1. - net.conn_probs) / np.log(1. - 1. / np.outer(n_neurons, n_neurons))
     C_ab        = K_ab / n_neurons
     C_aext      = net.K_bg
     # Background rate
@@ -59,7 +59,7 @@ elif choose_params == 'brunel':
     tau_m   = 0.02      # s
     # Weights
     J     =  0.2      # mV
-    g     =  4.
+    g     =  6.0
     if model == 'A':
         J_i     =  J      
         g_i     =  g 
@@ -70,14 +70,14 @@ elif choose_params == 'brunel':
     J_ext   = J       # In Brunels paper, J_i,ext = J_i
     # Synapse numbers
     C_e     = 4000.
-    gamma   = 0.25
+    gamma   = 0.25 # = 1/g
     C_i     = gamma * C_e
     C_ab    = np.array([[C_e, C_i], [C_e, C_i]]) # depends only on presynaptic population
     C_aext  = np.array([C_e, C_e])
     # Background rate
     # External frequency in order to reach threshold without recurrence
     v_thr   = theta / (C_e * J * tau_m)
-    v_ext   = 1.5 * v_thr
+    v_ext   = 2.0 * v_thr
     if n_pop > 2:
         n_pop   = 2         # This must be 2 for Brunel's parameters
     
@@ -93,9 +93,9 @@ v_guess = v_guess[:n_pop]
 ######################################################
 # Predefine matrices
 ######################################################
-mat1 = C_ab * J_ab
-mat2 = C_ab * J_ab ** 2
-mu_ext = J_ext * C_aext * v_ext
-sd_ext = J_ext ** 2 * C_aext * v_ext
-jac_mat1 = np.pi * tau_m**2 * mat1.T
-jac_mat2 = np.pi * tau_m**2 * 0.5 * mat2.T
+mat1 = C_ab * J_ab * tau_m
+mat2 = C_ab * J_ab ** 2 * tau_m
+mu_ext = J_ext * C_aext * v_ext * tau_m
+var_ext = J_ext ** 2 * C_aext * v_ext * tau_m
+jac_mat1 = np.pi * tau_m * mat1.T
+jac_mat2 = np.pi * tau_m * 0.5 * mat2.T
