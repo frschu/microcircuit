@@ -12,6 +12,7 @@ connect_nodes         (synapse parameters are set here)
 simulate
 '''
 from __future__ import print_function
+from imp import reload
 import nest
 import numpy as np
 from itertools import chain
@@ -20,9 +21,9 @@ import logging  # Write warnings to 'microcircuit.log'
 logging.basicConfig(filename='errors.log', filemode='w', level=logging.DEBUG)
 
 # Import specific moduls
-import network_params as net
-import sim_params as sim
-import user_params as user
+import network_params as net; reload(net)
+import sim_params as sim; reload(sim)
+import user_params as user; reload(user)
 import functions
 ######################################################
 

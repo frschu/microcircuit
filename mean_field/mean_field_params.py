@@ -9,7 +9,7 @@ import sim_params as sim; reload(sim)
 ######################################################
 
 # Global parameters
-choose_params = ['microcircuit', 'brunel'][0]
+choose_params = ['microcircuit', 'brunel'][1]
 n_pop = 2
 # Initial guess
 v_guess = np.array([2, 2, 2, 2, 2, 2, 1, 2])
@@ -59,7 +59,7 @@ elif choose_params == 'brunel':
     tau_m   = 0.02      # s
     # Weights
     J     =  0.2      # mV
-    g     =  4.
+    g     =  6.
     if model == 'A':
         J_i     =  J      
         g_i     =  g 

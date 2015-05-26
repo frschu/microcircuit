@@ -1,10 +1,9 @@
 """mean_field.py
 
-Numerical analysis of the equations corresponding to the 
-stationary solutions of the mean field approximation of the 
-cortical microcircuit model. 
+Simple 2d plots in order to get a feeling for the problem. 
+The frequencies v are only diagonal: v = [v1, v1, v1, ...].
 
-8 coupled integral equations are solved numerically. 
+Choose parameters in separate file. 
 """
 from __future__ import print_function
 import numpy as np
@@ -59,8 +58,8 @@ if plotting:
     sds = sd_plot(v_plot)
     lows= (V_r - mus) / sds
     ups = (theta - mus) / sds
-    u_min   = np.min((V_r - mus) / sds)
-    u_max    = np.max((theta - mus) / sds)
+    u_min   = np.min(lows)
+    u_max    = np.max(ups)
     u_min, u_max = (-2, 5)
     us  = np.linspace(u_min, u_max, 100) 
     
