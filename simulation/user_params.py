@@ -5,10 +5,6 @@
 '''
 import os
 
-# Import specific moduls
-import network_params as net
-import sim_params as sim
-
 # absolute path to which the output files should be written
 # only used if sim_params.run_mode == 'production'
 data_dir    = '/users/schuessler/uni/microcircuit/data/'

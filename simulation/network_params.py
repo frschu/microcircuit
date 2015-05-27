@@ -27,9 +27,9 @@ area    = 0.1
 # Note that this produces different dynamics compared to the original model.
 scale_K_linearly  = True
 
-layers  = ['L23', 'L4', 'L5', 'L6']
-types = ['e', 'i'] 
-populations = [layer + typus for layer in layers for typus in types]
+layers  = np.array(['L23', 'L4', 'L5', 'L6'])
+types = np.array(['e', 'i']) 
+populations = np.array([layer + typus for layer in layers for typus in types])
 
 
 full_scale_n_neurons = np.array( \
@@ -42,18 +42,29 @@ full_scale_n_neurons = np.array( \
    14395,   # layer 6 e
    2948])   # layer 6 i
 
-# mean EPSP amplitude (mV) for all connections except L4e->L2/3e
-PSP_e = .15 
-# mean EPSP amplitude (mv) for L4e->L2/3e connections
-# see p. 801 of the paper, second paragraph under 'Model Parameterization',
-# and the caption to Supplementary Fig. 7
-PSP_L4e_to_L23e = PSP_e * 2. 
-# standard deviation of PSC amplitudes relative to mean PSC amplitudes
-PSC_rel_sd = 0.1 
-# IPSP amplitude relative to EPSP amplitude
-g   = -4. 
 
-# probabilities for >=1 connection between neurons in the given populations
+# Synaptic weights
+# Weight factors for PSP amplitudes. All PSP amplitudes are derived by
+# PSPs[target, source] = PSP_e * g_all[target, source] such that PSPs has
+# the same shape as conn_probs.
+# Synaptic weight in the model are PSCs, which are derived in 'microcircuit.py'.
+g_i     = -4.           # weight for inhibitory synapses
+g_all   = np.tile([1., g_i], (len(populations), len(layers)))
+# Mean EPSP amplitude (mv) for L4e->L2/3e connections.
+# See p. 801 of the paper, second paragraph under 'Model Parameterization',
+# and the caption to Supplementary Fig. 7
+L23e_index  = np.where(populations == 'L23e')[0][0]
+L4e_index   = np.where(populations == 'L4e')[0][0]
+g_all[L23e_index, L4e_index] *= 2.
+# Mean reference PSP (EPSP amplitude except for L4e->L2/3e)
+PSP_e   = .15           # mv
+PSPs    = PSP_e * g_all
+# Standard deviation of PSC amplitudes relative to mean PSC amplitudes
+PSC_rel_sd = 0.1 
+
+
+# Connection probabilities
+# Probabilities for >=1 connection between neurons in the given populations
 # columns correspond to source populations; rows to target populations
 # i. e. conn_probs[post, pre] = conn_prob[target, source]
 # source      2/3e    2/3i    4e      4i      5e      5i      6e      6i       
@@ -70,6 +81,7 @@ conn_probs = np.array(
 # mean dendritic delays for excitatory and inhibitory transmission (ms)
 delay_e = 1.5   # ms, excitatory synapses
 delay_i = 0.75  # ms, inhibitory synapses
+delays  = np.tile([delay_e, delay_i], (len(populations), len(layers))) # adapt for more types!
 # standard deviation relative to mean delays
 delay_rel_sd = 0.5 
 

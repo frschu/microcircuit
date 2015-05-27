@@ -129,26 +129,18 @@ np.save(data_path + 'n_neurons_rec_voltge.npy', n_neurons_rec_voltage)
 
 # Compute PSC amplitude from PSP amplitude
 # These are used as weights (mean for normal_clipped distribution)
-def PSC(PSP, tau_m, tau_syn, C_m):
-    # specify PSP and tau_syn_{ex, in}
+def PSC_over_PSP():
+    '''Calculates factor for transformation from PSP to PSC'''
+    tau_m, tau_syn_ex, tau_syn_in, C_m = \
+        [net.model_params[key] for key in ['tau_m', 'tau_syn_ex', 'tau_syn_in', 'C_m']]
     delta_tau   = tau_syn - tau_m
     ratio_tau    = tau_m / tau_syn
     PSC_over_PSP = C_m * delta_tau / (tau_m * tau_syn * \
         (ratio_tau**(tau_m / delta_tau) - ratio_tau**(tau_syn / delta_tau)))
-    return PSP * PSC_over_PSP
-tau_m, tau_syn_ex, tau_syn_in, C_m = \
-    [net.model_params[key] for key in ['tau_m', 'tau_syn_ex', 'tau_syn_in', 'C_m']]
-PSC_e       = PSC(net.PSP_e, tau_m, tau_syn_ex, C_m)    # excitatory (presynaptic)
-PSC_L4e_to_L23e  = PSC(net.PSP_L4e_to_L23e, tau_m, tau_syn_ex, C_m) # synapses from L4e to L23e
-PSP_i       = net.PSP_e * net.g                         # IPSP from EPSP
-PSC_i       = PSC(PSP_i, tau_m, tau_syn_in, C_m)        # inhibitory (presynaptic)
-PSC_ext     = PSC(net.PSP_ext, tau_m, tau_syn_ex, C_m)  # external poisson
-PSC_th      = PSC(net.PSP_th, tau_m, tau_syn_ex, C_m)   # thalamus
-
-# Convert PSCs to array, shape of conn_probs
-PSC_neurons = [[PSC_e, PSC_i] * n_layers] * n_populations
-PSC_neurons = np.reshape(PSC_neurons, matrix_shape)
-PSC_neurons[0, 2] = PSC_L4e_to_L23e
+    return PSC_over_PSP
+PSCs    = net.PSPs * PSC_over_PSP()     # neuron populations
+PSC_ext = net.PSP_ext * PSC_over_PSP()  # external poisson
+PSC_th  = net.PSP_th * PSC_over_PSP()   # thalamus
 
 ######################################################
 # Create nodes
@@ -176,7 +168,7 @@ neurons_info    = nest.GetStatus(neurons)
 for ni in neurons_info:                 
     if ni['local']:                         # only adapt local nodes
         nest.SetStatus([ni['global_id']], 
-            {'V_m': pyrngs[ni['vp']].uniform(net.Vm0_mean, net.Vm0_std)})
+            {'V_m': pyrngs[ni['vp']].normal(net.Vm0_mean, net.Vm0_std)})
 # GIDs for neurons on subnets
 GID0        = neurons[0]
 upper_GIDs  = GID0 + np.cumsum(n_neurons) - 1
@@ -248,20 +240,16 @@ for target_index, target_pop in enumerate(net.populations):
             conn_dict       = net.conn_dict.copy()
             conn_dict['N']  = n_synapses
 
-            if   source_pop[-1] == 'e':
-                weight_dict = net.weight_dict_exc.copy()
-                mean_delay  = net.delay_e
-            elif source_pop[-1] == 'i':
-                weight_dict = net.weight_dict_inh.copy()
-                mean_delay  = net.delay_i
-            else:
-                print('No weight dictionary defined for this neuron type!')
-
-            mean_weight             = PSC_neurons[target_index, source_index]
+            mean_weight             = PSCs[target_index, source_index]
             std_weight              = abs(mean_weight * net.PSC_rel_sd)
+            if mean_weight >= 0:
+                weight_dict = net.weight_dict_exc.copy()
+            else:
+                weight_dict = net.weight_dict_inh.copy()
             weight_dict['mu']       = mean_weight
             weight_dict['sigma']    = std_weight
 
+            mean_delay              = delays[target_index, source_index]
             std_delay               = mean_delay * net.delay_rel_sd 
             delay_dict              = net.delay_dict.copy()
             delay_dict['mu']        = mean_delay

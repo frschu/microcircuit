@@ -1,6 +1,7 @@
 """mf_class.py
 
-Contains main class
+Class for mean field approximation of Brunel's adn the microcircuit model. 
+Contains parameters and functions of stationary frequency v.
 """
 from imp import reload
 import numpy as np
@@ -14,46 +15,47 @@ import sim_params as sim; reload(sim)
 # Main class
 ######################################################
 class mf_net:
-    def __init__(self, choose_model='brunelA', n_pop=2, g=6., v_ext_factor=2.):
-        '''Initialize according to the model chosen'''
+    def __init__(self, choose_model='brunelA', n_layer=1, g=6., v_ext_factor=2.):
+        '''Initialize according to the model chosen
+        The parameters g and v_ext_factor are only applied for Brunels model!
+        '''
         self.choose_model = choose_model
+        n_types = 2
+        n_pop   = n_layer * n_types
         if choose_model.startswith('brunel'):
             ######################################################
             # Brunel's parameters
             ######################################################
-            if n_pop > 2:
-                raise Exception("Brunel's model excepts n_pop < 3!")
-            self.populations = ['e', 'i']
-            self.V_r     = 10.       # mV
-            self.theta   = 20.       # mV
-            self.t_ref   = 0.002     # s
-            self.tau_m   = 0.02      # s
+            self.populations = np.tile(['e', 'i'], n_layer)
+            self.V_r    = 10.       # mV
+            self.theta  = 20.       # mV
+            self.t_ref  = 0.002     # s
+            self.tau_m  = 0.02      # s
             # Weights
             J     =  0.2      # mV
-            if choose_model.endswith('A'):
-                J_i     =  J      
-                g_i     =  g 
-            elif choose_model.endswith('B'):
+            if choose_model.endswith('B'):
                 J_i     =  0.2      # mV
-                g_i     =  4. 
-            J_ab    = np.array([[J, -g * J], [J_i, -g_i * J_i]])
-            self.J_ext   = J       # In Brunels paper, J_i,ext = J_i
+                g_i     =  1.01 * g 
+                self.J_ab   = np.tile([[J, -g * J], [J_i, -g_i * J_i]], (n_layer, n_layer))
+            else:
+                self.J_ab   = np.tile([J, -g * J], (n_pop, n_layer))
+            self.J_ext  = J       # In Brunels paper, J_i,ext = J_i
             # Synapse numbers
             C_e     = 4000.
             gamma   = 0.25
             C_i     = gamma * C_e
-            C_ab    = np.array([[C_e, C_i], [C_e, C_i]]) # depends only on presynaptic population
-            C_aext  = np.array([C_e, C_e])
+            self.C_ab   = np.tile([C_e, C_i], (n_pop, n_layer)) # depends only on presynaptic population
+            self.C_aext = np.tile([C_e], n_pop)
             # Background rate
             # External frequency in order to reach threshold without recurrence
-            self.v_thr   = self.theta / (C_e * J * self.tau_m)
-            self.v_ext   = self.v_thr * v_ext_factor 
+            self.v_thr  = self.theta / (C_e * self.J_ext * self.tau_m)
+            self.v_ext  = self.v_thr * v_ext_factor 
             
         else:
             ######################################################
             # Microcircuit model parameters
             ######################################################
-            self.populations = net.populations
+            self.populations = np.array(net.populations)[:n_pop]
             # Neuron model
             # Reset voltage and threshold (set V_r to zero)
             V_reset, V_th= [net.model_params[key] for key in ('V_reset', 'V_th')]
@@ -63,30 +65,15 @@ class mf_net:
             self.t_ref  = net.model_params['t_ref'] * 1e-3
             self.tau_m  = net.model_params['tau_m'] * 1e-3
             # Weights
-            n_populations   = len(net.populations)
-            n_layers        = len(net.layers)
-            matrix_shape    = np.shape(net.conn_probs)  # shape of connection probability matrix
-            
-            J           = net.PSP_e
-            J_ab        = [[J, -g * J] * n_layers] * n_populations
-            J_ab        = np.reshape(J_ab, matrix_shape)
-            J_ab[0, 2]  = net.PSP_L4e_to_L23e
+            self.J_ab   = net.PSPs[:n_pop, :n_pop]
             self.J_ext  = net.PSP_ext
             # Synapse numbers
             n_neurons   = net.full_scale_n_neurons
             K_ab        = np.log(1. - net.conn_probs) / np.log(1. - 1. / np.outer(n_neurons, n_neurons))
-            C_ab        = K_ab / n_neurons
-            C_aext      = net.K_bg
+            self.C_ab   = (K_ab / n_neurons)[:n_pop, :n_pop]
+            self.C_aext = net.K_bg[:n_pop]
             # Background rate
-            self.v_ext       = net.bg_rate * v_ext_factor
-
-        ######################################################
-        # Rescale to n_pop populations!
-        ######################################################
-        self.populations = self.populations[:n_pop]
-        self.J_ab = J_ab[:n_pop, :n_pop]
-        self.C_ab = C_ab[:n_pop, :n_pop]
-        self.C_aext = C_aext[:n_pop]
+            self.v_ext  = net.bg_rate
 
         ######################################################
         # Predefine matrices
