@@ -107,3 +107,15 @@ class mf_plot:
         #ax.set_xscale('log')
         return vs, lows, ups
         
+    def plot_transform(self, xs, v0s, xlabel="$g$"):
+        ax = plt.subplot2grid((1, 1), (0, 0), colspan=1, rowspan=1)
+        colors = style.colors[:len(self.plot_pops)]
+        for i, population in zip(self.i_pop, self.plot_pops):
+            ax.plot(xs, v0s[:, i], '.', color=colors[i], 
+                label=population)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel("$\\nu_0$ / Hz")
+        ax.grid(True)
+        ax.legend()
+        ax.set_ylim(0, 520)
+

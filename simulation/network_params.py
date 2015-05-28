@@ -67,7 +67,7 @@ PSC_rel_sd = 0.1
 # Probabilities for >=1 connection between neurons in the given populations
 # columns correspond to source populations; rows to target populations
 # i. e. conn_probs[post, pre] = conn_prob[target, source]
-# source      2/3e    2/3i    4e      4i      5e      5i      6e      6i       
+# source      L2/3e   L2/3i   L4e     L4i     L5e     L5i     L6e     L6i       
 conn_probs = np.array(
             [[0.1009, 0.1689, 0.0437, 0.0818, 0.0323, 0.    , 0.0076, 0.    ],
              [0.1346, 0.1371, 0.0316, 0.0515, 0.0755, 0.    , 0.0042, 0.    ],

@@ -15,7 +15,7 @@ import sim_params as sim; reload(sim)
 # Main class
 ######################################################
 class mf_net:
-    def __init__(self, choose_model='brunelA', n_layer=1, g=6., v_ext_factor=2.):
+    def __init__(self, choose_model='brunelA', n_layer=1, g=4., v_ext_factor=2.):
         '''Initialize according to the model chosen
         The parameters g and v_ext_factor are only applied for Brunels model!
         '''
@@ -32,7 +32,7 @@ class mf_net:
             self.t_ref  = 0.002     # s
             self.tau_m  = 0.02      # s
             # Weights
-            J     =  0.2      # mV
+            J     =  0.15      # mV
             if choose_model.endswith('B'):
                 J_i     =  0.2      # mV
                 g_i     =  1.01 * g 

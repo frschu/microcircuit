@@ -1,6 +1,6 @@
 """mean_field.py
 
-Imports mf_class and mf_plot.
+Imports mf_class as model and mf_plot.
 
 Numerical analysis of the equations corresponding to the 
 stationary solutions of the mean field approximation of the 
@@ -13,14 +13,14 @@ from imp import reload
 import numpy as np
 from scipy.optimize import root
 import time
-import mf_class; reload(mf_class)
+import mf_class as model; reload(model)
 import mf_plot; reload(mf_plot)
 plotting = True
 iterate_g = True                # iterate g for fixed v_ext
 iterate_v_ext = False           # iterate v_ext for fixed g
 
 # Global parameters
-choose_model = "brunelB"  # brunelA, brunelB for corresponding models!
+choose_model = "micro"  # brunelA, brunelB for corresponding models!
 n_layer = 4
 n_types = 2
 n_pop = n_layer * n_types
@@ -28,11 +28,12 @@ print("Model: ", choose_model)
 print("n layers: ", n_layer)
 # Create reference instance containing parameters and functions:
 # (used mostly for plotting)
-mf_net0  = mf_class.mf_net(choose_model=choose_model, n_layer=n_layer)
+mf_net0  = model.mf_net(choose_model=choose_model, n_layer=n_layer)
 plot_pops= mf_net0.populations[:2]    # These populations are plotted
 if not type(plot_pops) == np.ndarray:
     plot_pops = np.array([plot_pops])
 
+raise Exception
 ######################################################
 # Functions
 ######################################################
@@ -48,7 +49,7 @@ def v0_g(v_exts, gs, jacobian=False, root_method=None, options=None):
         v_guess = np.array([2.]*n_pop)  # initial guess
         for j, g in enumerate(gs):
             # create instance of class:
-            mf_net = mf_class.mf_net(choose_model=choose_model, n_layer=n_layer, 
+            mf_net = model.mf_net(choose_model=choose_model, n_layer=n_layer, 
                 g=g, v_ext_factor=v_ext_factor)
             if jacobian:
                 jac = mf_net.jacobian
@@ -78,7 +79,7 @@ def v0_v_ext(v_exts, gs, jacobian=False, root_method=None, options=None):
         v_guess = np.array([2.]*n_pop)  # initial guess
         for j, v_ext_factor in enumerate(v_exts):
             # create instance of class:
-            mf_net = mf_class.mf_net(choose_model=choose_model, n_layer=n_layer, 
+            mf_net = model.mf_net(choose_model=choose_model, n_layer=n_layer, 
                 g=g, v_ext_factor=v_ext_factor)
             if jacobian:
                 jac = mf_net.jacobian
@@ -104,7 +105,6 @@ def v0_v_ext(v_exts, gs, jacobian=False, root_method=None, options=None):
 # v_0 over g (fig. 1 B.1)
 jacobian        = False     # whether to use calculated jacobian
 root_method     = ['hybr', 'lm', 'broyden1', 'anderson', 'krylov'][0]
-# broyden1 works for g >~ 3.8, v_ext > 0.7
 print("Method: ", root_method)
 options         = None
 
