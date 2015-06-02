@@ -9,10 +9,10 @@ cortical microcircuit model.
 8 coupled integral equations are solved numerically. 
 """
 from __future__ import print_function
-from imp import reload
 import numpy as np
 from scipy.optimize import root
 import time
+from imp import reload
 import mf_trans as model; reload(model)
 import mf_micro as mf_micro; reload(mf_micro)
 import mf_plot; reload(mf_plot)
@@ -116,12 +116,14 @@ def v0_j02(v_guess0, j02s, jacobian=False, root_method=None, options=None):
 def cool_C_ab(v_guess_0, step_init = 0.01, d_step=0.5, tolerance=5, jacobian=False, root_method=None, options=None):
     """Iteratively change C_ab from C_B = Brunel's to C_M = microcircuit 
     on the straight line connecting C_B and C_M.
+    If not disabled, j02 varied as well.
     Returns distances, v0s[distance, population], failures
     """
     print("Iterate over C_ab")
     # initiate
     g   = 4.
-    j02 = 1.
+    j02_init = 1.
+    j02 =   j02_init
     v_guess = v_guess_0
     C_B     = model.mf_net().C_ab
     distances   = []
@@ -147,14 +149,18 @@ def cool_C_ab(v_guess_0, step_init = 0.01, d_step=0.5, tolerance=5, jacobian=Fal
     C_M     = mf_micro.mf_net().C_ab
     deltaC  = C_M - C_B
     #deltaC[deltaC > 0] = 0
+    deltaC[:, 0::2] = 0
+    deltaj02    = 1.
     distance    = 0.
     n_fails = 0
     n_succ  = 0
     # Go on
+    print("\t")
     while distance <= 1.:
         distance += step
         C_ab    = C_B + distance * deltaC
-        mf_net = model.mf_net(g=g, j02=j02, C_ab=C_ab)
+        #j02     = j02_init + distance * deltaj02
+        mf_net  = model.mf_net(g=g, j02=j02, C_ab=C_ab)
         try:
             sol = root(mf_net.root_v0, v_guess, jac=jac, method=root_method, options=options)
             if sol["success"]:
@@ -183,7 +189,7 @@ def cool_C_ab(v_guess_0, step_init = 0.01, d_step=0.5, tolerance=5, jacobian=Fal
             distance = distances[-1]
             step    *= d_step
             if n_fails >= tolerance:
-                print("Tolerance exceeded at distance = %.2e"%distance)
+                print("Tolerance exceeded at distance = %.3f"%distance)
                 break
     distances = np.array(distances)
     return(distances, v0s, failures, C_ab, C_M, step)     
@@ -247,7 +253,7 @@ if iterate_j02:
 ######################################################
 if plotting:
     if iterate_C:
-        suptitle = "Step by step transforming BrunelA to Microcircuit: transform $C_ab$" + \
+        suptitle = "Step by step transforming BrunelA to Microcircuit: transform $C_{ab}$" + \
             "\nmethod: " + root_method
     if iterate_j02:
         suptitle = "Step by step transforming BrunelA to Microcircuit: transform $J_{L23e, L4e}$" + \

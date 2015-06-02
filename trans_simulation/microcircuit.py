@@ -11,7 +11,6 @@ connect_nodes         (synapse parameters are set here)
 simulate
 '''
 from __future__ import print_function
-from imp import reload
 import nest
 import numpy as np
 from itertools import chain
@@ -20,25 +19,26 @@ import logging  # Write warnings to 'microcircuit.log'
 logging.basicConfig(filename='errors.log', filemode='w', level=logging.DEBUG)
 
 # Import specific moduls
-import network_params as net; reload(net)
+from imp import reload
 import sim_params as sim; reload(sim)
 import user_params as user; reload(user)
-import functions
+import functions; reload(functions)
+import network_params; reload(network_params)
+net0 = network_params.net()
 ######################################################
-
 
 ######################################################
 # Check parameters 
 ######################################################
 
 # Not exhaustive.
-if net.neuron_model != 'iaf_psc_exp':
+if net0.neuron_model != 'iaf_psc_exp':
     logging.warning('Unexpected neuron type: script is tuned to \'iaf_psc_exp\' neurons.')
 # Check whether there are only the neuron types 'e' and 'i'
 # If you want to adapt, you further need to adapt sections in this script:
     # derive_parameters: PSP to PSC
     # connect_nodes: weight dictionaries, if-statement 
-if len(net.types) != 2:
+if len(net0.types) != 2:
     raise Exception('Unexpected neuron types: script is tuned to (\'e\', \'i\')-neurons')
 
 
@@ -47,16 +47,11 @@ if len(net.types) != 2:
 ######################################################
 
 # Set data path
-if sim.run_mode == 'test':
-    data_path = user.test_path
-elif sim.run_mode == 'production':
-    data_path = functions.get_output_path(user.data_dir, 
-        net.area, sim.t_sim, net.n_th, net.dc_amplitude, 
-        overwrite=sim.overwrite_existing_files, n_digits=2)
-    if not os.path.exists(data_path):
-        os.makedirs(data_path)
-else: 
-    raise Exception('Unexpected sim_params.run_mode: expects \'test\' or \'production\'')
+data_path = functions.get_output_path(user.data_dir, 
+    net0.area, sim.t_sim, net0.n_th, net0.dc_amplitude, 
+    overwrite=sim.overwrite_existing_files, n_digits=2)
+if not os.path.exists(data_path):
+    os.makedirs(data_path)
 
 nest.ResetKernel()
 # set global kernel parameters
@@ -74,38 +69,30 @@ pyrngs = [np.random.RandomState(s) for s in
             range(sim.master_seed + sim.n_vp + 1, sim.master_seed + 2 * sim.n_vp + 1)]
 pyrngs_rec_spike = [np.random.RandomState(s) for s in 
             range(sim.master_seed + 2 * sim.n_vp + 1, 
-                  sim.master_seed + 2 * sim.n_vp + 1 + len(net.populations))]
+                  sim.master_seed + 2 * sim.n_vp + 1 + net0.n_populations)]
 pyrngs_rec_voltage = [np.random.RandomState(s) for s in 
-            range(sim.master_seed + 2 * sim.n_vp + 1 + len(net.populations), 
-                  sim.master_seed + 2 * sim.n_vp + 1 + 2 * len(net.populations))]
+            range(sim.master_seed + 2 * sim.n_vp + 1 + net0.n_populations, 
+                  sim.master_seed + 2 * sim.n_vp + 1 + 2 * net0.n_populations)]
 np.save(data_path + 'seed_numbers.npy', 
             np.array([sim.master_seed, 
-                      sim.master_seed + 2 * sim.n_vp + 1 + 2 * len(net.populations)]))
+                      sim.master_seed + 2 * sim.n_vp + 1 + 2 * net0.n_populations]))
+
+
+
+#######################################################
+# START ADAPTING FROM HERE!!!
+#######################################################
+net = network_params.net()
 
 ######################################################
 # Derive parameters
 ######################################################
 
 # Scale size of network
-n_neurons       = np.rint(net.full_scale_n_neurons * net.area).astype(int)
-n_total         = np.sum(n_neurons)
-
-# Scale synapse numbers
-if net.scale_K_linearly:
-    n_outer_full    = np.outer(net.full_scale_n_neurons, net.full_scale_n_neurons)
-    K_full_scale    = np.log(1. - net.conn_probs   ) / np.log(1. - 1. / n_outer_full)
-    K_scaled        = np.int_(K_full_scale * net.area)
-    if not net.n_th == 0:
-        K_th_full_scale = np.log(1. - net.conn_probs_th) / \
-            np.log(1. - 1. / (net.n_th * net.full_scale_n_neurons))
-        K_th_scaled     = np.int_(K_th_full_scale * net.area)
-else:
-    n_outer         = np.outer(n_neurons, n_neurons)
-    K_scaled        = np.int_(np.log(1. - net.conn_probs   ) / np.log(1. - 1. / n_outer))
-    if not net.n_th == 0:
-        K_th_scaled = np.int_(np.log(1. - net.conn_probs_th) / \
-            np.log(1. - 1. / (net.n_th * n_neurons)))
-
+n_neurons_micro = net.n_neurons_micro
+n_neurons       = net.n_neurons_equal
+# Get PSCs used as synaptic weights
+PSCs, PSC_ext, PSC_th = net.get_PSCs()
 
 # numbers of neurons from which to record spikes and membrane potentials
 # either rate of population or simply a fixed number regardless of population size
@@ -120,21 +107,6 @@ if sim.record_fraction_neurons_voltage:
 else:
     n_neurons_rec_voltage = (np.ones_like(n_neurons) * n_rec_voltage).astype(int)
 np.save(data_path + 'n_neurons_rec_voltage.npy', n_neurons_rec_voltage)
-
-# Compute PSC amplitude from PSP amplitude
-# These are used as weights (mean for normal_clipped distribution)
-def PSC_over_PSP():
-    '''Calculates factor for transformation from PSP to PSC'''
-    tau_m, tau_syn, C_m = \
-        [net.model_params[key] for key in ['tau_m', 'tau_syn_ex', 'C_m']]
-    delta_tau   = tau_syn - tau_m
-    ratio_tau    = tau_m / tau_syn
-    PSC_over_PSP = C_m * delta_tau / (tau_m * tau_syn * \
-        (ratio_tau**(tau_m / delta_tau) - ratio_tau**(tau_syn / delta_tau)))
-    return PSC_over_PSP
-PSCs    = net.PSPs * PSC_over_PSP()     # neuron populations
-PSC_ext = net.PSP_ext * PSC_over_PSP()  # external poisson
-PSC_th  = net.PSP_th * PSC_over_PSP()   # thalamus
 
 ######################################################
 # Create nodes
@@ -155,7 +127,7 @@ PSC_th  = net.PSP_th * PSC_over_PSP()   # thalamus
 print('Create nodes')
 
 # Neurons
-neurons     = nest.Create(net.neuron_model, n_total, params=net.model_params)
+neurons     = nest.Create(net.neuron_model, net.n_total, params=net.model_params)
 # Initialize membrane potentials locally
 # drawn from normal distribution with mu=Vm0_mean, sigma=Vm0_std
 neurons_info    = nest.GetStatus(neurons)
@@ -172,12 +144,12 @@ neuron_GIDs = np.array([range(*boundary) for boundary in zip(lower_GIDs, upper_G
 # External input
 # One poisson generator per population. 
 #Rate is determined by base rate times in-degree[population]
-ext_poisson_params = [{'rate': net.bg_rate * in_degree} for in_degree in net.K_bg]
+ext_poisson_params = [{'rate': net.v_ext * in_degree} for in_degree in net.C_aext]
 ext_poisson = nest.Create('poisson_generator', net.n_populations, 
     params=ext_poisson_params) 
 # One dc generator per population. 
 # Amplitude is determined by base amplitude times in-degree[population]
-ext_dc_params = [{'amplitude': net.dc_amplitude * in_degree} for in_degree in net.K_bg]
+ext_dc_params = [{'amplitude': net.dc_amplitude * in_degree} for in_degree in net.C_aext]
 ext_dc = nest.Create('dc_generator', net.n_populations, 
     params=ext_dc_params) 
 
@@ -205,6 +177,7 @@ if sim.record_thalamic_spikes:
     th_spike_detector  = nest.Create('spike_detector', 1, params=th_spike_detector_dict)
 
 
+raise Exception
 ###################################################
 # Connect
 ###################################################
@@ -267,7 +240,7 @@ for target_index, target_pop in enumerate(net.populations):
 
     # ...to thalamic population
     if not net.n_th == 0:
-        n_synapses_th   = K_th_scaled[target_index]
+        n_synapses_th   = net.C_th_scaled[target_index]
         if not n_synapses_th == 0:
             print('\tthalamus')
             conn_dict_th        = net.conn_dict.copy()

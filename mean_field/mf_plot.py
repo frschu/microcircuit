@@ -11,6 +11,7 @@ import matplotlib.gridspec as gridspec
 import sys, os
 sys.path.append(os.path.abspath("../")) # include path with style
 import style
+from imp import reload
 import mf_class; reload(mf_class)
 
 class mf_plot:

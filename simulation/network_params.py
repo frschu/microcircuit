@@ -1,14 +1,20 @@
-'''
-    network_params.py
+'''network_params.py
 
     Network parameters. 
     Based on network_params.sli (Potjans 2014)
-'''
-'''
+
     Contains:
     - network parameters
     - single-neuron parameters
     - stimulus parameters
+
+Connection probabilities as well as mean values of synaptic weights and 
+delays are implemented as numpy arrays with shape (n_pop, n_pop), where
+n_pop = number of populations. Each layer contains neurons of all types. 
+
+In order to introduce further types, all arrays have to be carefully adapted. 
+However, the script running the simulation should not depend on these adaptations 
+but work without further configuration (not yet tested).
 '''
 import numpy as np
 
@@ -30,7 +36,7 @@ scale_K_linearly  = True
 layers  = np.array(['L23', 'L4', 'L5', 'L6'])
 types = np.array(['e', 'i']) 
 populations = np.array([layer + typus for layer in layers for typus in types])
-
+n_populations = len(populations)
 
 full_scale_n_neurons = np.array( \
   [20683,   # layer 2/3 e

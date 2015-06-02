@@ -14,16 +14,8 @@
 #   00, 01, ... = nth experiment of this kind.
 #
 # Example: 'a0.1_t10.2_th_dc_00/'
-data_dir    = '/users/schuessler/uni/microcircuit/data/'
-test_path   = data_dir + 'test'
+data_dir    = '/users/schuessler/uni/microcircuit/trans_data/'
 
 # Simulation to analyze.
 simulation_spec = 'a0.5_t10.0_00/'
 
-
-# path to the mpi shell script
-# can be left out if set beforehand
-mpi = '/path_to_mpi_script/my_mpi_script.sh'
-
-# path to NEST
-nest_path = '/path_to_nest_install_folder/bin/nest'

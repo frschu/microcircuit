@@ -3,11 +3,11 @@
 Class for mean field approximation of microcircuit model. 
 Contains parameters and functions of stationary frequency v.
 """
-from imp import reload
 import numpy as np
 import sys, os
 sys.path.append(os.path.abspath("../simulation/")) # include path with simulation specificaitons
 # Import specific moduls
+from imp import reload
 import network_params as net; reload(net)
 import sim_params as sim; reload(sim)
 
@@ -28,8 +28,9 @@ class mf_net:
         # Neuron model
         # Reset voltage and threshold (set V_r to zero)
         V_reset, V_th= [net.model_params[key] for key in ('V_reset', 'V_th')]
-        self.V_r    = 0.0
-        self.theta  = V_th - V_reset 
+        self.E_L    = net.model_params['E_L']
+        self.V_r    = V_reset - self.E_L
+        self.theta  = V_th - self.E_L 
         # All times should be in seconds!
         self.t_ref  = net.model_params['t_ref'] * 1e-3
         self.tau_m  = net.model_params['tau_m'] * 1e-3

@@ -3,11 +3,11 @@
 Class for the transformation from Brunel in 8D to microcircuit model. 
 Contains parameters and functions of stationary frequency v.
 """
-from imp import reload
 import numpy as np
 import sys, os
 sys.path.append(os.path.abspath("../simulation/")) # include path with simulation specificaitons
 # Import specific moduls
+from imp import reload
 import network_params as net; reload(net)
 import sim_params as sim; reload(sim)
 
@@ -17,8 +17,9 @@ import sim_params as sim; reload(sim)
 class mf_net:
     def __init__(self, g=4., j02=1., C_ab=None):
         '''Initialize according to the model chosen
-        A: identical excitatory and inhibitory populations
-        B: parameters vary for exc and inh neurons
+        Specify g, j02 and C_ab as approaching the microcircuit model.
+        Note that V_r, theta, tau_m and v_ext are already changed to values of 
+        the microcircuit model.
         '''
         n_layer = 4
         n_types = 2
@@ -28,20 +29,18 @@ class mf_net:
         # Brunel's parameters
         ######################################################
         self.populations = np.array(net.populations)[:n_pop]
-        self.V_r    = 10.       # mV
-        self.theta  = 20.       # mV
+        self.V_r    = 0.       # mV
+        self.theta  = 15.       # mV
         self.t_ref  = 0.002     # s
-        self.tau_m  = 0.02      # s
+        self.tau_m  = 0.01      # s
         # Weights
         J     =  0.15      # mV
         self.J_ab   = np.tile([J, -g * J], (n_pop, n_layer))
         self.J_ab[0, 2] = J * j02
-        self.J_ext  = J       # In Brunels paper, J_i,ext = J_i
-        #self.J_ab   = net.PSPs[:n_pop, :n_pop]
-        #self.J_ext  = net.PSP_ext
+        self.J_ext  = J
         # Synapse numbers
         if C_ab == None:
-            C_e     = 500.
+            C_e     = 500. # mean for microcircuit = 501
             gamma   = 0.25
             C_i     = gamma * C_e
             self.C_ab   = np.tile([C_e, C_i], (n_pop, n_layer)) # depends only on presynaptic population
