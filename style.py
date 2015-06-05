@@ -20,7 +20,7 @@ except:
     print('seaborn not installed')
 
 
-fontsize_labels = 26    # size used in latex document
+fontsize_labels = 16    # size used in latex document
 #rcParams['text.usetex'] = True
 #rcParams['text.latex.preamble'] = [r'\usepackage[cmbright]{sfmath}']
 rcParams['font.family']= 'sans-serif'

@@ -88,6 +88,8 @@ docs/_build/
 data/
 *.gdf
 *.dat
+*.hdf5
+*.log
 
 # PDF
 *.pdf

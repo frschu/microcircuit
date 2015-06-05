@@ -113,7 +113,7 @@ def v0_j02(v_guess0, j02s, jacobian=False, root_method=None, options=None):
     return v0s, log
     
 
-def cool_C_ab(v_guess_0, step_init = 0.01, d_step=0.5, tolerance=5, jacobian=False, root_method=None, options=None):
+def cool_C_ab(v_guess_0, step_init = 0.01, d_step=0.5, vary_j02=False, tolerance=5, jacobian=False, root_method=None, options=None):
     """Iteratively change C_ab from C_B = Brunel's to C_M = microcircuit 
     on the straight line connecting C_B and C_M.
     If not disabled, j02 varied as well.
@@ -147,10 +147,10 @@ def cool_C_ab(v_guess_0, step_init = 0.01, d_step=0.5, tolerance=5, jacobian=Fal
     # Define steps and matrices
     step    = step_init     # initial step size
     C_M     = mf_micro.mf_net().C_ab
-    deltaC  = C_M - C_B
-    #deltaC[deltaC > 0] = 0
-    deltaC[:, 0::2] = 0
-    deltaj02    = 1.
+    delta_C = C_M - C_B
+    #delta_C[deltaC > 0] = 0     # only increasing
+    #delta_C[:, 0::2] = 0        # only excitatory
+    delta_j02    = 1.
     distance    = 0.
     n_fails = 0
     n_succ  = 0
@@ -158,8 +158,9 @@ def cool_C_ab(v_guess_0, step_init = 0.01, d_step=0.5, tolerance=5, jacobian=Fal
     print("\t")
     while distance <= 1.:
         distance += step
-        C_ab    = C_B + distance * deltaC
-        #j02     = j02_init + distance * deltaj02
+        C_ab    = C_B + distance * delta_C
+        if vary_j02:
+            j02     = j02_init + distance * delta_j02
         mf_net  = model.mf_net(g=g, j02=j02, C_ab=C_ab)
         try:
             sol = root(mf_net.root_v0, v_guess, jac=jac, method=root_method, options=options)
