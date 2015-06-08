@@ -19,9 +19,9 @@ import time, datetime
 
 # Import specific moduls
 from imp import reload
-import sim_params as sim; reload(sim)
-import user_params as user; reload(user)
-import network_params; reload(network_params)
+import sim_params_trans as sim; reload(sim)
+import user_params_trans as user; reload(user)
+import network_params_trans; reload(network_params_trans)
 
 # logging
 verbose     = False                     # whether to print every connection made
@@ -31,6 +31,7 @@ seed_file   = open(os.path.join(user.log_path, "seeds.log"), "a+")    # save the
 #######################################################
 # Instantiation
 #######################################################
+T0 = time.time()
 # Unchanged parameters
 area            = 1.0
 connection_type = "fixed_indegree"
@@ -40,7 +41,7 @@ PSC_rel_sd      = 0.0
 # Brunel:
 n_neurons       = "brunel"
 C_ab            = "brunel"
-net_brunel      = network_params.net(area=area, n_neurons=n_neurons, C_ab=C_ab, 
+net_brunel      = network_params_trans.net(area=area, n_neurons=n_neurons, C_ab=C_ab, 
                                      j02=j02, connection_type=connection_type,
                                      PSC_rel_sd=PSC_rel_sd)
 
@@ -49,7 +50,7 @@ net_brunel      = network_params.net(area=area, n_neurons=n_neurons, C_ab=C_ab,
 # adapt n_neurons AND C_ab!
 n_neurons       = "micro"
 C_ab            = "micro"
-net_micro       = network_params.net(area=area, n_neurons=n_neurons, C_ab=C_ab, 
+net_micro       = network_params_trans.net(area=area, n_neurons=n_neurons, C_ab=C_ab, 
                                      j02=j02, connection_type=connection_type,
                                      PSC_rel_sd=PSC_rel_sd)
 
@@ -63,9 +64,10 @@ delta_n     = n_micro - n_brunel
 
 # The steps on the way from Brunel to microcircuit
 dist_init   = 0.00  # initial point: Brunel
-dist_max    = 0.00  # the goal:      microcircuit light
+dist_final  = 1.00  # the goal:      microcircuit light
 step        = 0.1  # step size towards the goal
-dists       = np.arange(dist_init, dist_max + step, step)
+n_steps     = int(round(abs(dist_final - dist_init) / step)) + 1
+dists       = np.linspace(dist_init, dist_final, n_steps)
 
 old_seeds   = seed_file.readlines()
 if old_seeds == []:
@@ -94,10 +96,14 @@ if not net_micro.n_th == 0:
     file_name += "_th"
 if not net_micro.dc_amplitude == 0:
     file_name += "_dc"
+if connection_type=="fixed_total_number":
+    file_name += "_totalN"
 file_name   += ".hdf5"
+if verbose: print(file_name)
 
 data_file = h5py.File(os.path.join(data_path, file_name), "w")
 
+# Attributes
 data_file.attrs["area"]     = area
 data_file.attrs["t_sim"]    = sim.t_sim*1e-3
 data_file.attrs["t_trans"]  = sim.t_trans*1e-3
@@ -111,11 +117,11 @@ data_file.attrs["n_populations"]    = net_micro.n_populations
 data_file.attrs["n_layers"]         = net_micro.n_layers 
 data_file.attrs["n_types"]          = net_micro.n_types 
 
-
+# Save simulation details to info file.
 info_file_dir = os.path.join(data_path, "info.log")
 info_file   = open(info_file_dir, "a+")     # save the parameters of the simulation(s)
-info_file.write("new simulation\n")
-info_str0   = "dist n_syn    area t_sim  T_conn   T_sim    n_vp master_seed  date       time      filename"
+info_file.write("\nnew simulation\n")
+info_str0   = "dist area t_sim  T_conn   T_sim      T_save n_vp master_seed  date       time      filename"
 info_file.write(info_str0 + "\n")
 
 #######################################################
@@ -125,7 +131,7 @@ for distance in dists:
     C_ab    = C_brunel + distance * delta_C
     n_ab    = n_brunel + distance * delta_n
     # Get instance of network
-    net     = network_params.net(area=area, n_neurons=n_neurons, C_ab=C_ab, 
+    net     = network_params_trans.net(area=area, n_neurons=n_neurons, C_ab=C_ab, 
                                          j02=j02, connection_type=connection_type,
                                          PSC_rel_sd=PSC_rel_sd)
 
@@ -376,8 +382,6 @@ for distance in dists:
     grp.attrs["distance"] = distance
     grp.attrs["C_ab"] = net.C_ab
     grp.attrs["master_seed"] = master_seed
-    grp.attrs["time_to_connect"] = T_connect
-    grp.attrs["time_to_simulate"] = T_simulate
     grp.attrs["date_and_time"] = now
 
     if sim.record_cortical_spikes:
@@ -385,45 +389,52 @@ for distance in dists:
         spikes_grp.attrs["dt"]  = sim.dt 
         spikes_grp.attrs["info"]  = "times_{ith neuron} = times[rec_neuron_i[i]:rec_neuron_i[i+1]]"
         spikes_grp.attrs["info2"]  = "times in units of dt; dt in ms  =>  times/ms = times * dt"
+        spikes_grp.attrs["n_neurons_rec_spike"] = n_neurons_rec_spike
 
         senders_all = []
         int_times_all = []
-        last_rec_spike = 0
-        for i, population in enumerate(net.populations):
-            senders = nest.GetStatus((spike_detectors[i],))[0]["events"]["senders"]
-            times   = nest.GetStatus((spike_detectors[i],))[0]["events"]["times"]
-            sorted_times = (np.uint32(times / sim.dt))[np.argsort(senders)] 
+        for j, population in enumerate(net.populations):
+            senders = nest.GetStatus((spike_detectors[j],))[0]["events"]["senders"]
+            times   = nest.GetStatus((spike_detectors[j],))[0]["events"]["times"]
 
             # Create array of indices for data: 
             # times_{ith neuron} = times[rec_neuron_i[i]:rec_neuron_i[i+1]]
-            rec_neuron_i    = np.zeros(n_neurons_rec_spike[i] + 1)
-            rec_neuron_i[0] = last_rec_spike
+            rec_neuron_i    = np.zeros(n_neurons_rec_spike[j] + 1)
 
             # Get corresponding reduced GIDs: nth neuron recorded
             n_spikes_per_neuron = np.unique(senders, return_counts=True)[1]
             max_index       = len(n_spikes_per_neuron) + 1
-            nth_neuron      = np.cumsum(n_spikes_per_neuron) + last_rec_spike
-            rec_neuron_i[1 : max_index] = nth_neuron
-            
-            # Update last_rec_spike and fill up the entries for neurons without a single spike
-            last_rec_spike  = nth_neuron[-1]
-            rec_neuron_i[max_index : ]   = last_rec_spike
+            nth_neuron      = np.cumsum(n_spikes_per_neuron)
+            rec_neuron_i[1 : max_index] = nth_neuron        # leave out 0th index
+            rec_neuron_i[max_index : ]  = nth_neuron[-1]    # in case some neurons didn't fire at all
+
+            # sort times
+            sorted_times = (np.uint32(times / sim.dt))[np.argsort(senders)] 
+            for i in range(len(rec_neuron_i) - 1):
+                i0, i1 = (rec_neuron_i[i], rec_neuron_i[i+1])
+                sorted_times[i0:i1] = np.sort(sorted_times[i0:i1])
 
             # save data to HDF5 file:
             spikes_subgrp   = spikes_grp.create_group(population)
             dset_times      = spikes_subgrp.create_dataset("times", data=sorted_times)
             dset_indices    = spikes_subgrp.create_dataset("rec_neuron_i", data=rec_neuron_i)
-
+            
     T_save = time.time() - t_save_0
-    grp.attrs["time_to_save"] = T_save
-    
+
     ###################################################
     # Save info, set new seed
     ###################################################
+    print("T_connect    = ", T_connect)
+    print("T_simulate   = ", T_simulate)
+    print("T_save       = ", T_save)
+    grp.attrs["time_to_connect"]    = T_connect
+    grp.attrs["time_to_simulate"]   = T_simulate
+    grp.attrs["time_to_save"]       = T_save
+    
 
-    info_str    = "{0:4.2f} {1:8d} {2:4.1f} {3:6.1f} {4:8.1f} {5:8.1f}   {6:2d}  {7:10d}  ".format(
-                    distance, np.sum(net.C_ab), area, sim.t_sim*1e-3, 
-                    T_connect, T_simulate, sim.n_vp, master_seed)
+    info_str    = "{0:4.2f} {1:4.1f} {2:6.1f} {3:8.1f} {4:10.1f} {5:6.1f} {6:4d} {7:11d}  ".format(
+                    distance, area, sim.t_sim*1e-3, 
+                    T_connect, T_simulate, T_save, sim.n_vp, master_seed)
     info_str += now + "  " + group_name
     info_file.write(info_str + "\n")
 
@@ -431,6 +442,12 @@ for distance in dists:
     last_seed = master_seed + 1 + 2 * sim.n_vp + 2 * net.n_populations - 1  # last -1 since range ends beforehand
     seed_file.write("{0:6d}".format(last_seed) + "\t\t" + now + "\t" + group_name + "\n")
     master_seed = last_seed + 1
+
+#
+T_total = time.time() - T0
+print("T_total      = ", T_total)
+data_file.attrs["total_time"]    = T_total
+info_file.write("total time: %.2f\n"%T_total)
 
 info_file.close()
 seed_file.close()

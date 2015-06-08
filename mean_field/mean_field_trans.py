@@ -113,7 +113,7 @@ def v0_j02(v_guess0, j02s, jacobian=False, root_method=None, options=None):
     return v0s, log
     
 
-def cool_C_ab(v_guess_0, step_init = 0.01, d_step=0.5, vary_j02=False, tolerance=5, jacobian=False, root_method=None, options=None):
+def cool_C_ab(v_guess_0, step_init = 0.01, d_step=0.5, tolerance=5, jacobian=False, root_method='hybr', options=None, vary_j02=False):
     """Iteratively change C_ab from C_B = Brunel's to C_M = microcircuit 
     on the straight line connecting C_B and C_M.
     If not disabled, j02 varied as well.
@@ -202,6 +202,7 @@ jacobian        = False     # whether to use calculated jacobian
 root_method     = ['hybr', 'lm', 'broyden1', 'anderson', 'krylov'][0]
 print("Method: ", root_method)
 options         = None
+vary_j02 = False
 
 iterate_C = True
 if iterate_C:
@@ -210,7 +211,7 @@ if iterate_C:
     step_init   = d_step**3  # initial step size
     tolerance   = 10     # number of fails accepted at one distance
     t_int0      = time.time()
-    dists, v0s, fails, C_ab, C_M, final_step  = cool_C_ab(v_guess0, step_init, d_step, tolerance, jacobian, root_method, options)
+    dists, v0s, fails, C_ab, C_M, final_step  = cool_C_ab(v_guess0, step_init, d_step, tolerance, jacobian, root_method, options, vary_j02)
     t_int1      = time.time() - t_int0
     print("Integration time: %.2f"%(t_int1))
 

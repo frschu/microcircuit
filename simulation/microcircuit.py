@@ -58,6 +58,10 @@ elif sim.run_mode == 'production':
 else: 
     raise Exception('Unexpected sim_params.run_mode: expects \'test\' or \'production\'')
 
+npy_path = os.path.join(os.path.split(data_path[:-1])[0], "npy_data")
+if not os.path.exists(npy_path):
+    os.makedirs(npy_path)
+
 nest.ResetKernel()
 # set global kernel parameters
 nest.SetKernelStatus(
@@ -113,13 +117,13 @@ if sim.record_fraction_neurons_spike:
     n_neurons_rec_spike = np.rint(n_neurons * sim.frac_rec_spike).astype(int)
 else:
     n_neurons_rec_spike = (np.ones_like(n_neurons) * n_rec_spike).astype(int)
-np.save(data_path + 'n_neurons_rec_spike.npy', n_neurons_rec_spike)
+np.save(os.path.join(npy_path, 'n_neurons_rec_spike.npy'), n_neurons_rec_spike)
 
 if sim.record_fraction_neurons_voltage:
     n_neurons_rec_voltage = np.rint(n_neurons * sim.frac_rec_voltage).astype(int)
 else:
     n_neurons_rec_voltage = (np.ones_like(n_neurons) * n_rec_voltage).astype(int)
-np.save(data_path + 'n_neurons_rec_voltage.npy', n_neurons_rec_voltage)
+np.save(os.path.join(npy_path, 'n_neurons_rec_voltage.npy'), n_neurons_rec_voltage)
 
 # Compute PSC amplitude from PSP amplitude
 # These are used as weights (mean for normal_clipped distribution)
@@ -301,7 +305,6 @@ for target_index, target_pop in enumerate(net.populations):
         else:
             rec_spike_GIDs = target_GIDs[:n_neurons_rec_spike[target_index]]
         nest.Connect(list(rec_spike_GIDs), [spike_detectors[target_index]], 'all_to_all')
-        np.save(data_path + 'rec_spike_GIDs_' + target_pop + '.npy', rec_spike_GIDs)
 
     # ...to multimeter
     if sim.record_voltage:
@@ -313,7 +316,6 @@ for target_index, target_pop in enumerate(net.populations):
         else:
             rec_voltage_GIDs = target_GIDs[:n_neurons_rec_voltage[target_index]]
         nest.Connect([multimeters[target_index]], list(rec_voltage_GIDs), 'all_to_all')
-        np.save(data_path + 'rec_voltage_GIDs_' + target_pop + '.npy', rec_voltage_GIDs)
 
 t_connect = time.time() - t_connect_0
 

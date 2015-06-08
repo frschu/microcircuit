@@ -92,7 +92,7 @@ class net:
         self.g      = g
         self.j02    = j02
 
-        g_all       = np.tile([1., self.g], (self.n_populations, self.n_layers))
+        g_all       = np.tile([1., -self.g], (self.n_populations, self.n_layers))
         L23e_index  = np.where(self.populations == "L23e")[0][0]
         L4e_index   = np.where(self.populations == "L4e")[0][0]
         g_all[L23e_index, L4e_index] *= self.j02
@@ -127,8 +127,7 @@ class net:
         if self.connection_type == "fixed_total_number":
             C_ab_micro = K_scaled   # total number, do not divide! 
         elif self.connection_type == "fixed_indegree":
-            #C_ab_micro = (K_scaled / self.n_neurons) # divided by the actual number of neurons
-            C_ab_micro = (K_scaled / (full_scale_n_neurons * self.area) ) # divided by the old numbers 
+            C_ab_micro = (K_scaled.T / (full_scale_n_neurons * self.area)).T
         else:
             raise Exception("Unexpected connection type. Use 'fixed_total_number' for microcircuit " + 
                             "model or 'fixed_indegree' for Brunel's model!")

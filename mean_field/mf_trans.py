@@ -6,9 +6,10 @@ Contains parameters and functions of stationary frequency v.
 import numpy as np
 import sys, os
 sys.path.append(os.path.abspath("../simulation/")) # include path with simulation specificaitons
+sys.path.append(os.path.abspath("../mean_field/")) # include path with mean field approximation
 # Import specific moduls
 from imp import reload
-import network_params as net; reload(net)
+import network_params as net_params; reload(net_params)
 import sim_params as sim; reload(sim)
 
 ######################################################
@@ -28,7 +29,7 @@ class mf_net:
         ######################################################
         # Brunel's parameters
         ######################################################
-        self.populations = np.array(net.populations)[:n_pop]
+        self.populations = np.array(net_params.populations)[:n_pop]
         self.V_r    = 0.       # mV
         self.theta  = 15.       # mV
         self.t_ref  = 0.002     # s
@@ -46,14 +47,14 @@ class mf_net:
             self.C_ab   = np.tile([C_e, C_i], (n_pop, n_layer)) # depends only on presynaptic population
         else:
             self.C_ab   = C_ab
-        #n_neurons   = net.full_scale_n_neurons
-        #K_ab        = np.log(1. - net.conn_probs) / np.log(1. - 1. / np.outer(n_neurons, n_neurons))
+        #n_neurons   = net_params.full_scale_n_neurons
+        #K_ab        = np.log(1. - net_params.conn_probs) / np.log(1. - 1. / np.outer(n_neurons, n_neurons))
         #self.C_ab   = (K_ab / n_neurons)[:n_pop, :n_pop]
         #self.C_aext = np.tile([2000], n_pop)
-        self.C_aext = net.K_bg[:n_pop]
+        self.C_aext = net_params.K_bg[:n_pop]
         # Background rate
         # External frequency in order to reach threshold without recurrence
-        self.v_ext  = net.bg_rate
+        self.v_ext  = net_params.bg_rate
 
         ######################################################
         # Predefine matrices

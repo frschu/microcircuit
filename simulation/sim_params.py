@@ -14,8 +14,8 @@ run_mode = 'production'   # 'test' for writing files to
                     # 'production' for writing files
                     # to a chosen absolute path. 
 
-t_trans = 0.2e3     # ms; transitional period in order to reach equilibrium
-t_measure = 1e3   # ms; time actually measured
+t_trans = 0.0e3     # ms; transitional period in order to reach equilibrium
+t_measure = 20e3   # ms; time actually measured
 t_sim = t_measure + t_trans    # ms; simulated time 
 dt = 0.1            # ms; simulation step; default is 0.1 ms. (resolution of kernel)
 allgather = True    # communication protocol

@@ -8,7 +8,7 @@ import sys, os
 sys.path.append(os.path.abspath("../simulation/")) # include path with simulation specificaitons
 # Import specific moduls
 from imp import reload
-import network_params as net; reload(net)
+import network_params as net_params; reload(net_params)
 import sim_params as sim; reload(sim)
 
 ######################################################
@@ -16,7 +16,7 @@ import sim_params as sim; reload(sim)
 ######################################################
 class mf_net:
     def __init__(self, n_layer=4):
-        '''Initialize according to the model chosen
+        '''Initialize according to Potjans' microcircuit model
         '''
         n_types = 2
         n_pop   = n_layer * n_types
@@ -24,26 +24,26 @@ class mf_net:
         ######################################################
         # Microcircuit model parameters
         ######################################################
-        self.populations = np.array(net.populations)[:n_pop]
+        self.populations = np.array(net_params.populations)[:n_pop]
         # Neuron model
         # Reset voltage and threshold (set V_r to zero)
-        V_reset, V_th= [net.model_params[key] for key in ('V_reset', 'V_th')]
-        self.E_L    = net.model_params['E_L']
+        V_reset, V_th= [net_params.model_params[key] for key in ('V_reset', 'V_th')]
+        self.E_L    = net_params.model_params['E_L']
         self.V_r    = V_reset - self.E_L
         self.theta  = V_th - self.E_L 
         # All times should be in seconds!
-        self.t_ref  = net.model_params['t_ref'] * 1e-3
-        self.tau_m  = net.model_params['tau_m'] * 1e-3
+        self.t_ref  = net_params.model_params['t_ref'] * 1e-3
+        self.tau_m  = net_params.model_params['tau_m'] * 1e-3
         # Weights
-        self.J_ab   = net.PSPs[:n_pop, :n_pop]
-        self.J_ext  = net.PSP_ext
+        self.J_ab   = net_params.PSPs[:n_pop, :n_pop]
+        self.J_ext  = net_params.PSP_ext
         # Synapse numbers
-        n_neurons   = net.full_scale_n_neurons
-        K_ab        = np.log(1. - net.conn_probs) / np.log(1. - 1. / np.outer(n_neurons, n_neurons))
+        n_neurons   = net_params.full_scale_n_neurons
+        K_ab        = np.log(1. - net_params.conn_probs) / np.log(1. - 1. / np.outer(n_neurons, n_neurons))
         self.C_ab   = (K_ab / n_neurons)[:n_pop, :n_pop]
-        self.C_aext = net.K_bg[:n_pop]
+        self.C_aext = net_params.K_bg[:n_pop]
         # Background rate
-        self.v_ext  = net.bg_rate
+        self.v_ext  = net_params.bg_rate
 
         ######################################################
         # Predefine matrices

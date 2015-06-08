@@ -1,16 +1,16 @@
-'''sim_params.py
+"""sim_params.py
 
     Contains:
     - simulation parameters
     - recording parameters
-'''
+"""
 
 ###################################################
 ###     	Simulation parameters		###        
 ###################################################
 
 t_trans = 0.2e3     # ms; transitional period in order to reach equilibrium
-t_measure = 20.e3   # ms; time actually measured
+t_measure = 5.e3   # ms; time actually measured
 t_sim = t_measure + t_trans    # ms; simulated time 
 dt = 0.1            # ms; simulation step; default is 0.1 ms. (resolution of kernel)
 allgather = True    # communication protocol

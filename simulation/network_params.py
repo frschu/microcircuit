@@ -24,7 +24,7 @@ import numpy as np
 
 # area of network in mm^2; scales numbers of neurons
 # use 1 for the full-size network (77,169 neurons)
-area    = 0.1
+area    = 1.0
 
 # Whether to scale number of synapses K linearly: K = K_full_scale * area.
 # When scale_K_linearly is false, K is derived from the connection probabilities and
@@ -54,8 +54,8 @@ full_scale_n_neurons = np.array( \
 # PSPs[target, source] = PSP_e * g_all[target, source] such that PSPs has
 # the same shape as conn_probs.
 # Synaptic weight in the model are PSCs, which are derived in 'microcircuit.py'.
-g_i     = -4.           # weight for inhibitory synapses
-g_all   = np.tile([1., g_i], (len(populations), len(layers)))
+g_i     = 4.           # weight for inhibitory synapses
+g_all   = np.tile([1., -g_i], (len(populations), len(layers)))
 # Mean EPSP amplitude (mv) for L4e->L2/3e connections.
 # See p. 801 of the paper, second paragraph under 'Model Parameterization',
 # and the caption to Supplementary Fig. 7
