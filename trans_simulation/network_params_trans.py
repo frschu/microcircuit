@@ -158,7 +158,8 @@ class net:
         delay_i = 0.75  # ms, inhibitory synapses
 
         self.delays  = np.tile([delay_e, delay_i], (self.n_populations, self.n_layers)) # adapt...
-        self.delay_rel_sd = 0.0 # standard deviation relative to mean delays
+        self.delay_rel_sd = 0.5 # this is not included in Brunel's model, but stationary results should
+        # be independent of distributed delays! it is included in order to evade synchronization 
         
         # Synapse dictionaries
         # default connection dictionary

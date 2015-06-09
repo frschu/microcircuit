@@ -91,17 +91,28 @@ if not os.path.exists(data_path):
 # contains global conditions of simulations: 
 # - area, simulated time, thalamus, background
 # e.g. 'a1.0_t20.2_th_dc.hdf5'
-file_name= "a%.1f_t%.1f"%(area, sim.t_sim * 1e-3)
+sim_spec= "a%.1f_t%.1f"%(area, sim.t_sim * 1e-3)
 if not net_micro.n_th == 0:
-    file_name += "_th"
+    sim_spec += "_th"
 if not net_micro.dc_amplitude == 0:
-    file_name += "_dc"
+    sim_spec += "_dc"
 if connection_type=="fixed_total_number":
-    file_name += "_totalN"
-file_name   += ".hdf5"
+    sim_spec += "_totalN"
+file_name   = sim_spec + "_00.hdf5"
+
+# don't overwrite existing files...
+if file_name in os.listdir(data_path):
+    max_n = 0
+    for some_file in os.listdir(data_path):
+        print(some_file)
+        if some_file.startswith(sim_spec):
+            max_n = max(max_n, int(some_file[-7:-5]))
+            print(max_n)
+    file_name = sim_spec + "_" + str(max_n + 1).zfill(2) + ".hdf5"
 if verbose: print(file_name)
 
 data_file = h5py.File(os.path.join(data_path, file_name), "w")
+
 
 # Attributes
 data_file.attrs["area"]     = area
@@ -120,8 +131,8 @@ data_file.attrs["n_types"]          = net_micro.n_types
 # Save simulation details to info file.
 info_file_dir = os.path.join(data_path, "info.log")
 info_file   = open(info_file_dir, "a+")     # save the parameters of the simulation(s)
-info_file.write("\nnew simulation\n")
-info_str0   = "dist area t_sim  T_conn   T_sim      T_save n_vp master_seed  date       time      filename"
+info_file.write("\nfilename: " + filename + "\n")
+info_str0   = "dist area t_sim  T_conn   T_sim      T_save n_vp master_seed  date       time      groupname"
 info_file.write(info_str0 + "\n")
 
 #######################################################
