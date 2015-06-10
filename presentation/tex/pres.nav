@@ -23,7 +23,7 @@
 \defcounter {refsection}{0}\relax 
 \headcommand {\beamer@framepages {4}{4}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\sectionentry {2}{Section 1}{5}{Section 1}{0}}
+\headcommand {\sectionentry {2}{Network model}{5}{Network model}{0}}
 \defcounter {refsection}{0}\relax 
 \headcommand {\beamer@sectionpages {3}{4}}
 \defcounter {refsection}{0}\relax 
@@ -53,39 +53,81 @@
 \defcounter {refsection}{0}\relax 
 \headcommand {\beamer@framepages {10}{10}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\sectionentry {3}{Section 2}{11}{Section 2}{0}}
-\defcounter {refsection}{0}\relax 
-\headcommand {\beamer@sectionpages {5}{10}}
-\defcounter {refsection}{0}\relax 
-\headcommand {\beamer@subsectionpages {5}{10}}
-\defcounter {refsection}{0}\relax 
-\headcommand {\slideentry {3}{0}{11}{11/11}{}{0}}
+\headcommand {\slideentry {2}{0}{11}{11/11}{}{0}}
 \defcounter {refsection}{0}\relax 
 \headcommand {\beamer@framepages {11}{11}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\slideentry {3}{0}{12}{12/12}{}{0}}
+\headcommand {\slideentry {2}{0}{12}{12/12}{}{0}}
 \defcounter {refsection}{0}\relax 
 \headcommand {\beamer@framepages {12}{12}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\slideentry {3}{0}{13}{13/13}{}{0}}
+\headcommand {\slideentry {2}{0}{13}{13/13}{}{0}}
 \defcounter {refsection}{0}\relax 
 \headcommand {\beamer@framepages {13}{13}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\sectionentry {4}{Appendix}{14}{Appendix}{0}}
+\headcommand {\sectionentry {3}{Mean field model}{14}{Mean field model}{0}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\beamer@sectionpages {11}{13}}
+\headcommand {\beamer@sectionpages {5}{13}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\beamer@subsectionpages {11}{13}}
+\headcommand {\beamer@subsectionpages {5}{13}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\slideentry {4}{0}{14}{14/14}{}{0}}
+\headcommand {\slideentry {3}{0}{14}{14/14}{}{0}}
 \defcounter {refsection}{0}\relax 
 \headcommand {\beamer@framepages {14}{14}}
 \defcounter {refsection}{0}\relax 
-\headcommand {\slideentry {4}{0}{15}{15/15}{}{0}}
+\headcommand {\slideentry {3}{0}{15}{15/15}{}{0}}
 \defcounter {refsection}{0}\relax 
 \headcommand {\beamer@framepages {15}{15}}
-\headcommand {\beamer@partpages {1}{15}}
-\headcommand {\beamer@subsectionpages {14}{15}}
-\headcommand {\beamer@sectionpages {14}{15}}
-\headcommand {\beamer@documentpages {15}}
-\headcommand {\def \inserttotalframenumber {15}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {3}{0}{16}{16/16}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {16}{16}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {3}{0}{17}{17/17}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {17}{17}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {3}{0}{18}{18/18}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {18}{18}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\sectionentry {4}{Goals}{19}{Goals}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@sectionpages {14}{18}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@subsectionpages {14}{18}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {4}{0}{19}{19/19}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {19}{19}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {4}{0}{20}{20/20}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {20}{20}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {4}{0}{21}{21/21}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {21}{21}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {4}{0}{22}{22/22}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {22}{22}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\sectionentry {5}{Preliminary results}{23}{Preliminary results}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@sectionpages {19}{22}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@subsectionpages {19}{22}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {5}{0}{23}{23/23}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {23}{23}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\slideentry {5}{0}{24}{24/24}{}{0}}
+\defcounter {refsection}{0}\relax 
+\headcommand {\beamer@framepages {24}{24}}
+\headcommand {\beamer@partpages {1}{24}}
+\headcommand {\beamer@subsectionpages {23}{24}}
+\headcommand {\beamer@sectionpages {23}{24}}
+\headcommand {\beamer@documentpages {24}}
+\headcommand {\def \inserttotalframenumber {24}}

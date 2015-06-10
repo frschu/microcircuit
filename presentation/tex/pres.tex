@@ -76,40 +76,45 @@ Supervisor: Prof. Stefan Rotter
 
 \section{Intro}
 \begin{frame}[t]{Introduction}
-Here could be a figure //
-Subtitle to figure
+\begin{itemize}
+    \item Local cortical network is structure in layers
+    \item Relationship between structure and activity poorly understood
+    \item Experimental data only partly reproduced
+    \item Potjans assembles connectivity map in 2012
+\end{itemize}
 \end{frame}
 
-\section{Section 1}
-\begin{frame}[t]{Network model}
+
+\section{Network model}
+\begin{frame}[t]{Layered structure}
 \begin{figure}[htpb]
     \centering
     \includegraphics[width=0.5\linewidth]{../figures/microcircuit_model_pre}
-\label{fig:setup_1}
+\label{fig:model_0}
 \end{figure}
 \end{frame}
 
-\begin{frame}[t]{Network model}
+\begin{frame}[t]{Layered structure}
 \begin{figure}[htpb]
     \centering
     \includegraphics[width=0.5\linewidth]{../figures/microcircuit_model_pre0}
-\label{fig:setup_1}
+\label{fig:model_1}
 \end{figure}
 \end{frame}
 
-\begin{frame}[t]{Network model}
+\begin{frame}[t]{Layered structure}
 \begin{figure}[htpb]
     \centering
     \includegraphics[width=0.5\linewidth]{../figures/microcircuit_model_pre1}
-\label{fig:setup_1}
+\label{fig:model_2}
 \end{figure}
 \end{frame}
 
-\begin{frame}[t]{Network model}
+\begin{frame}[t]{Layered structure}
 \begin{figure}[htpb]
     \centering
     \includegraphics[width=0.5\linewidth]{../figures/microcircuit_model_full}
-\label{fig:setup_1}
+\label{fig:model3}
 \end{figure}
 \end{frame}
 
@@ -121,53 +126,186 @@ Subtitle to figure
         \rowcolor{LightCyan} Parameter specification & \\
         \cellcolor{LightCyan} Total population size & $\approx 80,000$\\
         \cellcolor{LightCyan} Total synapse number  & $\approx 0.3 * 10^9$\\
-        \cellcolor{LightCyan} Neuron model& leaky integrate-and-fire\\
+        \cellcolor{LightCyan} Neuron model          & Leaky integrate-and-fire\\
+        \cellcolor{LightCyan} Synapse model         & Exponential-shaped postsynaptic currents\\
         \cellcolor{LightCyan} Rel. inh. synaptic strength & $g = -4.0$\\
     \end{tabular}
 \end{table}
 \end{frame}
 
-
-\section{Section 2}
-\begin{frame}[t]{Formulas}
-    Klein-Nishina Formula
-\begin{equation}
-    \frac{\text{d} \sigma_\text{C}}{\text{d} E_{e, \text{kin}}} 
-    = \frac{\alpha^2 \lambda_e^2}{16 \pi^3 m_e c^2}  \frac{1}{a^2}\left(
-        \frac{b^2}{a^2(a - b)^2} + \frac{(b - 1)^2 - 1}{a (a - b)} \right) 
-    \label{eq:dode}
-\end{equation}
-with $a := E_\gamma / m_ec^2$ \\ 
-and $b := E_{e, \text{kin}} / m_ec^2$ 
-\end{frame}
-
-\begin{frame}[t]{Table}
-\begin{table}[htpb]
+\begin{frame}[t]{Population sizes}
+\begin{figure}[htpb]
     \centering
-    \label{tab:mono_calibration}
-    \begin{tabular}{l l r c c}
-        \rowcolor{LightCyan} Sample & Peak/Edge & $E$ / keV& NaI / Channel & PVC / Channel \\
-        \cellcolor{LightCyan}$^{137}$Cs & Photo & 662 & $8040.59 \pm 0.03$ &  \\
-        \cellcolor{LightCyan} & Compton& 477& $5720 \pm 4$ &  $178.9 \pm 0.3$  \\
-        \cellcolor{LightCyan} & Backscatter& 183&  $2510 \pm 12$ &  \\
-        \cellcolor{LightCyan}$^{22}$Na & Photo& 511& $6347 \pm 3$&  \\
-        \cellcolor{LightCyan} & Compton& 341& $4000 \pm 2000$& $108 \pm 2$  \\
-        \cellcolor{LightCyan} & Photo& 1277& $14180 \pm 20 $& \\
-        \cellcolor{LightCyan} & Compton& 1064& $12000 \pm 4000$& $414 \pm 4$ \\
-    \end{tabular}
-\end{table}
-\end{frame}
-
-
-\section{Appendix}
-\label{sec:appendix}
-\begin{frame}[t]{Figure}
- \begin{figure}[htpb]
-    \centering
-    \includegraphics[width=1.0\linewidth]{../figures/na_total_incident}
-    \label{fig:histo_na_137cs}
+    \includegraphics[width=0.9\linewidth]{../figures/population_sizes}
+\label{fig:pop_size}
 \end{figure}
 \end{frame}
 
+\begin{frame}[t]{Connection probabilities}
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.9\linewidth]{../figures/heat_map_conn_probs}
+\label{fig:conn_probs}
+\end{figure}
+\end{frame}
+
+\begin{frame}[t]{Synapse numbers}
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.9\linewidth]{../figures/heat_map_syn_numbers}
+\label{fig:syn_numbers}
+\end{figure}
+\end{frame}
+
+
+\section{Mean field model}
+\begin{frame}[t]{Neuron depolarization}
+Membrane potential follows
+\begin{equation}
+    \tau \dot{V_i}(t) = -V_i(t) + R I_i(t) \, .
+    \label{depol} 
+\end{equation}
+The model goes from a deterministic description,
+\begin{align}
+    R I_i(t)    &= \tau \sum_j J_{ij} \sum_k \delta(t - t_j^k - D) 
+    \label{input_det}
+\intertext{to a statistical one:}
+    R I_i(t)   &= \mu(t) + \sigma(t) \sqrt{\tau} \eta_i(t) 
+    \label{input}
+\end{align}
+Here, $\eta_i(t)$ is uncorrelated gaussian white noise.
+\end{frame}
+
+\begin{frame}[t]{Self-consistent solution in 2D model}
+Firing rate $\nu$ of each neuron obeys
+\begin{equation}
+    \frac{1}{\nu} = \tau_{rp} + 
+        2 \, \tau_m \int_{\frac{V_r - \mu}{\sigma}}^{\frac{\theta - \mu}{\sigma}} 
+        e^{u^2} \left(1 + \text{erf}(u)\right) \,\text{d}u 
+\end{equation}
+with average input
+\begin{align}
+    \mu        &= 
+        \tau C \, J \,\left(1 - \gamma g \right) \nu \quad
+        + 
+        \tau C \, J \, \nu_{ext} \\
+\intertext{and fluctuations}
+    {\sigma}^2 &=
+        \underbrace{
+            \tau C \, J^2 \left(1 + \gamma g^2\right) \, \nu
+        }_\text{local} +
+        \underbrace{
+            \tau C \, J^2 \,\nu_{ext} 
+        }_\text{external} \,.
+\end{align}
+\end{frame}
+
+\begin{frame}[t]{Extension to higher dimensions}
+For neuron $i$ in population $a$,
+\begin{equation}
+    \frac{1}{\nu_{a}} = \tau_{rp} + 
+        2 \, \tau_m \int_{\frac{V_r - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+        e^{u^2} \left(1 + \text{erf}(u)\right) \,\text{d}u 
+\end{equation}
+with average input
+\begin{align}
+    \mu_a        &= 
+        \tau \sum_{b \in \text{pop.}} C_{ab} \, J_{ab} \, \nu_b 
+        + \tau C_{a, ext} \, J_{a, ext} \, \nu_{ext}
+\intertext{and fluctuation}
+    {\sigma_a}^2 &= 
+        \tau \sum_{b \in \text{pop.}} C_{ab} \, {J_{ab}}^2  \, \nu_b
+        +
+        \tau C_{a, ext} \,{J_{a, ext}}^2 \,\nu_{ext}
+\end{align}
+\end{frame}
+
+\begin{frame}[t]{Extension to higher dimensions}
+For neuron $i$ in population $a$,
+\begin{equation}
+    \frac{1}{\nu_{a}} = \tau_{rp} + 
+        2 \, \tau_m \int_{\frac{V_r - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+        e^{u^2} \left(1 + \text{erf}(u)\right) \,\text{d}u 
+\end{equation}
+with average input
+\begin{align}
+    \boldsymbol\mu        &= 
+        A_l \boldsymbol\nu + A_{ext} \boldsymbol\nu_{ext}
+\intertext{and fluctuation}
+    \boldsymbol\sigma^2 &= 
+        B_l \boldsymbol\nu + B_{ext} \boldsymbol\nu_{ext}
+\end{align}
+\end{frame}
+
+
+
+\section{Goals}
+\begin{frame}[t]{Goals}
+\begin{enumerate}
+    \item On the original model
+    \begin{itemize}
+        \item Reconstruct the model in \emph{pynest}
+        \item Verify the equality of both implementations
+        \item Allow to easily extend the model to more neuron types
+        \item Test statistical robustness
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[t]{Goals}
+\begin{enumerate}
+    \item On the original model
+    \begin{itemize}
+        \item Reconstruct the model in \emph{pynest}
+        \item Verify the equality of both implementations
+        \item Allow to easily extend the model to more neuron types
+        \item Test statistical robustness
+    \end{itemize}
+    \item Developing a mean field model
+    \begin{itemize}
+        \item Extend Brunel's model to 8 dimensions
+        \item Calculate firing rates for parameters as in Potjans' model
+        \item Where and why does the mean field model fail?
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[t]{Goals}
+\begin{enumerate}
+    \item On the original model
+    \begin{itemize}
+        \item Reconstruct the model in \emph{pynest}
+        \item Verify the equality of both implementations
+        \item Allow to easily extend the model to more neuron types
+        \item Test statistical robustness
+    \end{itemize}
+    \item Developing a mean field model
+    \begin{itemize}
+        \item Extend Brunel's model to 8 dimensions
+        \item Calculate firing rates for parameters as in Potjans' model
+        \item Where and why does the mean field model fail?
+    \end{itemize}
+    \item Compare both models
+    \begin{itemize}
+        \item Simulate parallel to numerical solving
+        \item Test robustness on various parameters:
+        \begin{itemize}
+            \item neuron numbers
+            \item synapse numbers (fixed?)
+            \item distributions for weights and delays
+        \end{itemize}
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+
+\section{Preliminary results}
+\begin{frame}[t]{Potjans' model}
+\end{frame}
+
+
+
+%\section{Appendix}
+%\label{sec:appendix}
 
 \end{document}
