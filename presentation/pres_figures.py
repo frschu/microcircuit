@@ -2,6 +2,7 @@ from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+from matplotlib import rcParams
 from matplotlib import cm
 import sys, os
 sys.path.append(os.path.abspath('../trans_simulation')) # include path with style
@@ -12,12 +13,14 @@ import network_params_trans as net_par
 if 'c' in sys.argv:
     plt.close('all')
 
+xfactor = 2.6
+#rcParams["figure.figsize"] = (xfactor*4, xfactor*5.)  
 picture_format = '.pdf'
 figure_path = "./figures"
 colors = style.colors
 col_exc     = np.array([220, 60, 40.]) / 255.
 col_inh     = np.array([0., 61., 255.]) / 255.
-neuron_colors = [col_exc, col_inh]
+neuron_colors = [col_inh, col_exc]
 ######################################################
 net = net_par.net()
 
@@ -88,14 +91,14 @@ plot_heatmap(data, cbar_label, cbar_format, clim, cbar_ticks, fig_name)
 bar_edges = np.arange(0, 8, 1) + 0.1
 ticks=np.arange(0.5, 8., 1)
 
-fig = plt.figure()
+fig = plt.figure(figsize = (6.2, 7.66))
 ax = fig.add_subplot(111)
 for i in range(2):
-    ax.bar(bar_edges[i::2], net.n_neurons[i::2], width=0.8, color=neuron_colors[i], linewidth=0)
-ax.set_xticks(ticks)
-ax.set_xticklabels(net.populations)
-ax.set_xlabel('Population')
-ax.set_ylabel('Number of neurons')
+    ax.barh(bar_edges[i::2], net.n_neurons[::-1][i::2], height=0.8, color=neuron_colors[i], linewidth=0)
+ax.set_yticks(ticks)
+ax.set_yticklabels(net.populations[::-1])
+ax.set_ylabel('Population')
+ax.set_xlabel('Number of neurons')
 ax.grid(False)
 for ax in fig.axes:
     style.fixticks(ax)

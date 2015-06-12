@@ -13,6 +13,10 @@
 
 %% General document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{graphicx}
+\usepackage{caption}  
+\usepackage{subcaption}     % subfloats
+
+
 \usepackage{tikz}
 
 \usepackage[style=authoryear]{biblatex}
@@ -31,9 +35,11 @@
 \setbeamercolor*{example text}{fg=black} 
 \setbeamercolor*{structure}{fg=black} 
 
- \usenavigationsymbolstemplate{}
+\usenavigationsymbolstemplate{}
 \setbeamercolor*{palette tertiary}{fg=black,bg=black!10} 
 \setbeamercolor*{palette quaternary}{fg=black,bg=black!10} 
+
+\setbeamercovered{dynamic} % enable pause
 
 \renewcommand{\(}{\begin{columns}}
 \renewcommand{\)}{\end{columns}}
@@ -60,7 +66,7 @@ Friedrich Schüßler}
 \titlepage
 
 \centering 
-Supervisor: Prof. Stefan Rotter
+Supervisor: Prof. Stefan Rotter \& Benjamin Merkt
 \end{frame}
 
 \begin{frame}{Table of contents}
@@ -74,16 +80,16 @@ Supervisor: Prof. Stefan Rotter
 }
 
 
-\section{Intro}
-\begin{frame}[t]{Introduction}
-\begin{itemize}
-    \item Local cortical network is structure in layers
-    \item Relationship between structure and activity poorly understood
-    \item Experimental data only partly reproduced
-    \item Potjans assembles connectivity map in 2012
-\end{itemize}
-\end{frame}
-
+%\section{Intro}
+%\begin{frame}[t]{Introduction}
+%\begin{itemize}
+%    \item Local cortical network is structure in layers
+%    \item Relationship between structure and activity poorly understood
+%    \item Experimental data only partly reproduced
+%    \item Potjans assembles connectivity map in 2012
+%\end{itemize}
+%\end{frame}
+%
 
 \section{Network model}
 \begin{frame}[t]{Layered structure}
@@ -125,7 +131,7 @@ Supervisor: Prof. Stefan Rotter
     \begin{tabular}{l l}
         \rowcolor{LightCyan} Parameter specification & \\
         \cellcolor{LightCyan} Total population size & $\approx 80,000$\\
-        \cellcolor{LightCyan} Total synapse number  & $\approx 0.3 * 10^9$\\
+        \cellcolor{LightCyan} Total synapse number  & $\approx 0.3 \cdot 10^9$\\
         \cellcolor{LightCyan} Neuron model          & Leaky integrate-and-fire\\
         \cellcolor{LightCyan} Synapse model         & Exponential-shaped postsynaptic currents\\
         \cellcolor{LightCyan} Rel. inh. synaptic strength & $g = -4.0$\\
@@ -133,34 +139,35 @@ Supervisor: Prof. Stefan Rotter
 \end{table}
 \end{frame}
 
-\begin{frame}[t]{Population sizes}
-\begin{figure}[htpb]
+\begin{frame}[t]{Network parameters}
+\begin{figure}
     \centering
-    \includegraphics[width=0.9\linewidth]{../figures/population_sizes}
-\label{fig:pop_size}
+    \begin{subfigure}[b]{0.31\textwidth}
+        \includegraphics[width=\textwidth]{../figures/population_sizes}
+        \caption{Population size}
+        \label{fig:pop_size}
+    \end{subfigure}
+    \quad
+    \begin{subfigure}[b]{0.64\textwidth}
+        \includegraphics[width=\textwidth]{../figures/heat_map_syn_numbers}
+        \caption{Synapse numbers}
+        \label{fig:syn_numbers}
+    \end{subfigure}
 \end{figure}
 \end{frame}
 
-\begin{frame}[t]{Connection probabilities}
-\begin{figure}[htpb]
-    \centering
-    \includegraphics[width=0.9\linewidth]{../figures/heat_map_conn_probs}
-\label{fig:conn_probs}
-\end{figure}
-\end{frame}
-
-\begin{frame}[t]{Synapse numbers}
-\begin{figure}[htpb]
-    \centering
-    \includegraphics[width=0.9\linewidth]{../figures/heat_map_syn_numbers}
-\label{fig:syn_numbers}
-\end{figure}
-\end{frame}
-
+%\begin{frame}[t]{Connection probabilities}
+%\begin{figure}[htpb]
+%    \centering
+%    \includegraphics[width=0.9\linewidth]{../figures/heat_map_conn_probs}
+%\label{fig:conn_probs}
+%\end{figure}
+%\end{frame}
+%
 
 \section{Mean field model}
 \begin{frame}[t]{Neuron depolarization}
-Membrane potential follows
+Membrane potential $V_i$ at timescale $\tau$ follows
 \begin{equation}
     \tau \dot{V_i}(t) = -V_i(t) + R I_i(t) \, .
     \label{depol} 
@@ -180,7 +187,7 @@ Here, $\eta_i(t)$ is uncorrelated gaussian white noise.
 Firing rate $\nu$ of each neuron obeys
 \begin{equation}
     \frac{1}{\nu} = \tau_{rp} + 
-        2 \, \tau_m \int_{\frac{V_r - \mu}{\sigma}}^{\frac{\theta - \mu}{\sigma}} 
+        2 \, \tau \int_{\frac{V_r - \mu}{\sigma}}^{\frac{\theta - \mu}{\sigma}} 
         e^{u^2} \left(1 + \text{erf}(u)\right) \,\text{d}u 
 \end{equation}
 with average input
@@ -200,11 +207,114 @@ with average input
 \end{align}
 \end{frame}
 
+\begin{frame}[t]{Goals}
+\begin{enumerate}
+    \visible<1-|handout:0>{\item Reconstruct the original model in \emph{pynest}
+    \vfill
+    }
+    \visible<2-|handout:0>{\item Develop a mean field model for firing rates
+    \vfill
+    }
+    \visible<3>{\item Compare network model with mean field model
+    }
+\end{enumerate}
+\end{frame}
+
+%\begin{frame}[t]{Goals}
+%\begin{enumerate}
+%    \item On the original model
+%    \begin{itemize}
+%        \item Reconstruct the model in \emph{pynest}
+%        \item Verify the equality of both implementations
+%        \item Allow to easily extend the model to more neuron types
+%        \item Test statistical robustness
+%    \end{itemize}
+%    \item Developing a mean field model
+%    \begin{itemize}
+%        \item Extend Brunel's model to 8 dimensions
+%        \item Calculate firing rates for parameters as in Potjans' model
+%        \item Where and why does the mean field model fail?
+%    \end{itemize}
+%    \item Compare both models
+%    \begin{itemize}
+%        \item Simulate parallel to numerical solving
+%        \item Test robustness on various parameters:
+%        \begin{itemize}
+%            \item neuron numbers
+%            \item synapse numbers (fixed?)
+%            \item distributions for weights and delays
+%        \end{itemize}
+%    \end{itemize}
+%\end{enumerate}
+%\end{frame}
+%
+
+\section{Preliminary results}
+\begin{frame}[t]{Compare SLI and pynest implementations}
+\begin{figure}
+    \centering
+    \visible<1-|handout:0>{
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{../../analysis/figures/{{spon_activity_a1.0_t20.0_00_sli}}}
+        \caption{SLI}
+        \label{fig:sim_pynest}
+    \end{subfigure}
+    \quad
+    }
+    \visible<2>{
+    \begin{subfigure}[b]{0.40\textwidth}
+        \includegraphics[width=\textwidth]{../../analysis/figures/{{spon_activity_a1.0_t20.0_00}}}
+        \caption{Pynest}
+        \label{fig:sim_pynest}
+    \end{subfigure}
+    }\par
+\end{figure}
+\end{frame}
+
+%\begin{frame}[t]{Membrane potential distribution}
+%\begin{figure}[htpb]
+%    \centering
+%    \includegraphics[width=0.9\textwidth]{../../analysis/figures/{{membrane_potential_a1.0_t20.0_00_L23e}}}
+%    \label{fig:pop_size}
+%\end{figure}
+%\end{frame}
+%
+\begin{frame}[t]{Membrane potential distribution}
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../analysis/figures/{{membrane_potential_a1.0_t20.0_00}}}
+    \label{fig:pop_size}
+\end{figure}
+\end{frame}
+
+\begin{frame}[t]{Current state of the numerical approach}
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.9\textwidth]{../../analysis/figures/{{numerical_approach_num_only}}}
+    \label{fig:pop_size}
+\end{figure}
+\end{frame}
+
+\begin{frame}[t]{Take home}
+    Mean field model would be great to understand the dynamics
+    \pause
+    \vfill
+    ... but ...
+    \pause
+    \vfill
+    turns out to be quite instable in large parameter spaces. 
+\end{frame}
+
+
+
+\section{Appendix}
+\label{sec:appendix}
+
 \begin{frame}[t]{Extension to higher dimensions}
 For neuron $i$ in population $a$,
 \begin{equation}
     \frac{1}{\nu_{a}} = \tau_{rp} + 
-        2 \, \tau_m \int_{\frac{V_r - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+        2 \, \tau \int_{\frac{V_r - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
         e^{u^2} \left(1 + \text{erf}(u)\right) \,\text{d}u 
 \end{equation}
 with average input
@@ -224,7 +334,7 @@ with average input
 For neuron $i$ in population $a$,
 \begin{equation}
     \frac{1}{\nu_{a}} = \tau_{rp} + 
-        2 \, \tau_m \int_{\frac{V_r - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+        2 \, \tau \int_{\frac{V_r - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
         e^{u^2} \left(1 + \text{erf}(u)\right) \,\text{d}u 
 \end{equation}
 with average input
@@ -239,73 +349,5 @@ with average input
 
 
 
-\section{Goals}
-\begin{frame}[t]{Goals}
-\begin{enumerate}
-    \item On the original model
-    \begin{itemize}
-        \item Reconstruct the model in \emph{pynest}
-        \item Verify the equality of both implementations
-        \item Allow to easily extend the model to more neuron types
-        \item Test statistical robustness
-    \end{itemize}
-\end{enumerate}
-\end{frame}
-
-\begin{frame}[t]{Goals}
-\begin{enumerate}
-    \item On the original model
-    \begin{itemize}
-        \item Reconstruct the model in \emph{pynest}
-        \item Verify the equality of both implementations
-        \item Allow to easily extend the model to more neuron types
-        \item Test statistical robustness
-    \end{itemize}
-    \item Developing a mean field model
-    \begin{itemize}
-        \item Extend Brunel's model to 8 dimensions
-        \item Calculate firing rates for parameters as in Potjans' model
-        \item Where and why does the mean field model fail?
-    \end{itemize}
-\end{enumerate}
-\end{frame}
-
-\begin{frame}[t]{Goals}
-\begin{enumerate}
-    \item On the original model
-    \begin{itemize}
-        \item Reconstruct the model in \emph{pynest}
-        \item Verify the equality of both implementations
-        \item Allow to easily extend the model to more neuron types
-        \item Test statistical robustness
-    \end{itemize}
-    \item Developing a mean field model
-    \begin{itemize}
-        \item Extend Brunel's model to 8 dimensions
-        \item Calculate firing rates for parameters as in Potjans' model
-        \item Where and why does the mean field model fail?
-    \end{itemize}
-    \item Compare both models
-    \begin{itemize}
-        \item Simulate parallel to numerical solving
-        \item Test robustness on various parameters:
-        \begin{itemize}
-            \item neuron numbers
-            \item synapse numbers (fixed?)
-            \item distributions for weights and delays
-        \end{itemize}
-    \end{itemize}
-\end{enumerate}
-\end{frame}
-
-
-\section{Preliminary results}
-\begin{frame}[t]{Potjans' model}
-\end{frame}
-
-
-
-%\section{Appendix}
-%\label{sec:appendix}
 
 \end{document}

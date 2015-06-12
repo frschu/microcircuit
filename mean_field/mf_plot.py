@@ -116,7 +116,8 @@ class mf_plot:
                 label=population)
         ax.set_xlabel(xlabel)
         ax.set_ylabel("$\\nu_0$ / Hz")
+        ax.set_yscale("log")
         ax.grid(True)
         ax.legend()
-        ax.set_ylim(0, 520)
+        #ax.set_ylim(, 520)
 

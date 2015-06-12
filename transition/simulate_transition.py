@@ -35,40 +35,35 @@ T0 = time.time()
 # Unchanged parameters
 area            = 1.0
 connection_type = "fixed_indegree"
-j02             = 1.0
+g               = 4.0
+rate_ext        = 8.0 # Hz background rate
 PSC_rel_sd      = 0.0
+delay_rel_sd    = 0.0
 
 # Brunel:
+j02             = 1.0
 n_neurons       = "brunel"
 C_ab            = "brunel"
-net_brunel      = network_params_trans.net(area=area, n_neurons=n_neurons, C_ab=C_ab, 
-                                     j02=j02, connection_type=connection_type,
-                                     PSC_rel_sd=PSC_rel_sd)
+net_brunel      = network_params_trans.net(area=area, 
+                                           n_neurons=n_neurons, C_ab=C_ab, 
+                                           connection_type=connection_type,
+                                           j02=j02, g=g, rate_ext=rate_ext,
+                                           PSC_rel_sd=PSC_rel_sd, 
+                                           delay_rel_sd=delay_rel_sd) 
 
 # Microcircuit light:
 # only some parameters like Potjans" model
-# adapt n_neurons AND C_ab!
+j02             = 2.0
 n_neurons       = "micro"
 C_ab            = "micro"
-net_micro       = network_params_trans.net(area=area, n_neurons=n_neurons, C_ab=C_ab, 
-                                     j02=j02, connection_type=connection_type,
-                                     PSC_rel_sd=PSC_rel_sd)
+net_micro       = network_params_trans.net(area=area, 
+                                           n_neurons=n_neurons, C_ab=C_ab, 
+                                           connection_type=connection_type,
+                                           j02=j02, g=g, rate_ext=rate_ext,
+                                           PSC_rel_sd=PSC_rel_sd, 
+                                           delay_rel_sd=delay_rel_sd) 
 
-# Differences between the two models
-C_brunel    = net_brunel.C_ab
-C_micro     = net_micro.C_ab
-delta_C     = C_micro - C_brunel
-n_brunel    = net_brunel.n_neurons
-n_micro     = net_micro.n_neurons
-delta_n     = n_micro - n_brunel
-
-# The steps on the way from Brunel to microcircuit
-dist_init   = 0.00  # initial point: Brunel
-dist_final  = 1.00  # the goal:      microcircuit light
-step        = 0.1  # step size towards the goal
-n_steps     = int(round(abs(dist_final - dist_init) / step)) + 1
-dists       = np.linspace(dist_init, dist_final, n_steps)
-
+# Initial Seeds
 old_seeds   = seed_file.readlines()
 if old_seeds == []:
     master_seed = sim.master_seed
@@ -79,6 +74,7 @@ else:
         master_seed = int(last_line.split("\t")[0]) + 1
     except: 
         master_seed = sim.master_seed
+
 
 #######################################################
 # Create data file
@@ -113,7 +109,6 @@ if verbose: print(file_name)
 
 data_file = h5py.File(os.path.join(data_path, file_name), "w")
 
-
 # Attributes
 data_file.attrs["area"]     = area
 data_file.attrs["t_sim"]    = sim.t_sim*1e-3
@@ -135,16 +130,33 @@ info_file.write("\nfilename: " + filename + "\n")
 info_str0   = "dist area t_sim  T_conn   T_sim      T_save n_vp master_seed  date       time      groupname"
 info_file.write(info_str0 + "\n")
 
+
 #######################################################
 # Looping
 #######################################################
+# The steps on the way from Brunel to microcircuit
+dist_init   = 0.10  # initial point: Brunel
+dist_final  = 1.00  # the goal:      microcircuit light
+step        = 0.05  # step size towards the goal
+n_steps     = int(round(abs(dist_final - dist_init) / step)) + 1
+dists       = np.linspace(dist_init, dist_final, n_steps)
+
 for distance in dists:
-    C_ab    = C_brunel + distance * delta_C
-    n_ab    = n_brunel + distance * delta_n
-    # Get instance of network
-    net     = network_params_trans.net(area=area, n_neurons=n_neurons, C_ab=C_ab, 
-                                         j02=j02, connection_type=connection_type,
-                                         PSC_rel_sd=PSC_rel_sd)
+    # New model
+    area            = (1. - dist) * model_init.area         + dist * model_final.area        
+    n_neurons       = (1. - dist) * model_init.n_neurons    + dist * model_final.n_neurons   
+    C_ab            = (1. - dist) * model_init.C_ab         + dist * model_final.C_ab        
+    j02             = (1. - dist) * model_init.j02          + dist * model_final.j02         
+    g               = (1. - dist) * model_init.g            + dist * model_final.g           
+    rate_ext        = (1. - dist) * model_init.rate_ext     + dist * model_final.rate_ext    
+    PSC_rel_sd      = (1. - dist) * model_init.PSC_rel_sd   + dist * model_final.PSC_rel_sd  
+    delay_rel_sd    = (1. - dist) * model_init.delay_rel_sd + dist * model_final.delay_rel_sd
+    net = network_params_trans.net(area=area, 
+                                     n_neurons=n_neurons, C_ab=C_ab, 
+                                     connection_type="fixed_indegree",
+                                     j02=j02, g=g, rate_ext=rate_ext,
+                                     PSC_rel_sd=PSC_rel_sd, 
+                                     delay_rel_sd=delay_rel_sd) 
 
     ######################################################
     # Prepare simulation
@@ -451,7 +463,9 @@ for distance in dists:
 
     # save the last seed to file, such that independent realizations are possible
     last_seed = master_seed + 1 + 2 * sim.n_vp + 2 * net.n_populations - 1  # last -1 since range ends beforehand
-    seed_file.write("{0:6d}".format(last_seed) + "\t\t" + now + "\t" + group_name + "\n")
+    seed_file.write("{0:6d}".format(last_seed) + "\t\t" + 
+                    now + "\t" + 
+                    os.path.join(filename, group_name) + "\n")
     master_seed = last_seed + 1
 
 #
