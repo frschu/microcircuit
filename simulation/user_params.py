@@ -14,11 +14,11 @@
 #   00, 01, ... = nth experiment of this kind.
 #
 # Example: 'a0.1_t10.2_th_dc_00/'
-data_dir    = '/users/schuessler/uni/microcircuit/data/'
+data_dir    = '/users/schuessler/uni/microcircuit/data/micro'
 test_path   = data_dir + 'test'
 
 # Simulation to analyze.
-simulation_spec = 'a1.0_t20.0_00/'
+simulation_spec = 'a1.0_t20.0_00'
 
 
 # path to the mpi shell script

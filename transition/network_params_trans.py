@@ -1,13 +1,19 @@
 """network_params.py
 
     Network parameters for the network to be changed from Brunel A to microcircuit
+
+    Default is Potjans' microcircuit model without thalamus. 
 """
 import numpy as np
 
 class net:
-    def __init__(self, area=0.1, n_neurons="micro", C_ab="micro", 
-                 j02=2., connection_type="fixed_total_number", 
-                 PSC_rel_sd=0.1, g=4., rate_ext=8.0):
+    def __init__(self, 
+                 area=1.0,                                  # simulation size
+                 n_neurons="micro", C_ab="micro",           # "brunel" or arrays
+                 connection_type="fixed_total_number",      # else: "fixed_indegree"
+                 j02=2., PSC_rel_sd=0.1, delay_rel_sd=0.5,  
+                 g=4., rate_ext=8.0):                       # set to zero for Brunel
+
         """Class of network parameters.
 
         Contains:
@@ -31,12 +37,13 @@ class net:
         PSC_rel_sd      = 0.0
         g, rate_ext varied accordingly
 
-        Naming: C_ab, C_aext, J_ab, J_ext
-        Don"t use conn_probs, K_bg, PSPs, PSP_ext any more!
+        Naming: C_ab, C_aext, J_ab, J_ext, rate_ext
+        Don't use conn_probs, K_bg, PSPs, PSP_ext, v_ext, any more!
         """
         ###################################################
         ###     	Network parameters		###        
         ###################################################
+
         # area of network in mm^2; scales numbers of neurons
         # use 1 for the full-size network (77,169 neurons)
         self.area    = area
@@ -149,16 +156,17 @@ class net:
                 raise Exception("'C_ab' expects either numpy.ndarray or string "+
                                 "in {'micro', 'brunel'}")
 
+        
         ###################################################
         ###          Delays and dicts                   ###        
         ###################################################
-
         # mean dendritic delays for excitatory and inhibitory transmission (ms)
         delay_e = 1.5   # ms, excitatory synapses
-        delay_i = 0.75  # ms, inhibitory synapses
+        delay_i = delay_e   #0.75  # ms, inhibitory synapses
 
         self.delays  = np.tile([delay_e, delay_i], (self.n_populations, self.n_layers)) # adapt...
-        self.delay_rel_sd = 0.0 # standard deviation relative to mean delays
+        self.delay_rel_sd = delay_rel_sd # this is not included in Brunel's model, but stationary results should
+        # be independent of distributed delays! it is included in order to evade synchronization 
         
         # Synapse dictionaries
         # default connection dictionary
@@ -171,10 +179,10 @@ class net:
         # default synapse dictionary
         self.syn_dict = {"model": "static_synapse"}
         
+        
         ###################################################
         ###          Single-neuron parameters		###        
         ###################################################
-        
         self.neuron_model = "iaf_psc_exp"   # neuron model. For PSP-to-PSC conversion to
                                             # be correct, synapses should be current-based
                                             # with an exponential time course
@@ -184,13 +192,13 @@ class net:
         # neuron model parameters
         # Reset voltage and threshold (set V_r to zero)
         self.model_params = {"tau_m": 10.,       # membrane time constant (ms)
-        	            "tau_syn_ex": 0.5,  # excitatory synaptic time constant (ms)
-                            "tau_syn_in": 0.5,  # inhibitory synaptic time constant (ms)
-                            "t_ref": 2.,        # absolute refractory period (ms)
-        	            "E_L": -65.,        # resting membrane potential (mV)
-        	            "V_th": -50.,       # spike threshold (mV)
-                            "C_m": 250.,        # membrane capacitance (pF)
-        	            "V_reset": -65.     # reset potential (mV)
+        	                 "tau_syn_ex": 0.5,  # excitatory synaptic time constant (ms)
+                             "tau_syn_in": 0.5,  # inhibitory synaptic time constant (ms)
+                             "t_ref": 2.,        # absolute refractory period (ms)
+        	                 "E_L": -65.,        # resting membrane potential (mV)
+        	                 "V_th": -50.,       # spike threshold (mV)
+                             "C_m": 250.,        # membrane capacitance (pF)
+        	                 "V_reset": -65.     # reset potential (mV)
                             } 
         # Rescaling for model calculations: these values are not used in the simulation!
         self.t_ref  = self.model_params["t_ref"] * 1e-3          # s
@@ -199,10 +207,9 @@ class net:
         self.V_r    = self.model_params["V_reset"] - self.E_L   # mV
         self.theta  = self.model_params["V_th"] - self.E_L      # mV
 
-        
 
         ###################################################
-        ###          Stimuli: Thalamus and DC background ##        
+        ###          External stimuli                    ##        
         ###################################################
         # rate of background Poisson input at each external input synapse (spikes/s) 
         self.rate_ext  = rate_ext        # Hz 
@@ -257,7 +264,22 @@ class net:
         self.delay_th    = 1.5  
         # standard deviation relative to mean delay of thalamic input
         self.delay_th_rel_sd = 0.5  
+
+
+        ######################################################
+        # Predefine matrices for mean field                 ##
+        ######################################################
+        self.mu_ext     = self.J_ext    * self.C_aext * self.rate_ext
+        self.var_ext    = self.J_ext**2 * self.C_aext * self.rate_ext
+        self.mat1       = self.C_ab * self.J_ab
+        self.mat2       = self.C_ab * self.J_ab**2
+        self.jac_mat1   = np.pi * self.tau_m**2 * self.mat1.T
+        self.jac_mat2   = np.pi * self.tau_m**2 * 0.5 * self.mat2.T
         
+
+    ######################################################
+    # Methods                                           ##
+    ######################################################
     def get_PSCs(self):
         """Compute PSC amplitude from PSP amplitude
         These are used as weights (mean for normal_clipped distribution)
@@ -268,8 +290,120 @@ class net:
         ratio_tau    = tau_m / tau_syn
         PSC_over_PSP = C_m * delta_tau / (tau_m * tau_syn * \
             (ratio_tau**(tau_m / delta_tau) - ratio_tau**(tau_syn / delta_tau)))
-        PSCs    = self.J_ab * PSC_over_PSP     # neuron populations
+        PSCs    = self.J_ab  * PSC_over_PSP     # neuron populations
         PSC_ext = self.J_ext * PSC_over_PSP  # external poisson
-        PSC_th  = self.J_th * PSC_over_PSP   # thalamus
+        PSC_th  = self.J_th  * PSC_over_PSP   # thalamus
         return PSCs, PSC_ext, PSC_th
         
+    def root_v0(self, v):
+        """The integral equations to be solved
+        Returns the array 'root', each entry corresponding to one population.
+        Solve for root == 0.
+        """
+        from scipy.integrate import quad
+        from scipy.special import erf
+        mu_v = self.tau_m * (np.dot(self.mat1, v) + self.mu_ext)
+        sd_v = np.sqrt(self.tau_m * (np.dot(self.mat2, v) + self.var_ext))
+        low = (self.V_r - mu_v) / sd_v
+        up  = (self.theta - mu_v) / sd_v
+        bounds      = np.array([low, up]).T
+
+        def integrand(u):
+            if u < -4.0:
+                return -1. / np.sqrt(pi) * (1.0 / u - 1.0 / (2.0 * u**3) + 
+                                            3.0 / (4.0 * u**5) - 
+                                            15.0 / (8.0 * u**7))
+            else:
+                return np.exp(u**2) * (1. + erf(u))
+        integral    = np.array([quad(integrand, lower, upper)[0] for lower, upper in bounds])
+        root        = - 1. / v + self.t_ref + np.sqrt(np.pi) * self.tau_m * integral
+        return root
+
+    def root_v0_siegert(self, v):
+        """The integral equations to be solved
+        Returns the array 'root', each entry corresponding to one population.
+        Solve for root == 0.
+        
+        This is a different version. Might be more stable numerically.
+        """
+        from scipy.integrate import quad
+        from scipy.special import erf
+        def enum(arr1, *args):
+            i_range = range(len(arr1))
+            return zip(i_range, arr1 ,*args)
+
+        max_err = 1e-16
+        def integral1(mu, sigma, y_r, y_theta):
+            """Integral for mu < theta"""
+            def integrand(u):
+                if u == 0:
+                    return np.exp(-y_theta**2) * 2 * (y_theta - y_r)
+                else:
+                    return np.exp(-(u - y_theta)**2) * (1.0 - np.exp(2 * (y_r - y_theta) * u)) / u
+        
+            lower_bound = y_theta
+            err_dn = 1.
+            while err_dn > max_err and lower_bound > 1e-16:
+                err_dn = integrand(lower_bound)
+                if err_dn > max_err:            
+                    lower_bound /= 2
+        
+            upper_bound = y_theta
+            err_up = 1.
+            while err_up > max_err:
+               err_up = integrand(upper_bound)
+               if err_up > max_err:
+                   upper_bound *= 2
+        
+            return np.exp(y_theta**2) * quad(integrand, lower_bound, upper_bound)[0] 
+         
+        def integral2(mu, sigma, y_r, y_theta):
+            """Integral for mu > theta"""
+            def integrand(u):
+                if u == 0:
+                    return 2 * (y_theta - y_r)
+                else:
+                    return (np.exp(2 * y_theta * u - u**2) - np.exp(2 * y_r * u - u**2)) / u
+        
+            upper_bound = 1.0
+            err = 1.0
+            while err > max_err:
+                err = integrand(upper_bound)
+                upper_bound *= 2
+        
+            return quad(integrand, 0.0, upper_bound)[0] 
+       
+        mus         = self.tau_m * (np.dot(self.mat1, v) + self.mu_ext)
+        sigmas      = np.sqrt(self.tau_m * (np.dot(self.mat2, v) + self.var_ext))
+        y_rs        = (self.V_r - mus) / sigmas
+        y_thetas    = (self.theta - mus) / sigmas
+        
+        integrals    = np.zeros(len(v))
+        for i, mu, sigma, y_r, y_theta in enum(mus, sigmas, y_rs, y_thetas):
+            if mu <= self.theta * 0.95:
+                integrals[i] = integral1(mu, sigma, y_r, y_theta)
+            else:
+                integrals[i] = integral2(mu, sigma, y_r, y_theta)
+
+        root        = - 1. / v + self.t_ref + self.tau_m * integrals
+        return root
+
+
+    def jacobian(self, v):
+        """The Jacobian of root_v0.
+
+        NEEDS TO BE REVIEWED FIRST            
+
+        Used to ease the process of solving.
+        The calculations are done transposed to avoid unnecessary transposes (adding axes to mu and sd)
+        """
+        raise Exception("REVIEW FIRST")
+        mu_v  = self.mu(v)
+        sd_v  = self.sd(v)
+        low = (self.V_r - mu_v) / sd_v
+        up  = (self.theta - mu_v) / sd_v
+        f_low   = self.integrand(low)
+        f_up    = self.integrand(up)
+        jac_T = np.diag(v) - \
+            (self.jac_mat1 * (f_up - f_low) + self.jac_mat2 * (up * f_up - low * f_low) / sd_v**2)
+        return jac_T.T

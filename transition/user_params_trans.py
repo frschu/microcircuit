@@ -5,7 +5,7 @@ in "functions.py" to understand the file structure.
 """
 import os
 
-data_dir    = "/users/schuessler/uni/microcircuit/trans_data/vary_d"
+data_dir    = "/users/schuessler/uni/microcircuit/data/vary_d"
 log_path    = "/users/schuessler/uni/microcircuit/trans_simulation"
 
 

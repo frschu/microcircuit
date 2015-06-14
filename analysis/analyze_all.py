@@ -18,7 +18,7 @@ sys.path.append(os.path.abspath('../')) # include path with style
 sys.path.append(os.path.abspath('../simulation/')) # include path with simulation specificaitons
 sys.path.append(os.path.abspath('./simulation/')) # include path with simulation specificaitons
 import style; reload(style)
-# Close other plots by adding 'c' after 'run <script>' 
+# close other plots by adding 'c' after 'run <script>' 
 if 'c' in sys.argv:
     plt.close('all')
 picture_format = '.pdf'

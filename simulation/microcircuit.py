@@ -58,7 +58,7 @@ elif sim.run_mode == 'production':
 else: 
     raise Exception('Unexpected sim_params.run_mode: expects \'test\' or \'production\'')
 
-npy_path = os.path.join(os.path.split(data_path[:-1])[0], "npy_data")
+npy_path = os.path.join(os.path.split(data_path)[0], "npy_data")
 if not os.path.exists(npy_path):
     os.makedirs(npy_path)
 
@@ -82,7 +82,7 @@ pyrngs_rec_spike = [np.random.RandomState(s) for s in
 pyrngs_rec_voltage = [np.random.RandomState(s) for s in 
             range(sim.master_seed + 2 * sim.n_vp + 1 + len(net.populations), 
                   sim.master_seed + 2 * sim.n_vp + 1 + 2 * len(net.populations))]
-np.save(data_path + 'seed_numbers.npy', 
+np.save(os.path.join(data_path, 'seed_numbers.npy'), 
             np.array([sim.master_seed, 
                       sim.master_seed + 2 * sim.n_vp + 1 + 2 * len(net.populations)]))
 
