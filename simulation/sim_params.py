@@ -1,21 +1,16 @@
-'''sim_params.py
+"""sim_params.py
 
     Contains:
     - simulation parameters
     - recording parameters
-'''
+"""
 
 ###################################################
 ###     	Simulation parameters		###        
 ###################################################
 
-run_mode = 'production'   # 'test' for writing files to 
-                    # directory containing microcircuit.sli 
-                    # 'production' for writing files
-                    # to a chosen absolute path. 
-
-t_trans = 0.0e3     # ms; transitional period in order to reach equilibrium
-t_measure = 20e3   # ms; time actually measured
+t_trans = 0.2e3     # ms; transitional period in order to reach equilibrium
+t_measure = 20.e3   # ms; time actually measured
 t_sim = t_measure + t_trans    # ms; simulated time 
 dt = 0.1            # ms; simulation step; default is 0.1 ms. (resolution of kernel)
 allgather = True    # communication protocol
@@ -24,11 +19,11 @@ allgather = True    # communication protocol
 # actual seeds will be master_seed ... master_seed + 2*n_vp
 #  ==>> different master seeds must be spaced by at least 2*n_vp + 1
 # see Gewaltig et al. '2012' for details       
-master_seed = 123456    # changes rng_seeds and grng_seed
+master_seed = 000000    # changes rng_seeds and grng_seed
 
 n_mpi_procs = 1         # number of MPI processes
 
-n_threads_per_proc = 2 	# number of threads per MPI process
+n_threads_per_proc = 8 	# number of threads per MPI process
                             # use for instance 24 for a full-scale simulation
 
 
@@ -53,21 +48,21 @@ memory = '500mb' 	    # total memory
 # Whether to create a new directory to save the data. If True, no such directory is 
 # created and the data in the corresponding existing file is overwritten. 
 # Data path is described in user_params.py.
-overwrite_existing_files = False
+overwrite_existing_files = True
 
 # Cortical spikes
 record_cortical_spikes = True 
 record_fraction_neurons_spike = True 
 frac_rec_spike = 0.1
 n_rec_spike = 100 
-rand_rec_spike = False  # whether to chose neurons to record from randomly
 
 # Cortical voltages
-record_voltage = False
+record_voltage = True
 record_fraction_neurons_voltage = True
 frac_rec_voltage = 0.02 
 n_rec_voltage = 20 
-rand_rec_voltage = False    # whether to chose neurons to record from randomly
+t_rec_volt_start  = 0.0 # time up to which voltages are recorded
+t_rec_volt_stop   = 1e3 + t_trans # time up to which voltages are recorded
 
 # Thalamic spikes
 # Relevant only if network_params.n_thal > 0

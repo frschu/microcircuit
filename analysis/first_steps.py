@@ -16,7 +16,6 @@ import matplotlib.gridspec as gridspec
 import sys, os
 sys.path.append(os.path.abspath('../')) # include path with style
 sys.path.append(os.path.abspath('../simulation/')) # include path with simulation specificaitons
-sys.path.append(os.path.abspath('./simulation/')) # include path with simulation specificaitons
 import style; reload(style)
 # Close other plots by adding 'c' after 'run <script>' 
 if 'c' in sys.argv:
@@ -27,7 +26,6 @@ picture_format = '.pdf'
 # Import specific moduls
 import network_params as net; reload(net)
 import user_params as user; reload(user)
-import functions_analysis as functions; reload(functions)
 
 reverse_order = True # do analysis such that plots resemble those of the paper (starting with L6i)
 plotting = True

@@ -95,7 +95,7 @@ t_sim   = float(sim_spec.split("_")[1][1:])          # s
 t_trans = 0.2  # s; starting point of analysis (avoid transients)
 t_measure = t_sim - t_trans
 
-# Further derived paramters
+# Further derived parameters
 lower_GIDs = np.insert(np.cumsum(n_rec_spike)[:-1], 0, 0)    # lower boundaries incl. zero
 n_rec_spike_layer = np.sum(n_rec_spike.reshape(n_layers, n_types), 1) # recorded spikes per layer
 
@@ -132,7 +132,6 @@ for i, population in enumerate(populations):
     n_GIDs_file = "n_GIDs_" + population + ".npy"
     raw_times_all   = np.load(os.path.join(npy_path, times_file)) * 1e-3 # in seconds
     n_GIDs  = np.load(os.path.join(npy_path, n_GIDs_file))
-    
 
     
     # Firing rate:
