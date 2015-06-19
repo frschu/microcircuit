@@ -35,8 +35,6 @@ scale_K_linearly  = True
 
 layers  = np.array(['L23', 'L4', 'L5', 'L6'])
 types = np.array(['e', 'i']) 
-populations = np.array([layer + typus for layer in layers for typus in types])
-n_populations = len(populations)
 
 full_scale_n_neurons = np.array( \
   [20683,   # layer 2/3 e
@@ -54,8 +52,8 @@ full_scale_n_neurons = np.array( \
 # PSPs[target, source] = PSP_e * g_all[target, source] such that PSPs has
 # the same shape as conn_probs.
 # Synaptic weight in the model are PSCs, which are derived in 'microcircuit.py'.
-g_i     = 4.           # weight for inhibitory synapses
-g_all   = np.tile([1., -g_i], (len(populations), len(layers)))
+g     = 4.           # weight for inhibitory synapses
+g_all   = np.tile([1., -g], (len(populations), len(layers)))
 # Mean EPSP amplitude (mv) for L4e->L2/3e connections.
 # See p. 801 of the paper, second paragraph under 'Model Parameterization',
 # and the caption to Supplementary Fig. 7

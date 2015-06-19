@@ -21,13 +21,12 @@ import time, datetime
 
 from imp import reload
 import sim_params as sim; reload(sim)
-import user_params as user; reload(user)
-import network_params; reload(network_params)
 import functions; reload(functions)
+import model_class; reload(model_class)
 
 # logging
 verbose     = False                     # whether to print every connection made
-seed_file   = open(os.path.join(user.log_path, "seeds.log"), "a+")    # save the last used seed number
+seed_file   = open(os.path.join(sim.log_path, "seeds.log"), "a+")    # save the last used seed number
 ######################################################
 
 #######################################################
@@ -36,20 +35,20 @@ seed_file   = open(os.path.join(user.log_path, "seeds.log"), "a+")    # save the
 T0 = time.time()
 # Unchanged parameters
 area            = 1.0
-connection_type = "fixed_indegree"
+connection_rule = "fixed_total_number" # "fixed_indegree", "fixed_total_number"
 g               = 4.0
 rate_ext        = 8.0 # Hz background rate
-PSC_rel_sd      = 0.1 # 0.1 for  Potjans' model
+PSC_rel_sd      = 0.0 # 0.1 for  Potjans' model
 delay_rel_sd    = 0.5 # 0.5 for Potjans' model  
 j02             = 2.0
 n_neurons       = "micro"
 C_ab            = "micro"
-model_micro       = network_params.net(area=area, 
-                                           n_neurons=n_neurons, C_ab=C_ab, 
-                                           connection_type=connection_type,
-                                           j02=j02, g=g, rate_ext=rate_ext,
-                                           PSC_rel_sd=PSC_rel_sd, 
-                                           delay_rel_sd=delay_rel_sd) 
+model_micro     = model_class.model(area=area, 
+                                    n_neurons=n_neurons, C_ab=C_ab, 
+                                    connection_rule=connection_rule,
+                                    j02=j02, g=g, rate_ext=rate_ext,
+                                    PSC_rel_sd=PSC_rel_sd, 
+                                    delay_rel_sd=delay_rel_sd) 
 
 # Initial Seeds
 old_seeds   = seed_file.readlines()
@@ -62,12 +61,13 @@ else:
         master_seed = int(last_line.split("\t")[0]) + 1
     except: 
         master_seed = sim.master_seed
+master_seed = sim.master_seed
 
 
 #######################################################
 # Create data file
 #######################################################
-data_sup_path = user.data_dir
+data_sup_path = sim.data_dir
 data_path = os.path.join(data_sup_path, "micro")
 if not os.path.exists(data_path):
     os.makedirs(data_path)
@@ -81,7 +81,7 @@ if not model_micro.n_th == 0:
     sim_spec += "_th"
 if not model_micro.dc_amplitude == 0:
     sim_spec += "_dc"
-if connection_type=="fixed_total_number":
+if connection_rule=="fixed_total_number":
     sim_spec += "_totalN"
 file_name   = sim_spec + "_00.hdf5"
 
@@ -102,7 +102,7 @@ data_file.attrs["t_sim"]    = sim.t_sim*1e-3
 data_file.attrs["t_trans"]  = sim.t_trans*1e-3
 data_file.attrs["n_vp"]     = sim.n_vp
 data_file.attrs["dt"]       = sim.dt
-data_file.attrs["connection_type"]  = connection_type
+data_file.attrs["connection_rule"]  = connection_rule
 data_file.attrs["populations"]      = model_micro.populations 
 data_file.attrs["layers"]           = model_micro.layers 
 data_file.attrs["types"]            = model_micro.types 
@@ -131,13 +131,12 @@ for run_i in range(n_runs):
     ######################################################
     # Prepare simulation
     ######################################################
-    pyrngs, pyrngs_rec_spike, pyrngs_rec_voltage = functions.prepare_simulation(master_seed, model=model)
+    pyrngs = functions.prepare_simulation(master_seed, n_populations=model.n_populations)
 
     ######################################################
     # Derive parameters
     ######################################################
-    (PSCs, PSC_ext, PSC_th, 
-        n_neurons_rec_spike, n_neurons_rec_voltage) = functions.derive_parameters(model)
+    (n_neurons_rec_spike, n_neurons_rec_voltage) = functions.derive_parameters(model)
      
     ######################################################
     # Create nodes
@@ -150,7 +149,7 @@ for run_i in range(n_runs):
     ###################################################
     print("Connect")
     t_connect_0 = time.time()
-    functions.connect(model, all_GIDs, PSCs, PSC_ext, PSC_th,
+    functions.connect(model, all_GIDs,
                       n_neurons_rec_spike, n_neurons_rec_voltage,
                       verbose)
     T_connect   = time.time() - t_connect_0
@@ -162,7 +161,8 @@ for run_i in range(n_runs):
     t_simulate_0 = time.time()
     nest.Simulate(sim.t_sim)
     T_simulate  = time.time() - t_simulate_0
-    
+   
+     
     ###################################################
     # Save recorded data
     ###################################################
@@ -186,8 +186,8 @@ for run_i in range(n_runs):
         spikes_grp.attrs["n_neurons_rec_spike"] = n_neurons_rec_spike
 
         for j, population in enumerate(model.populations):
-            senders = nest.GetStatus((spike_detectors[j],))[0]["events"]["senders"]
-            times   = nest.GetStatus((spike_detectors[j],))[0]["events"]["times"]
+            senders = nest.GetStatus(spike_detectors[j])[0]["events"]["senders"]
+            times   = nest.GetStatus(spike_detectors[j])[0]["events"]["times"]
             times   = np.uint(times / sim.dt) # in unit of dt!
 
             # Create array of indices for data: 
@@ -217,11 +217,11 @@ for run_i in range(n_runs):
         voltage_grp = grp.create_group("voltage")
 
         # Times can be reconstructed with times = np.arange(start + dt_volt, stop, dt_volt)
-        start       = nest.GetStatus((multimeters[0],))[0]["start"]   # ms
-        stop        = nest.GetStatus((multimeters[0],))[0]["stop"]   # ms
+        start       = nest.GetStatus(multimeters[0])[0]["start"]   # ms
+        stop        = nest.GetStatus(multimeters[0])[0]["stop"]   # ms
         if stop == float("inf"):
             stop = sim.t_sim
-        dt_volt     = nest.GetStatus((multimeters[0],))[0]["interval"]   # ms
+        dt_volt     = nest.GetStatus(multimeters[0])[0]["interval"]   # ms
         voltage_grp.attrs["dt_volt"]     = dt_volt 
         voltage_grp.attrs["t_min"]  = start 
         voltage_grp.attrs["t_max"]  = stop 
@@ -266,8 +266,9 @@ for run_i in range(n_runs):
                     now + "\t" + 
                     os.path.join(file_name, group_name) + "\n")
     master_seed = last_seed + 1
+    
 
-#
+
 T_total = time.time() - T0
 print("T_total      = ", T_total)
 data_file.attrs["total_time"]    = T_total

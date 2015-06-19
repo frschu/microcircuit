@@ -14,6 +14,10 @@ import os
 # Import specific moduls
 from imp import reload
 import sim_params as sim; reload(sim)
+data_path_test = os.path.join(sim.data_dir, "test", "pynest_only_seeds")
+if not os.path.exists(data_path_test):
+    os.makedirs(data_path_test)
+
 
 #######################################################
 # Functions
@@ -28,16 +32,32 @@ def prepare_simulation(master_seed, n_populations):
         "resolution": sim.dt,
         "total_num_virtual_procs": sim.n_vp})
     if sim.to_text_file:
-        nest.SetKernelStatus({"data_path": os.path.join(sim.data_dir, "text")})
+        nest.SetKernelStatus({"data_path": data_path_test})
    
     # Set random seeds
-    nest.sli_run('0 << /rngs [%i %i] Range { rngdict/gsl_mt19937 :: exch CreateRNG } Map >> SetStatus'%(
-                 master_seed, master_seed + sim.n_vp - 1))
+    
+    # PYNEST
+    #nest.sli_run('0 << /rngs [%i %i] Range { rngdict/gsl_mt19937 :: exch CreateRNG } Map >> SetStatus'%(
+    #             master_seed, master_seed + sim.n_vp - 1))
     #nest.SetKernelStatus({"rng_seeds" : range(master_seed, master_seed + sim.n_vp)})
-    nest.sli_run('0 << /grng rngdict/gsl_mt19937 :: %i CreateRNG >> SetStatus'%(master_seed + sim.n_vp))
+    #nest.sli_run('0 << /grng rngdict/gsl_mt19937 :: %i CreateRNG >> SetStatus'%(master_seed + sim.n_vp))
     #nest.SetKernelStatus({"grng_seed" : master_seed + sim.n_vp})
-    pyrngs = [np.random.RandomState(s) for s in 
-                range(master_seed + sim.n_vp + 1, master_seed + 2 * sim.n_vp + 1)]
+    #pyrngs = [np.random.RandomState(s) for s in 
+    #            range(master_seed + sim.n_vp + 1, master_seed + 2 * sim.n_vp + 1)]
+
+    # SLI VERSION
+    sli_str  = "0 << \n"
+    #sli_str += "/rngs %i [0 %i 1 sub] add Range { rngdict/gsl_mt19937 :: exch CreateRNG } Map\n"%(master_seed, sim.n_vp) # local RNG, seeded
+    #sli_str += "/grng rngdict/gsl_mt19937 :: %i %i add CreateRNG\n"%(master_seed, sim.n_vp) # global RNG
+    sli_str += "/rng_seeds %i [0 %i 1 sub] add Range\n"%(master_seed, sim.n_vp) # local RNG seeds
+    sli_str += "/grng_seed %i %i add\n"%(master_seed, sim.n_vp) # global RNG seed
+    sli_str += ">> SetStatus"
+    nest.sli_run(sli_str)
+    sli_str2  = "/script_rngs [%i]\n"%sim.n_vp
+    sli_str2 += "{%i add rngdict /gsl_mt19937 get exch CreateRNG } Table def\n"%(master_seed + sim.n_vp)
+    sli_str2 += "/normal_rdvs script_rngs { rdevdict /normal get CreateRDV } Map def"
+    nest.sli_run(sli_str2)
+    pyrngs = None
     return pyrngs
 
 
@@ -76,6 +96,8 @@ def create_nodes(model, pyrngs):
     multimeters     = []
     ext_poisson     = []
     ext_dc          = []
+    print(data_path_test)
+    Vm0_file = open(os.path.join(data_path_test, "Vm0_pynest"), "w")
     for pop_index, population in enumerate(model.populations):
         # Neurons
         neuron_GIDs.append(nest.Create(model.neuron_model, model.n_neurons[pop_index], params=model.model_params))
@@ -84,8 +106,12 @@ def create_nodes(model, pyrngs):
         neurons_info    = nest.GetStatus(neuron_GIDs[pop_index])
         for ni in neurons_info:                 
             if ni["local"]:                         # only adapt local nodes
-                Vm_init = pyrngs[ni["vp"]].normal(model.Vm0_mean, model.Vm0_std)
-                nest.SetStatus([ni["global_id"]], {"V_m": Vm_init})
+                sli_str3 = "%i << /V_m normal_rdvs %i get Random %.1f mul %.1f add >> SetStatus"%(ni["global_id"], ni["vp"], model.Vm0_std, model.Vm0_mean)
+                nest.sli_run(sli_str3)
+                Vm_init = nest.GetStatus([ni["global_id"]])[0]["V_m"]
+                #Vm_init = pyrngs[ni["vp"]].normal(model.Vm0_mean, model.Vm0_std)
+                #nest.SetStatus([ni["global_id"]], {"V_m": Vm_init})
+                Vm0_file.write(str(ni["global_id"]) + "\t" + str(Vm_init) + "\n")
 
         # Devices
         if sim.record_cortical_spikes:
@@ -97,7 +123,7 @@ def create_nodes(model, pyrngs):
             multimeter_dict = {"label": sim.multimeter_label + population + "_", 
                                 "to_file": sim.to_text_file, 
                                 "start": sim.t_rec_volt_start,   
-                                "stop": sim.t_rec_volt_stop, 
+                                #"stop": sim.t_rec_volt_stop, 
                                 "interval": 1.0, # ms
                                 "withtime": True, 
                                 "record_from": ["V_m"]}
@@ -128,6 +154,9 @@ def create_nodes(model, pyrngs):
             th_spike_detector = None
     else:
         th_parrots, th_poisson, th_spike_detector = (None, None, None)
+
+
+    Vm0_file.close()
         
     return (neuron_GIDs, 
             spike_detectors, multimeters,
@@ -138,9 +167,9 @@ def connect(model, all_GIDs,
             n_neurons_rec_spike, n_neurons_rec_voltage,
             verbose):
     (neuron_GIDs, 
-     spike_detectors, multimeters,
-     ext_poisson, ext_dc, 
-     th_parrots, th_poisson, th_spike_detector) = all_GIDs
+            spike_detectors, multimeters,
+            ext_poisson, ext_dc, 
+            th_parrots, th_poisson, th_spike_detector) = all_GIDs
     
     # Connect target populations...
     for target_index, target_pop in enumerate(model.populations):

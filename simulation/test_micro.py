@@ -1,8 +1,8 @@
-"""simulate_transition.py
+"""test_micro.py
 
 Naming convention: layer (e.g. L4), type (usually e and i), population (e.g. L4e)
 
-for-loop for simulating the transition from Brunel's to Potjans' model.
+repetitive runs for Potjans' model.
 
 Runs functions:
 prepare_simulation
@@ -19,14 +19,13 @@ import h5py
 import sys, os, shutil
 import time, datetime
 
-# Import specific moduls
 from imp import reload
 import sim_params as sim; reload(sim)
+import functions_test as functions; reload(functions)
 import model_class; reload(model_class)
-import functions; reload(functions)
 
 # logging
-verbose     = True                     # whether to print every connection made
+verbose     = False                     # whether to print every connection made
 seed_file   = open(os.path.join(sim.log_path, "seeds.log"), "a+")    # save the last used seed number
 ######################################################
 
@@ -35,26 +34,12 @@ seed_file   = open(os.path.join(sim.log_path, "seeds.log"), "a+")    # save the 
 #######################################################
 T0 = time.time()
 # Unchanged parameters
-area            = 1.0
-connection_rule = "fixed_indegree"
+area            = 0.1
+connection_rule = "fixed_total_number"
 g               = 4.0
 rate_ext        = 8.0 # Hz background rate
-PSC_rel_sd      = 0.0 # 0.1 for  Potjans' model
+PSC_rel_sd      = 0.1 # 0.1 for  Potjans' model
 delay_rel_sd    = 0.5 # 0.5 for Potjans' model  
-
-# Brunel:
-j02             = 1.0
-n_neurons       = "brunel"
-C_ab            = "brunel"
-model_brunel    = model_class.model(area=area, 
-                                    n_neurons=n_neurons, C_ab=C_ab, 
-                                    connection_rule=connection_rule,
-                                    j02=j02, g=g, rate_ext=rate_ext,
-                                    PSC_rel_sd=PSC_rel_sd, 
-                                    delay_rel_sd=delay_rel_sd) 
-
-# Microcircuit light:
-# only some parameters like Potjans" model
 j02             = 2.0
 n_neurons       = "micro"
 C_ab            = "micro"
@@ -64,25 +49,27 @@ model_micro     = model_class.model(area=area,
                                     j02=j02, g=g, rate_ext=rate_ext,
                                     PSC_rel_sd=PSC_rel_sd, 
                                     delay_rel_sd=delay_rel_sd) 
+model_micro     = model_class.model() 
 
 # Initial Seeds
-old_seeds   = seed_file.readlines()
-if old_seeds == []:
-    master_seed = sim.master_seed
-    seed_file.write("seed\t\tdate       time\t\t file\n")
-else:
-    last_line   = old_seeds[-1]
-    try: 
-        master_seed = int(last_line.split("\t")[0]) + 1
-    except: 
-        master_seed = sim.master_seed
+#old_seeds   = seed_file.readlines()
+#if old_seeds == []:
+#    master_seed = sim.master_seed
+#    seed_file.write("seed\t\tdate       time\t\t file\n")
+#else:
+#    last_line   = old_seeds[-1]
+#    try: 
+#        master_seed = int(last_line.split("\t")[0]) + 1
+#    except: 
+#        master_seed = sim.master_seed
+master_seed = sim.master_seed
 
 
 #######################################################
 # Create data file
 #######################################################
 data_sup_path = sim.data_dir
-data_path = os.path.join(data_sup_path, "vary_d")
+data_path = os.path.join(data_sup_path, "gibberish")
 if not os.path.exists(data_path):
     os.makedirs(data_path)
 
@@ -106,7 +93,7 @@ if file_name in os.listdir(data_path):
         if some_file.startswith(sim_spec):
             max_n = max(max_n, int(some_file[len(sim_spec)+1: len(sim_spec) + 3])) 
     file_name = sim_spec + "_" + str(max_n + 1).zfill(2) + ".hdf5"
-if verbose: print("Filename: vary_d/" + file_name)
+if verbose: print("Filename: micro/" + file_name)
 
 data_file = h5py.File(os.path.join(data_path, file_name), "w")
 
@@ -126,12 +113,11 @@ data_file.attrs["n_types"]          = model_micro.n_types
 data_file.attrs["delay_e"]          = model_micro.delay_e 
 data_file.attrs["delay_i"]          = model_micro.delay_i 
 
-
 # Save simulation details to info file.
 info_file_dir = os.path.join(data_path, "info.log")
 info_file   = open(info_file_dir, "a+")     # save the parameters of the simulation(s)
 info_file.write("\nfilename: " + file_name + "\n")
-info_str0   = "dist area t_sim  T_conn   T_sim      T_save n_vp master_seed  date       time      groupname"
+info_str0   = "i    area t_sim  T_conn   T_sim      T_save n_vp master_seed  date       time      groupname"
 info_file.write(info_str0 + "\n")
 
 
@@ -139,32 +125,10 @@ info_file.write(info_str0 + "\n")
 # Looping
 #######################################################
 # The steps on the way from Brunel to microcircuit
-model_init      = model_brunel
-model_final     = model_micro
-dist_init   = 0.10  # initial point: Brunel
-dist_final  = 1.00  # the goal:      microcircuit light
-step        = 0.05  # step size towards the goal
-n_steps     = int(round(abs(dist_final - dist_init) / step)) + 1
-dists       = np.linspace(dist_init, dist_final, n_steps)
-data_file.attrs["dists"] = dists 
+model     = model_micro
+n_runs = 1
 
-for distance in dists:
-    # New model
-    area            = (1. - distance) * model_init.area         + distance * model_final.area        
-    n_neurons       = (1. - distance) * model_init.n_neurons    + distance * model_final.n_neurons   
-    C_ab            = (1. - distance) * model_init.C_ab         + distance * model_final.C_ab        
-    j02             = (1. - distance) * model_init.j02          + distance * model_final.j02         
-    g               = (1. - distance) * model_init.g            + distance * model_final.g           
-    rate_ext        = (1. - distance) * model_init.rate_ext     + distance * model_final.rate_ext    
-    PSC_rel_sd      = (1. - distance) * model_init.PSC_rel_sd   + distance * model_final.PSC_rel_sd  
-    delay_rel_sd    = (1. - distance) * model_init.delay_rel_sd + distance * model_final.delay_rel_sd
-    model   = model_class.model(area=area, 
-                                n_neurons=n_neurons, C_ab=C_ab, 
-                                connection_rule="fixed_indegree",
-                                j02=j02, g=g, rate_ext=rate_ext,
-                                PSC_rel_sd=PSC_rel_sd, 
-                                delay_rel_sd=delay_rel_sd) 
-
+for run_i in range(n_runs):
     ######################################################
     # Prepare simulation
     ######################################################
@@ -186,7 +150,7 @@ for distance in dists:
     ###################################################
     print("Connect")
     t_connect_0 = time.time()
-    functions.connect(model, all_GIDs, 
+    functions.connect(model, all_GIDs,
                       n_neurons_rec_spike, n_neurons_rec_voltage,
                       verbose)
     T_connect   = time.time() - t_connect_0
@@ -198,7 +162,8 @@ for distance in dists:
     t_simulate_0 = time.time()
     nest.Simulate(sim.t_sim)
     T_simulate  = time.time() - t_simulate_0
-    
+   
+    """
     ###################################################
     # Save recorded data
     ###################################################
@@ -206,10 +171,9 @@ for distance in dists:
     t_save_0    = time.time()
     
     now         = str(datetime.datetime.now())[:-7]
-    group_name  = "d%.2f_j%.2f_sdJ%.2f"%(distance, j02, PSC_rel_sd)  
+    group_name  = "%i"%(run_i)  
     print(group_name)
     grp         = data_file.create_group(group_name)
-    grp.attrs["distance"] = distance
     grp.attrs["C_ab"] = model.C_ab
     grp.attrs["master_seed"] = master_seed
     grp.attrs["date_and_time"] = now
@@ -223,8 +187,8 @@ for distance in dists:
         spikes_grp.attrs["n_neurons_rec_spike"] = n_neurons_rec_spike
 
         for j, population in enumerate(model.populations):
-            senders = nest.GetStatus((spike_detectors[j],))[0]["events"]["senders"]
-            times   = nest.GetStatus((spike_detectors[j],))[0]["events"]["times"]
+            senders = nest.GetStatus(spike_detectors[j])[0]["events"]["senders"]
+            times   = nest.GetStatus(spike_detectors[j])[0]["events"]["times"]
             times   = np.uint(times / sim.dt) # in unit of dt!
 
             # Create array of indices for data: 
@@ -254,11 +218,11 @@ for distance in dists:
         voltage_grp = grp.create_group("voltage")
 
         # Times can be reconstructed with times = np.arange(start + dt_volt, stop, dt_volt)
-        start       = nest.GetStatus((multimeters[0],))[0]["start"]   # ms
-        stop        = nest.GetStatus((multimeters[0],))[0]["stop"]   # ms
+        start       = nest.GetStatus(multimeters[0])[0]["start"]   # ms
+        stop        = nest.GetStatus(multimeters[0])[0]["stop"]   # ms
         if stop == float("inf"):
             stop = sim.t_sim
-        dt_volt     = nest.GetStatus((multimeters[0],))[0]["interval"]   # ms
+        dt_volt     = nest.GetStatus(multimeters[0])[0]["interval"]   # ms
         voltage_grp.attrs["dt_volt"]     = dt_volt 
         voltage_grp.attrs["t_min"]  = start 
         voltage_grp.attrs["t_max"]  = stop 
@@ -291,8 +255,8 @@ for distance in dists:
     grp.attrs["time_to_save"]       = T_save
     
 
-    info_str    = "{0:4.2f} {1:4.1f} {2:6.1f} {3:8.1f} {4:10.1f} {5:6.1f} {6:4d} {7:11d}  ".format(
-                    distance, area, sim.t_sim*1e-3, 
+    info_str    = "{0:4d} {1:4.1f} {2:6.1f} {3:8.1f} {4:10.1f} {5:6.1f} {6:4d} {7:11d}  ".format(
+                    run_i, area, sim.t_sim*1e-3, 
                     T_connect, T_simulate, T_save, sim.n_vp, master_seed)
     info_str += now + "  " + group_name
     info_file.write(info_str + "\n")
@@ -303,6 +267,7 @@ for distance in dists:
                     now + "\t" + 
                     os.path.join(file_name, group_name) + "\n")
     master_seed = last_seed + 1
+    """
 
 #
 T_total = time.time() - T0

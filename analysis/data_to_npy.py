@@ -35,7 +35,7 @@ import data_to_npy_functions as functions; reload(functions)
 
 # Data path
 data_sup_path = user.data_dir
-simulation_spec = user.simulation_spec
+simulation_spec = "a0.1_t1.2"
 print(simulation_spec)
 
 simulation_path = os.path.join(data_sup_path, simulation_spec)
