@@ -11,6 +11,7 @@ from __future__ import print_function
 import nest
 import numpy as np
 import os
+import h5py
 # Import specific moduls
 from imp import reload
 import sim_params as sim; reload(sim)
@@ -18,6 +19,88 @@ import sim_params as sim; reload(sim)
 #######################################################
 # Functions
 #######################################################
+
+
+# Create data file
+def initialize_data_file(sub_path, model, verbose):
+    """Creates data_path and file_name for HDF5-file where all data is saved to.
+    Further saves attributes to this data_file.
+    """
+    # Data path
+    data_sup_path = sim.data_dir
+    data_path = os.path.join(data_sup_path, sub_path)
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
+    
+    # File name
+    # contains global conditions of simulations: 
+    # - area, simulated time, thalamus, background
+    # e.g. 'a1.0_t20.2_th_dc.hdf5'
+    sim_spec = "a%.1f_t%.1f"%(model.area, sim.t_sim * 1e-3)
+    if not model.n_th == 0:
+        sim_spec += "_th"
+    if not model.dc_amplitude == 0:
+        sim_spec += "_dc"
+    if model.connection_rule=="fixed_total_number":
+        sim_spec += "_totalN"
+    file_name   = sim_spec + "_00.hdf5"
+    
+    # don't overwrite existing files...
+    if file_name in os.listdir(data_path):
+        max_n = 0
+        for some_file in os.listdir(data_path):
+            if some_file.startswith(sim_spec):
+                max_n = max(max_n, int(some_file[len(sim_spec)+1: len(sim_spec) + 3])) 
+        file_name = sim_spec + "_" + str(max_n + 1).zfill(2) + ".hdf5"
+    if verbose: print("Filename: micro/" + file_name)
+    
+    data_file = h5py.File(os.path.join(data_path, file_name), "w")
+    
+    # Attributes
+    data_file.attrs["area"]     = model.area
+    data_file.attrs["t_sim"]    = sim.t_sim*1e-3
+    data_file.attrs["t_trans"]  = sim.t_trans*1e-3
+    data_file.attrs["n_vp"]     = sim.n_vp
+    data_file.attrs["dt"]       = sim.dt
+    data_file.attrs["connection_rule"]  = model.connection_rule
+    data_file.attrs["populations"]      = model.populations 
+    data_file.attrs["layers"]           = model.layers 
+    data_file.attrs["types"]            = model.types 
+    data_file.attrs["n_populations"]    = model.n_populations 
+    data_file.attrs["n_layers"]         = model.n_layers 
+    data_file.attrs["n_types"]          = model.n_types 
+    data_file.attrs["delay_e"]          = model.delay_e 
+    data_file.attrs["delay_i"]          = model.delay_i 
+    
+    return (data_file, file_name, data_path)
+
+def initialize_seeds():
+    """Creates inital master_seed from file or sim_spec (if not previous seed found)."""
+    seed_file   = open(os.path.join(sim.log_path, "seeds.log"), "a+")    # File containing previous seed numbers
+    old_seeds   = seed_file.readlines()
+    if old_seeds == []:
+        master_seed = sim.master_seed
+        seed_file.write("seed\t\tdate       time\t\t file\n")
+    else:
+        last_line   = old_seeds[-1]
+        try: 
+            master_seed = int(last_line.split("\t")[0]) + 1
+        except: 
+            master_seed = sim.master_seed
+
+    return (seed_file, master_seed)
+
+def initialize_info_file(file_name, data_path):
+    """Save simulation details to info file."""
+    info_file_dir = os.path.join(data_path, "info.log")
+    info_file   = open(info_file_dir, "a+")     # save the parameters of the simulation(s)
+    info_file.write("\nfilename: " + file_name + "\n")
+    info_str0   = "i    area t_sim  T_conn   T_sim      T_save n_vp master_seed  date       time      groupname"
+    info_file.write(info_str0 + "\n")
+
+    return info_file
+
+
 def prepare_simulation(master_seed, n_populations):
     """Prepare random generators with master seed."""
     nest.ResetKernel()
@@ -239,3 +322,70 @@ def connect(model, all_GIDs,
         if sim.record_thalamic_spikes:
             if verbose: print("Connect thalamus to th_spike_detector")
             nest.Connect(th_parrots, th_spike_detector, "all_to_all")
+
+
+def save_data(grp, all_GIDs, populations, n_neurons_rec_spike, n_neurons_rec_voltage):
+    if sim.record_cortical_spikes:
+        spike_detectors = all_GIDs[1]
+        spikes_grp = grp.create_group("spikes")
+        spikes_grp.attrs["dt"]  = sim.dt 
+        spikes_grp.attrs["info"]  = "times_{ith neuron} = times[rec_neuron_i[i]:rec_neuron_i[i+1]]"
+        spikes_grp.attrs["info2"]  = "times in units of dt; dt in ms  =>  times/ms = times * dt"
+        spikes_grp.attrs["n_neurons_rec_spike"] = n_neurons_rec_spike
+
+        for j, population in enumerate(populations):
+            senders = nest.GetStatus(spike_detectors[j])[0]["events"]["senders"]
+            times   = nest.GetStatus(spike_detectors[j])[0]["events"]["times"]
+            times   = np.uint(times / sim.dt) # in unit of dt!
+
+            # Create array of indices for data: 
+            # times_{ith neuron} = times[rec_neuron_i[i]:rec_neuron_i[i+1]]
+            rec_neuron_i    = np.zeros(n_neurons_rec_spike[j] + 1)
+
+            # Get corresponding reduced GIDs: nth neuron recorded
+            n_spikes_per_neuron = np.unique(senders, return_counts=True)[1]
+            max_index       = len(n_spikes_per_neuron) + 1
+            nth_neuron      = np.cumsum(n_spikes_per_neuron)
+            rec_neuron_i[1 : max_index] = nth_neuron        # leave out 0th index
+            rec_neuron_i[max_index : ]  = nth_neuron[-1]    # in case some neurons didn't fire at all
+
+            # sort times
+            sorted_times = times[np.argsort(senders)] 
+            for i in range(len(rec_neuron_i) - 1):
+                i0, i1 = (rec_neuron_i[i], rec_neuron_i[i+1])
+                sorted_times[i0:i1] = np.sort(sorted_times[i0:i1])
+
+            # save data to HDF5 file:
+            spikes_subgrp   = spikes_grp.create_group(population)
+            dset_times      = spikes_subgrp.create_dataset("times", data=sorted_times)
+            dset_indices    = spikes_subgrp.create_dataset("rec_neuron_i", data=rec_neuron_i)
+            
+    if sim.record_voltage:
+        multimeters = all_GIDs[2]
+        voltage_grp = grp.create_group("voltage")
+
+        # Times can be reconstructed with times = np.arange(start + dt_volt, stop, dt_volt)
+        start       = nest.GetStatus(multimeters[0])[0]["start"]   # ms
+        stop        = nest.GetStatus(multimeters[0])[0]["stop"]   # ms
+        if stop == float("inf"):
+            stop = sim.t_sim
+        dt_volt     = nest.GetStatus(multimeters[0])[0]["interval"]   # ms
+        voltage_grp.attrs["dt_volt"]     = dt_volt 
+        voltage_grp.attrs["t_min"]  = start 
+        voltage_grp.attrs["t_max"]  = stop 
+        voltage_grp.attrs["n_neurons_rec_voltage"] = n_neurons_rec_voltage
+
+        for j, population in enumerate(model.populations):
+            volts       = nest.GetStatus((multimeters[j],))[0]["events"]["V_m"]
+            senders     = nest.GetStatus((multimeters[j],))[0]["events"]["senders"]
+            n_events    = nest.GetStatus((multimeters[j],))[0]["n_events"]   # number of 
+            n_rec       = n_neurons_rec_voltage[j]
+            n_times     = n_events / n_rec
+            # Create mask in order to get sorted_volts[GID, times_index]
+            s_inverse   = np.unique(senders, return_inverse=True)[1]
+            volt_mask   = np.sort(np.argsort(s_inverse).reshape(n_rec, n_times))
+            sorted_volts = volts[volt_mask]
+
+            # save data to HDF5 file:
+            dset_volts      = voltage_grp.create_dataset(population, data=sorted_volts)
+

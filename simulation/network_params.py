@@ -24,7 +24,7 @@ import numpy as np
 
 # area of network in mm^2; scales numbers of neurons
 # use 1 for the full-size network (77,169 neurons)
-area    = 0.1
+area    = 1.0
 
 # Whether to scale number of synapses K linearly: K = K_full_scale * area.
 # When scale_K_linearly is false, K is derived from the connection probabilities and

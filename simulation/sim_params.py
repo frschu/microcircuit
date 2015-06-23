@@ -18,7 +18,7 @@ log_path    = "/users/schuessler/uni/microcircuit/simulation"
 ###################################################
 
 t_trans = 0.2e3     # ms; transitional period in order to reach equilibrium
-t_measure = 20.e3   # ms; time actually measured
+t_measure = 300.0e3   # ms; time actually measured
 t_sim = t_measure + t_trans    # ms; simulated time 
 dt = 0.1            # ms; simulation step; default is 0.1 ms. (resolution of kernel)
 allgather = True    # communication protocol
@@ -51,16 +51,16 @@ n_vp = int(n_threads_per_proc * n_mpi_procs)# number of virtual processes
 
 # Cortical spikes
 record_cortical_spikes = True
-record_fraction_neurons_spike = True 
+record_fraction_neurons_spike = False
 frac_rec_spike = 0.1
-n_rec_spike = 100 
+n_rec_spike = 100
 
 # Cortical voltages
 record_voltage = False
 record_fraction_neurons_voltage = True
 frac_rec_voltage = 0.02 
 n_rec_voltage = 20 
-t_rec_volt_start  = 0.0 # time up to which voltages are recorded
+t_rec_volt_start  = 0 # time up to which voltages are recorded
 t_rec_volt_stop   = 1e3 + t_trans # time up to which voltages are recorded
 
 

@@ -23,8 +23,8 @@ reverse_order = True # do analysis such that plots resemble those of the paper (
 # File and path
 ######################################################
 data_path = os.path.join(sim.data_dir, "vary_d")
-#data_path = os.path.join(sim.data_dir, "micro")
-sim_spec = "a1.0_t20.2_02"
+data_path = os.path.join(sim.data_dir, "micro")
+sim_spec = "a1.0_t20.4_totalN_00"
 
 # Original data
 file_name  = sim_spec + ".hdf5"  
@@ -126,22 +126,22 @@ for sim_spec2 in data_file.keys():
                 # raster, histogram, etc
                 n_spikes = len(times)
                 rates.append(n_spikes / t_measure)
-                hist_spikes_i += np.histogram(times, bins=n_bins_spikes, range=(t_trans, t_sim))[0]
+                hist_spikes_i += np.histogram(times, bins=n_bins_spikes, range=(t_trans, t_sim), density=False)[0]
                 if n_spikes > 1:
-                    isi = np.diff(times)
-                    mean_isi = np.mean(isi)
-                    var_isi = np.var(isi)
-                    cv_isi = var_isi / mean_isi**2
-                    cv_isi_all = np.append(cv_isi_all, cv_isi)
+                    isi         = np.diff(times)
+                    mean_isi    = np.mean(isi)
+                    var_isi     = np.var(isi)
+                    cv_isi      = var_isi / mean_isi**2
+                    cv_isi_all  = np.append(cv_isi_all, cv_isi)
                 else:
                     no_isi.append(str(population) + '_' + str(j))
                 
                 # data for raster plot
                 if j < len(indices) * max_plot:
-                    raster_mask = (times > t_min_raster) * (times < t_max_raster)
-                    n_spikes_raster = min(n_spikes, sum(raster_mask))
-                    neuron_ids_raster = [j]*n_spikes_raster + offsets[i]
-                    raster_data = np.vstack((times[raster_mask], neuron_ids_raster))
+                    raster_mask         = (times > t_min_raster) * (times < t_max_raster)
+                    n_spikes_raster     = min(n_spikes, sum(raster_mask))
+                    neuron_ids_raster   = [j]*n_spikes_raster + offsets[i]
+                    raster_data         = np.vstack((times[raster_mask], neuron_ids_raster))
                     res_raster_pop.create_dataset(str(j), data=raster_data)
     
             # Means
