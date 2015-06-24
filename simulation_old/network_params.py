@@ -48,14 +48,21 @@ full_scale_n_neurons = np.array( \
 
 
 # Synaptic weights
-# Synaptic weight in the model are PSCs, which are derived in 'model_class.py'.
+# Weight factors for PSP amplitudes. All PSP amplitudes are derived by
+# PSPs[target, source] = PSP_e * g_all[target, source] such that PSPs has
+# the same shape as conn_probs.
+# Synaptic weight in the model are PSCs, which are derived in 'microcircuit.py'.
 g     = 4.           # weight for inhibitory synapses
-# Factor for mean EPSP amplitude for L4e->L2/3e connections.
+g_all   = np.tile([1., -g], (len(populations), len(layers)))
+# Mean EPSP amplitude (mv) for L4e->L2/3e connections.
 # See p. 801 of the paper, second paragraph under 'Model Parameterization',
 # and the caption to Supplementary Fig. 7
-j02 = 2.
+L23e_index  = np.where(populations == 'L23e')[0][0]
+L4e_index   = np.where(populations == 'L4e')[0][0]
+g_all[L23e_index, L4e_index] *= 2.
 # Mean reference PSP (EPSP amplitude except for L4e->L2/3e)
 PSP_e   = .15           # mv
+PSPs    = PSP_e * g_all
 # Standard deviation of PSC amplitudes relative to mean PSC amplitudes
 PSC_rel_sd = 0.1 
 
@@ -78,12 +85,13 @@ conn_probs = np.array(
 # mean dendritic delays for excitatory and inhibitory transmission (ms)
 delay_e = 1.5   # ms, excitatory synapses
 delay_i = 0.75  # ms, inhibitory synapses
+delays  = np.tile([delay_e, delay_i], (len(populations), len(layers))) # adapt for more types!
 # standard deviation relative to mean delays
 delay_rel_sd = 0.5 
 
 # Synapse dictionaries
 # default connection dictionary
-connection_rule   = "fixed_total_number"
+conn_dict   = {'rule': 'fixed_total_number'}
 # weight distribution of connections between populations
 weight_dict_exc = {'distribution': 'normal_clipped', 'low': 0.0} 
 weight_dict_inh = {'distribution': 'normal_clipped', 'high': 0.0} 
@@ -119,13 +127,13 @@ model_params = {'tau_m': 10.,       # membrane time constant (ms)
 ###################################################
  
 # rate of background Poisson input at each external input synapse (spikes/s) 
-rate_ext    = 8.        # Hz 
-PSP_ext     = 0.15      # mean EPSP amplitude (mV) for external input
+bg_rate = 8.        # Hz 
+PSP_ext = 0.15      # mean EPSP amplitude (mV) for external input
 # DC amplitude at each external input synapse (pA)
 # This is relevant for reproducing Potjans & Diesmann (2012) Fig. 7.
 dc_amplitude = 0. 
 # in-degrees for background input
-C_aext = np.array([
+K_bg = np.array([
         1600,   # 2/3e
         1500,   # 2/3i
         2100,   # 4e

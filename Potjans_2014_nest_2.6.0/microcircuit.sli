@@ -123,9 +123,8 @@
 
     /seed_offset master_seed n_vp add def
     /script_rngs [ n_vp ] 
-    { seed_offset add rngdict /MT19937 get exch CreateRNG } Table def
+    { seed_offset add rngdict /gsl_mt19937 get exch CreateRNG } Table def
     /normal_rdvs script_rngs { rdevdict /normal get CreateRDV } Map def
-
 } def
 
 
@@ -213,6 +212,11 @@
 % th_spike_detector_GID
 /CreateNetworkNodes
 {
+    output_path (/) join (Vm0) join
+    (w) ofsopen
+    ; /outputstream Set
+    outputstream 
+
     % create and configure neurons
     neuron_model model_params SetDefaults
     % arrays of GIDs:
@@ -234,13 +238,14 @@
         0 1 n_pops_per_layer 1 sub
         {
             /population_index Set
-	    layer_subnet ChangeSubnet
+	        layer_subnet ChangeSubnet
             /subnet Create /population_subnet Set
             population_subnet ChangeSubnet
-	    % create neurons
-	    /subnet Create /neuron_subnet Set
-	    neuron_subnet ChangeSubnet
-	    neuron_subnet_GIDs [layer_index population_index] neuron_subnet put
+
+	        % create neurons
+	        /subnet Create /neuron_subnet Set
+	        neuron_subnet ChangeSubnet
+	        neuron_subnet_GIDs [layer_index population_index] neuron_subnet put
             /neuron_subnet_GIDs Set
             neuron_model n_neurons layer_index get population_index get
             Create ;
@@ -248,68 +253,84 @@
             % initialize membrane potentials
             neuron_subnet GetLocalNodes
             {
-               dup /vp get /node_vp Set
-	        << /V_m normal_rdvs node_vp get Random Vm0_std mul Vm0_mean add
+                /local_knoten Set
+                local_knoten dup
+                /vp get /node_vp Set
+                << /V_m normal_rdvs node_vp get Random Vm0_std mul Vm0_mean add
                 >> SetStatus
-	    } forall
+                
+                local_knoten /global_id get cvs <- (\t) <-
+                local_knoten /V_m get cvs <- (\n) <-
+            } forall
+            (\n) <-
 	    
-	    population_subnet ChangeSubnet
-	    % create and configure stimulus and recording devices
-	    /subnet Create /device_subnet Set
-	    device_subnet ChangeSubnet
+	        % create and configure stimulus and recording devices
+	        population_subnet ChangeSubnet
+	        /subnet Create /device_subnet Set
+	        device_subnet ChangeSubnet
+
             /spike_detector Create /this_spike_detector Set
-	    this_spike_detector
-	    <<
-	       % Set spike detector label for filenames. The GID of the spike
+	        this_spike_detector
+	        <<
+	           % Set spike detector label for filenames. The GID of the spike
                % detector and the process number are appended automatically.
-	       /label spike_detector_label layer_index cvs join (_) join
-               population_index cvs join
-	       /to_file save_cortical_spikes
-	    >> SetStatus 
+	           /label spike_detector_label layer_index cvs join (_) join
+                   population_index cvs join
+	           /to_file save_cortical_spikes
+	        >> SetStatus 
             spike_detector_GIDs [layer_index population_index]
             this_spike_detector put
-	    /spike_detector_GIDs Set
-	    /voltmeter Create /this_voltmeter Set
-	    this_voltmeter
-	    <<
-	       /label voltmeter_label layer_index cvs join (_) join
-               population_index cvs join
-	       /to_file save_voltages
-	    >> SetStatus
+	        /spike_detector_GIDs Set
+
+	        /voltmeter Create /this_voltmeter Set
+	        this_voltmeter
+	        <<
+	           /label voltmeter_label layer_index cvs join (_) join
+                   population_index cvs join
+	           /to_file save_voltages
+               /start 0.0
+	        >> SetStatus
             voltmeter_GIDs [layer_index population_index] this_voltmeter put
-	    /voltmeter_GIDs Set
+	        /voltmeter_GIDs Set
+
             /poisson_generator Create /this_poisson_generator Set
             K_bg layer_index get population_index get /this_K_bg Set
-	    this_poisson_generator
-	    <<
-	       /rate this_K_bg bg_rate mul
+	        this_poisson_generator
+	        <<
+	           /rate this_K_bg bg_rate mul
             >> SetStatus
-            
+                
             poisson_GIDs [layer_index population_index] this_poisson_generator
             put
-	    /poisson_GIDs Set	    
+	        /poisson_GIDs Set	    
+
             /dc_generator Create /this_dc_generator Set
-	    this_dc_generator
-	    <<
-	       /amplitude this_K_bg dc_amplitude mul
-	    >> SetStatus
+	        this_dc_generator
+	        <<
+	           /amplitude this_K_bg dc_amplitude mul
+	        >> SetStatus
             dc_GIDs [layer_index population_index] this_dc_generator put
-	    /dc_GIDs Set
+	        /dc_GIDs Set
         } for % loop over e and i populations
     } for % loop over layers
+
+    % CLOSE FILE AGAIN
+    close 
 
     % create and configure thalamic neurons (parrots) and their Poisson inputs
     0 ChangeSubnet
     n_thal 0 gt
     {
         /subnet Create /th_subnet Set 
+
         th_subnet ChangeSubnet
-	/subnet Create /th_neuron_subnet_GID Set
-	th_neuron_subnet_GID ChangeSubnet
+        /subnet Create /th_neuron_subnet_GID Set
+        th_neuron_subnet_GID ChangeSubnet
         /parrot_neuron n_thal Create ;
+
         th_subnet ChangeSubnet
-	/subnet Create /th_device_subnet Set
-	th_device_subnet ChangeSubnet
+        /subnet Create /th_device_subnet Set
+        th_device_subnet ChangeSubnet
         /poisson_generator Create /th_poisson_GID Set
         th_poisson_GID 
         << 
@@ -321,12 +342,12 @@
         {
             /spike_detector Create /th_spike_detector_GID Set
             th_spike_detector_GID
-	    <<
-	       % Set thalamic spike detector label. The GID of the spike
-               % detector and the process number are appended automatically.
-	       /label th_spike_detector_label
-	       /to_file save_thalamic_spikes
-	    >> SetStatus
+            <<
+               % Set thalamic spike detector label. The GID of the spike
+                   % detector and the process number are appended automatically.
+               /label th_spike_detector_label
+               /to_file save_thalamic_spikes
+            >> SetStatus
         } if
     } if
 } def
@@ -367,6 +388,10 @@
 
 /ConnectNetworkNodes
 {
+    output_path (/) join (n_synapses) join
+    (w) ofsopen
+    ; /outputstream Set
+    outputstream 
     tic
 
     0 1 n_layers 1 sub % target layer
@@ -374,42 +399,42 @@
         /target_layer Set
         0 1 n_pops_per_layer 1 sub % target population
         {
-	    /target_pop Set
-            % get neuron IDs
+	        /target_pop Set
+                % get neuron IDs
 
-            neuron_subnet_GIDs target_layer get target_pop get 
-	    dup GetGlobalNodes /target_nodes Set
-            GetLocalNodes /local_target_nodes Set	  
+                neuron_subnet_GIDs target_layer get target_pop get 
+	        dup GetGlobalNodes /target_nodes Set
+                GetLocalNodes /local_target_nodes Set	  
 
-            /n_targets n_neurons target_layer get target_pop get def
-            /full_scale_n_targets full_scale_n_neurons target_layer get
-            target_pop get def
+                /n_targets n_neurons target_layer get target_pop get def
+                /full_scale_n_targets full_scale_n_neurons target_layer get
+                target_pop get def
 	  
-	    0 1 n_layers 1 sub % source layer
-	    {
-	        /source_layer Set
-	        0 1 n_pops_per_layer 1 sub % source population
+	        0 1 n_layers 1 sub % source layer
 	        {
-		    /source_pop Set
-		   
-		    %%% local connections
-		   
-		    % get neuron IDs
+	            /source_layer Set
+	            0 1 n_pops_per_layer 1 sub % source population
+	            {
+                    /source_pop Set
+		       
+                    %%% local connections
+		       
+                    % get neuron IDs
                     neuron_subnet_GIDs source_layer get source_pop get
                     GetGlobalNodes 
                     /source_nodes Set
-		   
+           
                     /n_sources n_neurons source_layer get source_pop get def
                     /full_scale_n_sources full_scale_n_neurons
                     source_layer get source_pop get def
 
                     % get connection probability
-		    conn_probs
-		    % pick row (target) in conn_probs
-		    target_layer n_pops_per_layer mul target_pop add get
-		    % pick column (source) in conn_probs
-		    source_layer n_pops_per_layer mul source_pop add get
-		    /this_conn Set % probability for this connection
+                    conn_probs
+                    % pick row (target) in conn_probs
+                    target_layer n_pops_per_layer mul target_pop add get
+                    % pick column (source) in conn_probs
+                    source_layer n_pops_per_layer mul source_pop add get
+                    /this_conn Set % probability for this connection
 
                     % Compute numbers of synapses assuming binomial degree
                     % distributions and allowing for multapses (see Potjans
@@ -419,13 +444,16 @@
                         /prod full_scale_n_sources full_scale_n_targets mul def
                         ( log(1.-this_conn)/log((prod-1.)/prod) ) ExecMath 
                         /n_syn_temp Set
-                        n_syn_temp n_targets mul full_scale_n_targets div
+                        n_syn_temp area mul
+                        %n_targets mul full_scale_n_targets div
                     }{
                         /prod n_sources n_targets mul def
                         ( log(1.-this_conn)/log((prod-1.)/prod) ) ExecMath
                     } ifelse
                     cvi /this_n_synapses Set
                        
+                    this_n_synapses cvs <- (\t) <-
+
                     this_n_synapses 0 gt
                     {
                         PSC_array target_layer get target_pop get source_layer
@@ -450,12 +478,12 @@
                           syn_dict /weight weight_dict_inh put
                         } ifelse
 
-			% fill the delay dictionary for Connect and insert it into the synapse dictionary
+                        % fill the delay dictionary for Connect and insert it into the synapse dictionary
                         delay_dict /mu delays source_pop get put
                         delay_dict /sigma delays_sd source_pop get abs put
                         syn_dict /delay delay_dict put        
 
-			% fill the connectivity dictionary with the number of synapses to be used
+                        % fill the connectivity dictionary with the number of synapses to be used
                         conn_dict /N this_n_synapses put
                         conn_dict /rule /fixed_total_number put
 
@@ -467,9 +495,9 @@
                         Connect
 
                     } if % this_n_synapses > 0
-              
-	        } for % source population
-	    } for % source layer
+	            } for % source population
+	        } for % source layer
+            (\n) <-
 	  
             n_thal 0 gt
             {
@@ -517,7 +545,7 @@
                     % insert the delay dictionary into the synapse dictionary
                     syn_dict /delay delay_dict put 
 
-		    % fill the connectivity dictionary with the number of synapses to be used       
+		            % fill the connectivity dictionary with the number of synapses to be used       
                     conn_dict /N this_n_synapses put
                     conn_dict /rule /fixed_total_number put
 
@@ -592,6 +620,8 @@
     } if
     
     toc /ConnectTime Set
+    % CLOSE FILE AGAIN
+    close 
 } def
 
 

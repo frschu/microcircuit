@@ -18,7 +18,7 @@ data_dir    = '/users/schuessler/uni/microcircuit/data/micro'
 test_path   = data_dir + 'test'
 
 # Simulation to analyze.
-simulation_spec = 'a1.0_t20.0_00'
+simulation_spec = 'a0.2_t1.0_00'
 
 
 # path to the mpi shell script

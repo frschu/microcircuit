@@ -35,11 +35,7 @@
                       % (production) for writing files
                       % to a chosen absolute path. 
 
-/t_trans 200.0 def    % transitional period in order to reach equilibrium
-/t_measure 1000.0 def % measured time 'ms' 
-/t_sim 
-t_measure t_trans add 
-def                   % simulated time (ms)
+/t_sim 1000.0 def     % simulated time (ms)
 /dt 0.1 def           % simulation step (ms). Default is 0.1 ms.
 /allgather true def   % communication protocol
 
@@ -51,7 +47,7 @@ def                   % simulated time (ms)
 
 /n_mpi_procs 1 def	                    % number of MPI processes
 
-/n_threads_per_proc 8 def	            % number of threads per MPI process
+/n_threads_per_proc 1 def	            % number of threads per MPI process
                                             % use for instance 24 for a full-scale simulation
 
 

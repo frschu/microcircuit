@@ -26,35 +26,35 @@ from imp import reload
 import numpy as np
 import sys, os, time
 sys.path.append(os.path.abspath('../')) # include path with style
-sys.path.append(os.path.abspath('../simulation/')) # include path with simulation specifications
+sys.path.append(os.path.abspath('../simulation_old/')) # include path with simulation specifications
 # Import specific moduls
 import network_params as net; reload(net)
 import user_params as user; reload(user)
-import functions_analysis as functions; reload(functions)
+import data_to_npy_functions as functions; reload(functions)
 ######################################################
 
 # Data path
 data_sup_path = user.data_dir
-simulation_spec = user.simulation_spec
+simulation_spec = "a0.1_t1.2"
 print(simulation_spec)
 
-simulation_path = data_sup_path + simulation_spec
-pynest_path = simulation_path + 'pynest/'
+simulation_path = os.path.join(data_sup_path, simulation_spec)
+pynest_path =  os.path.join(simulation_path,  'pynest/')
 if 'sli' in sys.argv:
     sli = True
-    data_path = simulation_path + 'sli/' 
-    output_path = simulation_path + 'npy_data_sli/' 
+    data_path =  os.path.join(simulation_path,  'sli/')
+    output_path =  os.path.join(simulation_path, 'npy_data_sli/') 
 else:
     sli = False
-    data_path = simulation_path + 'pynest/' 
-    output_path = simulation_path + 'npy_data/' 
+    data_path =  os.path.join(simulation_path,  'pynest/') 
+    output_path =  os.path.join(simulation_path, 'npy_data/')
 if not os.path.exists(output_path):
     os.mkdir(output_path)
 
 # Get data specified for pynest simulation
 populations = net.populations
 n_populations = len(populations)
-n_rec_spike = np.load(pynest_path + 'n_neurons_rec_spike.npy')
+n_rec_spike = np.load(os.path.join(pynest_path, 'n_neurons_rec_spike.npy'))
 
 # Simulation parameters
 area    = float(simulation_spec.split("_")[0][1:])          # mm**2
@@ -64,7 +64,7 @@ t_trans = 200. # ms; starting point of analysis (avoid transients)
 # those of the pynest simulation!
 if sli:         
     lower_GIDs = np.zeros(n_populations)
-    GID_file = open(data_path + 'population_GIDs.dat', 'r')
+    GID_file = open(os.path.join(data_path, 'population_GIDs.dat'), 'r')
     for i, line in enumerate(GID_file):
         lower_GIDs[i] = np.int_(line.split()[0])
     GID_file.close()
@@ -78,7 +78,7 @@ for i, population in enumerate(populations):
     if sli:
         rec_spike_GIDs = lower_GIDs[i] + np.arange(n_rec_spike[i])
     else:
-        rec_spike_GIDs = np.load(pynest_path + 'rec_spike_GIDs_' + population + '.npy')
+        rec_spike_GIDs = np.load(os.path.join(pynest_path, 'rec_spike_GIDs_' + population + '.npy'))
     t0 = time.time()
     GIDs, times = functions.get_GIDs_times(population, data_path, t_trans, sli=sli)
     dt0 = time.time() - t0
@@ -113,9 +113,9 @@ for i, population in enumerate(populations):
         print('time to read data: %.3f s'%dt0)
        
         voltages_file = 'voltages_' + population + '.npy'
-        np.save(output_path + voltages_file, Vs_pop)
+        np.save(os.path.join(output_path, voltages_file), Vs_pop)
 
         if i == 0:
             V_times = np.arange(t_trans, t_max + dt, dt)
             V_times_file = 'V_times.npy'
-            np.save(output_path + V_times_file, V_times)
+            np.save(os.path.join(output_path, V_times_file), V_times)

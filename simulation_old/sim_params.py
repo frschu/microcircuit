@@ -1,16 +1,21 @@
-"""sim_params.py
+'''sim_params.py
 
     Contains:
     - simulation parameters
     - recording parameters
-"""
+'''
 
 ###################################################
 ###     	Simulation parameters		###        
 ###################################################
 
-t_trans = 0.2e3     # ms; transitional period in order to reach equilibrium
-t_measure = 20.e3   # ms; time actually measured
+run_mode = 'production'   # 'test' for writing files to 
+                    # directory containing microcircuit.sli 
+                    # 'production' for writing files
+                    # to a chosen absolute path. 
+
+t_trans = 0.0e3     # ms; transitional period in order to reach equilibrium
+t_measure = 20e3   # ms; time actually measured
 t_sim = t_measure + t_trans    # ms; simulated time 
 dt = 0.1            # ms; simulation step; default is 0.1 ms. (resolution of kernel)
 allgather = True    # communication protocol
@@ -19,11 +24,11 @@ allgather = True    # communication protocol
 # actual seeds will be master_seed ... master_seed + 2*n_vp
 #  ==>> different master seeds must be spaced by at least 2*n_vp + 1
 # see Gewaltig et al. '2012' for details       
-master_seed = 000000    # changes rng_seeds and grng_seed
+master_seed = 123456    # changes rng_seeds and grng_seed
 
 n_mpi_procs = 1         # number of MPI processes
 
-n_threads_per_proc = 8 	# number of threads per MPI process
+n_threads_per_proc = 2 	# number of threads per MPI process
                             # use for instance 24 for a full-scale simulation
 
 
@@ -48,7 +53,7 @@ memory = '500mb' 	    # total memory
 # Whether to create a new directory to save the data. If True, no such directory is 
 # created and the data in the corresponding existing file is overwritten. 
 # Data path is described in user_params.py.
-overwrite_existing_files = True
+overwrite_existing_files = False
 
 # Cortical spikes
 record_cortical_spikes = True 

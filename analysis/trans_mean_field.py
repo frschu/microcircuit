@@ -1,51 +1,13 @@
 """trans_mean_field.py
     Iteratively solve consistency equation for v, starting at 
     model_init, changing towards model_final.
-
-    Contains: 
-    function transition: adaptive step size transition
-
-    Global boundaries: model_init, model_final
-
-    Plotting results.
 """
-
-"""Further command line arguments:
-        c       script will close all open plots
-        sli     data of the original simulation written in sli will be analyzed. 
-                Note that at this point, the data must be of the same simulation type, 
-                as specifications are loaded from .npy-files of the pynest simulation. 
-
-    Overview over all populations: Raster plot, mean rates, mean CV of ISI per population.
-"""
-from imp import reload
 import numpy as np
 from scipy.optimize import root
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-from matplotlib import rcParams
-import sys, os
-import time
-sys.path.append(os.path.abspath('../presentation')) # include path with style
-sys.path.append(os.path.abspath('../transition/')) # include path with simulation specifications
+from imp import reload
 import network_params_trans; reload(network_params_trans)
-import user_params_trans as user; reload(user)
-import pres_style as style; reload(style)
 
-show_fig = False
-save_fig = True
-xfactor = 2.6
-style.rcParams['figure.figsize'] = (xfactor*6.2, xfactor*3.83) 
-figure_path = os.path.join(".", "figures")
 
-# Close other plots by adding 'c' after 'run <script>' 
-if 'c' in sys.argv:
-    plt.close('all')
-picture_format = '.pdf'
-
-######################################################
-# Functions
-######################################################
 def transition(model_init, model_final,  
                v_guess_0=np.array([110, 107, 122, 117, 120, 117, 141, 122]),
                step_init=0.01, d_step=0.5, tolerance=5,
@@ -179,7 +141,7 @@ net_brunel      = network_params_trans.net(area=area,
 # Microcircuit light:
 # only some parameters like Potjans" model
 # adapt n_neurons AND C_ab!
-j02             = 1.0
+j02             = 2.0
 n_neurons       = "micro"
 C_ab            = "micro"
 net_micro       = network_params_trans.net(area=area, 
@@ -190,9 +152,6 @@ net_micro       = network_params_trans.net(area=area,
                                            delay_rel_sd=delay_rel_sd) 
 
 
-#######################################################
-# Run the loop
-#######################################################
 model_init      = net_brunel
 model_final     = net_micro
 v_guess_0       = np.array([110, 107, 122, 117, 120, 117, 141, 122])
@@ -235,13 +194,20 @@ colors = style.colors[:len(plot_pops)]
 for i, population in zip(i_pop, plot_pops):
     ax.plot(dists, v0s[:, i], '.', color=colors[i], 
         label=population)
-ax.set_xlabel("$d(C_{brunel}, C_{micro})$")
-ax.set_ylabel("$\\nu_0$ / Hz")
-#ax.set_yscale("log")
-ax.grid(True)
-ax.legend(loc="best")
-ax.set_ylim(0, 20)
 ax.set_xlim(0, min(1.0, dists[-1]*1.1))
+ax.set_xlabel("$d(\mathrm{Model},\, \mathrm{Brunel})$")
+ax.set_ylabel("$\\nu_0$ / Hz")
+ax.set_ylim(0, 20)
+#ax.set_yscale("log")
+ax.grid(False)
+ax.legend(loc="best")
+
+xticks = np.linspace(0, 1, 6)
+xticklabels = list(xticks)
+xticklabels[0] = "Brunel"
+xticklabels[-1] = "Potjans"
+ax.set_xticks(xticks)
+ax.set_xticklabels(xticklabels)
 
 fig_name = "numerical_approach_num_only"
 fig_name += picture_format
