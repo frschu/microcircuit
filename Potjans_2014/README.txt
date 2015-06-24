@@ -44,6 +44,9 @@ Files:
 	- run_microcircuit.sh
 	Bash script. Creates sim_script.sh and submits it to the queue
 
+	- spike_analysis.py
+	Python script for basic analysis
+
 The bash script is designed for a cluster with a queuing system that uses qsub.
 It takes all parameters from user_params.sli and sim_params.sli and can be left
 unchanged. The actual simulation script 'microcircuit.sli' does not need to be
@@ -97,7 +100,15 @@ Instructions:
      voltmeter label + layer index + population index + spike detector GID +
      virtual process + .dat
 
+   - Run 'spike_analysis.py' with the variable 'datapath' set to the output
+     folder in order to merge the spike files of each population (including
+     thalamic ones, if present), sort GIDs, and produce dot plots and firing
+     rate plots.
+   - The analysis script does not currently cover voltages.
+    
 The simulation was successfully tested with MPI 1.4.3.
+The analysis script works with Python 2.6.6 including packages numpy 1.3.0,
+matplotlib 0.99.1.1, and glob.
 
 ---------------------------------------------------
 

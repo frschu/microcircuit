@@ -51,19 +51,7 @@ model_micro     = model_class.model(area=area,
                                     delay_rel_sd=delay_rel_sd) 
 model_micro     = model_class.model() 
 
-# Initial Seeds
-#old_seeds   = seed_file.readlines()
-#if old_seeds == []:
-#    master_seed = sim.master_seed
-#    seed_file.write("seed\t\tdate       time\t\t file\n")
-#else:
-#    last_line   = old_seeds[-1]
-#    try: 
-#        master_seed = int(last_line.split("\t")[0]) + 1
-#    except: 
-#        master_seed = sim.master_seed
 master_seed = sim.master_seed
-
 
 #######################################################
 # Create data file

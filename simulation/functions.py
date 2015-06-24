@@ -1,11 +1,21 @@
 """functions.py
 
-Contains functions:
-prepare_simulation
-derive_parameters
-create_nodes    (all node parameters should be set only here)
-connect         (synapse parameters are set here)
+Functions for simulating, 
+applied in: 
+simulate_microcircuit.py
+simulate_transition.py
 
+Contains:
+# Pre-loop
+    initialize_data_file
+    initialize_seeds
+    initialize_info_file
+# Functions inside the loop
+    prepare_simulation
+    derive_parameters
+    create_nodes    
+    connect         
+    save_data
 """
 from __future__ import print_function
 import nest
@@ -17,13 +27,15 @@ from imp import reload
 import sim_params as sim; reload(sim)
 
 #######################################################
-# Functions
+# Pre-loop functions
 #######################################################
-
-
-# Create data file
 def initialize_data_file(sub_path, model, verbose):
     """Creates data_path and file_name for HDF5-file where all data is saved to.
+
+    file_name contains global conditions of simulations: 
+    - area, simulated time, thalamus, background, connection_rule
+    e.g. 'a1.0_t20.2_th_dc_00.hdf5'
+
     Further saves attributes to this data_file.
     """
     # Data path
@@ -33,9 +45,6 @@ def initialize_data_file(sub_path, model, verbose):
         os.makedirs(data_path)
     
     # File name
-    # contains global conditions of simulations: 
-    # - area, simulated time, thalamus, background
-    # e.g. 'a1.0_t20.2_th_dc.hdf5'
     sim_spec = "a%.1f_t%.1f"%(model.area, sim.t_sim * 1e-3)
     if not model.n_th == 0:
         sim_spec += "_th"
@@ -75,7 +84,7 @@ def initialize_data_file(sub_path, model, verbose):
     return (data_file, file_name, data_path)
 
 def initialize_seeds():
-    """Creates inital master_seed from file or sim_spec (if not previous seed found)."""
+    """Creates initial master_seed from file or sim_spec (if no previous seed is found)."""
     seed_file   = open(os.path.join(sim.log_path, "seeds.log"), "a+")    # File containing previous seed numbers
     old_seeds   = seed_file.readlines()
     if old_seeds == []:
@@ -101,6 +110,9 @@ def initialize_info_file(file_name, data_path):
     return info_file
 
 
+#######################################################
+# Functions inside the loop
+#######################################################
 def prepare_simulation(master_seed, n_populations):
     """Prepare random generators with master seed."""
     nest.ResetKernel()
@@ -123,10 +135,11 @@ def prepare_simulation(master_seed, n_populations):
                 range(master_seed + sim.n_vp + 1, master_seed + 2 * sim.n_vp + 1)]
     return pyrngs
 
-
 def derive_parameters(model):
-    # numbers of neurons from which to record spikes and membrane potentials
-    # either rate of population or simply a fixed number regardless of population size
+    """Derives numbers of neurons from which to record spikes and membrane potentials:
+    either rate of population 
+    or simply a fixed number regardless of population size
+    """
     if sim.record_fraction_neurons_spike:
         n_neurons_rec_spike = (model.n_neurons * sim.frac_rec_spike).astype(int)
     else:
@@ -139,10 +152,8 @@ def derive_parameters(model):
 
     return n_neurons_rec_spike, n_neurons_rec_voltage
 
-
 def create_nodes(model, pyrngs):
-    """
-        Creates the following GIDs:
+    """Creates the following GIDs:
         neuron_GIDs
         ext_poisson
         ext_dc
@@ -220,6 +231,9 @@ def create_nodes(model, pyrngs):
 def connect(model, all_GIDs, 
             n_neurons_rec_spike, n_neurons_rec_voltage,
             verbose):
+    """Connect input GIDs according to connection_rule and dictionaries
+    given in network_params.py
+    """
     (neuron_GIDs, 
      spike_detectors, multimeters,
      ext_poisson, ext_dc, 
@@ -323,8 +337,10 @@ def connect(model, all_GIDs,
             if verbose: print("Connect thalamus to th_spike_detector")
             nest.Connect(th_parrots, th_spike_detector, "all_to_all")
 
-
 def save_data(grp, all_GIDs, populations, n_neurons_rec_spike, n_neurons_rec_voltage):
+    """Save spike data and membrane potentials (if specified so in sim_params.py).
+    Thalamic spikes not yet included.
+    """
     if sim.record_cortical_spikes:
         spike_detectors = all_GIDs[1]
         spikes_grp = grp.create_group("spikes")

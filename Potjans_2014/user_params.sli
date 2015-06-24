@@ -21,54 +21,51 @@
  */
 
 (sim_params) run
-(network_params) run
-
-% number of simulation (please adapt manually, as string formatting is extremely stupid in SLI...)
-/sim_number 0 def
-
-%run_mode (production) eq
-%{
-%    % absolute path to which the output files should be written
-%    /output_sup_path (/home/fs/uni/microcircuit/data/)
-%    def
-%    
-%    % add simulation specifications to data file
-%    area 1.0 eq
-%    {
-%        /astr (a1.0) def
-%    }{
-%        /astr (a) area cvs join def
-%    } ifelse
-%    /sim_spec
-%    astr (_t) join 
-%    t_sim 0.001 mul cvs join
-%    def
-%    n_thal 0 gt
-%    {
-%        /sim_spec
-%        sim_spec (_th) join def
-%    } if
-%    dc_amplitude 0 gt
-%    {
-%        /sim_spec
-%        sim_spec (_dc) join def
-%    } if
-%    /simulation_name
-%    sim_spec (_0) join
-%    sim_number cvs join
-%    def
-%    /simulation_path output_sup_path simulation_name join def
-%    /output_path simulation_path (/sli/) join def
-%    simulation_path MakeDirectory
-%    output_path MakeDirectory
-%} if
 
 run_mode (production) eq
 {
     % absolute path to which the output files should be written
-    /output_path (/home/fs/uni/microcircuit/data/sli_test)
+    /output_sup_path (/users/schuessler/uni/microcircuit/data/test/)
     def
+    
+    % add simulation specifications to data file
+    area 1.0 eq
+    {
+        /astr (a1.0) def
+    }{
+        /astr (a) area cvs join def
+    } ifelse
+    /sim_spec
+    astr (_t) join 
+    t_sim 0.001 mul cvs join
+    def
+    n_thal 0 gt
+    {
+        /sim_spec
+        sim_spec (_th) join def
+    } if
+    dc_amplitude 0 gt
+    {
+        /sim_spec
+        sim_spec (_dc) join def
+    } if
+    /simulation_name
+    sim_spec (_0) join
+    sim_number cvs join
+    def
+    /simulation_path output_sup_path simulation_name join def
+    /output_path simulation_path (/sli/) join def
+    simulation_path MakeDirectory
+    output_path MakeDirectory
 } if
+
+%run_mode (production) eq
+%{
+%    % absolute path to which the output files should be written
+%    /output_path (/users/schuessler/uni/microcircuit/data/test/sli_only_seeds)
+%    def
+%} if
+
 
 % path to the mpi shell script
 % can be left out if set beforehand

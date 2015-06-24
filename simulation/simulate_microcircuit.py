@@ -1,16 +1,22 @@
 """simulate_microcircuit.py
 
+Repetitive runs for Potjans' model.
+
+Structure:
+instantiate model                   from model_class.py
+initialize_data_file                creates file_name and opens HDF5-file
+initialize_seeds                    opens seeds.log and looks for previous master seeds 
+initialize_info_file                opens and initializes info_file, where basic parameters of the simulation are saved in plain text
+
+Loop over n_runs:
+    prepare_simulation              prepare random generators such that each simulation is independent 
+    derive_parameters               calculate number of neurons to record from (spikes and membrane potentials separately)
+    create_nodes                    node parameters are set here (incl. membrane potential initialization)
+    connect                         synapse parameters are set here
+    nest.simulate
+    save_data                       saves data to HDF5-file.
+
 Naming convention: layer (e.g. L4), type (usually e and i), population (e.g. L4e)
-
-repetitive runs for Potjans' model.
-
-Runs functions:
-prepare_simulation
-derive_parameters
-create_nodes    (all node parameters should be set only here)
-connect         (synapse parameters are set here)
-
-Saves data to hdf5 file.
 """
 from __future__ import print_function
 import nest
@@ -23,13 +29,10 @@ from imp import reload
 import sim_params as sim; reload(sim)
 import functions; reload(functions)
 import model_class; reload(model_class)
-
-# logging
 verbose     = False                     # whether to print every connection made
-######################################################
 
 #######################################################
-# Instantiation
+# Instantiate model
 #######################################################
 T0 = time.time()
 # Unchanged parameters

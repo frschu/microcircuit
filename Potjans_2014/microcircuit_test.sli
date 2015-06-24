@@ -99,7 +99,6 @@
 } def
 
 
-
 /PrepareSimulation
 {
     ResetKernel
@@ -111,10 +110,10 @@
        /total_num_virtual_procs n_vp
        /communicate_allgather allgather
        /overwrite_files overwrite_existing_files
-       %/rngs master_seed [0 n_vp 1 sub] add Range { rngdict/gsl_mt19937 :: exch CreateRNG } Map  % local RNG, seeded
-       %/grng rngdict/gsl_mt19937 :: master_seed n_vp add CreateRNG                              % global RNG
-       /rng_seeds master_seed [0 n_vp 1 sub] add Range % local RNG seeds
-       /grng_seed master_seed n_vp add                 % global RNG seed
+       /rngs master_seed [0 n_vp 1 sub] add Range { rngdict/gsl_mt19937 :: exch CreateRNG } Map  % local RNG, seeded
+       /grng rngdict/gsl_mt19937 :: master_seed n_vp add CreateRNG                              % global RNG
+       %/rng_seeds master_seed [0 n_vp 1 sub] add Range % local RNG seeds
+       %/grng_seed master_seed n_vp add                 % global RNG seed
        run_mode (production) eq
        {
            /data_path output_path
