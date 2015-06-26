@@ -1,0 +1,275 @@
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Spiking network simulation}
+\label{sub:methods_simulation}
+Following Nordlie et al.'s suggestions on 
+\emph{good model description practice} \cite{nordlie2009},
+the network model is described in prose in the following paragraphs while a detailed 
+overview is provided in two tables: The model is summarized in table 
+\ref{tab:model_description}, 
+whereas specific numerical values of the parameters are displayed in table 
+\ref{tab:network_params}. 
+
+\subsubsection{Neuron model}
+The neurons are leaky integrate-and-fire neurons with a fixed voltage threshold. 
+Below the threshold $\theta$, the dynamics of the membrane potential $V_i(t)$ 
+for neuron $i$ are governed by the differential equation 
+\begin{equation}
+    \tau_\text{m} \,\frac{\text{d} V_i(t)}{\text{d} t} 
+            = -(V_i(t) - E_\text{L}) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t) \, .
+    \label{eq:leaky_integrator}
+\end{equation}
+The membrane is specified by its resting potential $E_\text{L}$, 
+the time constant $\tau_\text{m}$ and the capacitance $C_\text{m}$.
+If at time $t$ the threshold is reached, the neuron emits a spike and remains 
+in a refractory period for a fixed time $\tau_\text{rp}$, with the membrane 
+potential set to $V_\text{r}$. The total input to the neuron is represented by 
+the current $I_i(t)$. 
+
+\subsubsection{Network connectivity}
+The network consists of eight cortical populations arranged in four 
+layers. Each layer contains an excitatory as well as an inhibitory population. 
+A total of 77169 leaky integrate-and-fire neurons are distributed according to the population
+sizes given in table \ref{tab:network_params}. The total numbers of excitatory and inhibitory 
+neurons are 61843 and 15326, respectively, yielding a ratio of 4.04 of excitatory over inhibitory
+neurons. \\
+For each combination of pre- and postsynaptic population, pairs of neurons to be connected are drawn
+randomly until a fixed number of synapses is reached, allowing for multiple synapses and 
+self-connections. Potjans' original model defines the connection probability $P_{\text{conn}, \,ab}$ 
+of one neuron in the presynaptic population $a$ to form at least one connection with one neuron in 
+the postsynaptic population $b$. For given population sizes $N_a$ and $N_b$, the number of 
+synapses $C_{ab}$ is then calculated by
+\begin{equation}
+    C_{ab} = \frac{\log \left( 1 - P_{\text{conn}, \,ab} \right)}{\log \left( 1 - \frac{1}{N_a N_b} \right)} \, ,
+    \label{eq:synapse_numbers}
+\end{equation}
+the inverse of the formula for connection probabilities derived by Potjans et. al \cite{potjans2014}.
+
+% Model description
+\begin{table}[htpb]
+    \centering
+    \caption{
+        Model description according to Nordlie et al. \cite{nordlie2009}. 
+        Specific parameters are shown in table \ref{tab:network_params}.
+        }
+    \label{tab:model_description}
+    \begin{tabular}{m{3.1cm} p{10cm}}
+        \rowcolor{TableColor}\multicolumn{2}{l}{Model summary} \\
+        Populations     &   8 cortical populations\\
+        Topology        &   --\\
+        Connectivity    &   Random connections with fixed number of synapses for 
+                            each combination of pre- and postsynaptic population\\
+        Neuron model    &   Leaky integrate-and-fire, fixed voltage threshold, fixed 
+                            absolute refractory period\\
+        Synapse model   &   exponential-shaped postsynaptic current\\
+        Plasticity      &   --\\
+        Input           &   Independent fixed-rate Poisson spike trains\\
+        Measurements    &   Spike activity, membrane potentials \tnn
+
+        \rowcolor{TableColor} Populations & \\
+        Layers          &   L2/3, L4, L5, L6 \\
+        Cortical network&   one excitatory (e) and one inhibitory (i) population per layer\\
+        Size            &   population specific size 
+                            (see table \ref{tab:network_params}) \tnn
+
+        \rowcolor{TableColor} Connectivity & \\
+        Type            &   Random connectivity with independently chosen pre- and postsynaptic
+                            neurons; fixed total number of connections between two populations
+                            (see table \ref{tab:network_params}) \\
+        Weights         &   Fixed; drawn from clipped Gaussian distributions 
+                            ($w > 0$ for excitatory, $w~<~0$ for inhibitory)\\
+        Delays          &   Fixed; drawn from clipped Gaussian distributions ($d~>~0$);
+                            multiples of computation step size \tnn
+
+        \rowcolor{TableColor}\multicolumn{2}{l}{ Neuron and synapse model} \\
+        Name            &   iaf neuron\\
+        Type            &   Leaky integrate-and-fire, exponential-shaped current inputs\\
+        Subthreshold \newline dynamics of \newline neuron~$i$
+                        &   {$\!\begin{aligned} 
+                            \tau_\text{m} \,\frac{\text{d} V_i(t)}{\text{d} t} 
+                                    &= -(V_i(t) - E_\text{L}) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t)
+                                        &\text{if}\quad& t > t^* + \tau_\text{rp} \\ 
+                                V_i(t)        &= V_\text{r}  &\text{else}& \\[0.2cm]
+                                I_i(t) &= C_\text{m} \sum_j J_{ij} \sum_k \delta (t - t_j^k - d_{ij})  
+                            \end{aligned}$}  \\
+                            &THIS IS NOT TRUE -- STATE THE ACTUAL ODE! \\
+        Spiking         &   If $\,\,V_i(t_-) < \theta \quad \land \quad V_i(t_+) \ge \theta$: \\
+                        &   \quad 1. set $t^* = t$    \\
+                        &   \quad 2. emit spike with time stamp $t^*$ \tnn
+
+        \rowcolor{TableColor} Input & \\
+        Type            &   Independent Poisson spikes to iaf neurons
+                            (see table \ref{tab:network_params})
+    \end{tabular}
+\end{table}
+
+% Network parameters
+\begin{table}[htpb]
+    \centering
+    \caption{
+        Network parameters
+        }
+    \label{tab:network_params}
+    \begin{tabular}{p{3.5cm} *{8}{x{1.2cm}}}
+        \rowcolor{TableColor}\multicolumn{9}{l}{Populations and inputs} \tn
+        Name        
+            & L23e & L23i & L4e & L4i & L5e & L5i & L6e & L6i  \tn
+        Population size, $N$   
+            & 20683 & 5834 & 21915 & 5479 & 4850 & 1065 & 14395 & 2948 \tn
+        External inputs, $k_\text{ext}$ 
+            & 1600 & 1500 & 2100 & 1900 & 2000 & 1900 & 2900 & 2100 \tn
+        Background rate     
+        & 8 Hz \tnn
+
+        \rowcolor{TableColor}\multicolumn{9}{l}{Connection probabilities between pre- and postsynaptic populations} \tn
+        \backslashbox{post}{pre}
+            & L23e & L23i & L4e & L4i & L5e & L5i & L6e & L6i  \tn
+        L23e
+            & 0.101 & 0.169 & 0.044 & 0.082 & 0.032 & 0.000 & 0.008 & 0.000 \tn 
+        L23i
+            & 0.135 & 0.137 & 0.032 & 0.051 & 0.075 & 0.000 & 0.004 & 0.000 \tn 
+        L4e
+            & 0.008 & 0.006 & 0.050 & 0.135 & 0.007 & 0.000 & 0.045 & 0.000 \tn 
+        L4i
+            & 0.069 & 0.003 & 0.079 & 0.160 & 0.003 & 0.000 & 0.106 & 0.000 \tn 
+        L5e
+            & 0.100 & 0.062 & 0.051 & 0.006 & 0.083 & 0.373 & 0.020 & 0.000 \tn 
+        L5i
+            & 0.055 & 0.027 & 0.026 & 0.002 & 0.060 & 0.316 & 0.009 & 0.000 \tn 
+        L6e
+            & 0.016 & 0.007 & 0.021 & 0.017 & 0.057 & 0.020 & 0.040 & 0.225 \tn 
+        L6i
+            & 0.036 & 0.001 & 0.003 & 0.001 & 0.028 & 0.008 & 0.066 & 0.144 \tnn
+
+        \rowcolor{TableColor}\multicolumn{9}{l}{Further connectivity} \tn
+        $J \pm \delta J$    
+            &  \multicolumn{3}{l}{$87.8 \pm 8.8 \,\text{pA}$}
+            &  \multicolumn{5}{l}{Excitatory synaptic strengths} \tn
+        $g$    
+            &  \multicolumn{3}{l}{$-4$}
+            &  \multicolumn{5}{l}{Relative inhibitory synapse strength} \tn
+        $d_e \pm \delta d_e$    
+            &  \multicolumn{3}{l}{$1.5 \pm 0.75 \,\text{ms}$}
+            &  \multicolumn{5}{l}{Excitatory synaptic transmission delays} \tn
+        $d_i \pm \delta d_i$    
+            &  \multicolumn{3}{l}{$0.8 \pm 0.4 \,\text{ms}$}
+            &  \multicolumn{5}{l}{Inhibitory synaptic transmission delays} \tnn
+
+        \rowcolor{TableColor}\multicolumn{9}{l}{Neuron model} \tn
+        $\tau_\text{m}$    
+            &  \multicolumn{3}{l}{$10 \,\text{ms}$}
+            &  \multicolumn{5}{l}{Membrane time constant} \tn
+        $\tau_\text{ref}$    
+            &  \multicolumn{3}{l}{$\hphantom{0}2 \,\text{ms}$}
+            &  \multicolumn{5}{l}{Absolute refractory period} \tn
+        $\tau_\text{syn}$    
+        &  \multicolumn{3}{l}{$\hphantom{0}0.5 \,\text{ms}$}
+            &  \multicolumn{5}{l}{Postsynaptic current time constant} \tn
+        $C_\text{m}$    
+            &  \multicolumn{3}{l}{$250 \,\text{pF}$}
+            &  \multicolumn{5}{l}{Membrane capacity} \tn
+        $E_\text{L}$    
+            &  \multicolumn{3}{l}{$-65 \,\text{mV}$}
+            &  \multicolumn{5}{l}{Leaky rest potential} \tn
+        $V_\text{reset}$    
+            &  \multicolumn{3}{l}{$-65 \,\text{mV}$}
+            &  \multicolumn{5}{l}{Reset potential} \tn
+        $\theta$    
+            &  \multicolumn{3}{l}{$-50 \,\text{mV}$}
+            &  \multicolumn{5}{l}{Fixed firing threshold} \tn
+    \end{tabular}
+\end{table}
+
+\subsubsection{Synaptic input}
+The spikes of neurons are modeled as delta functions. Accordingly, the 
+input current of neuron $i$ can be described as the sum over arriving 
+spike trains, 
+\begin{equation}
+    I_i(t) = C_\text{m} \sum_j J_{ij} \sum_k \delta (t - t_j^k - d_{ij}) \, ,
+    \label{eq:input_current}
+\end{equation}
+where $t_j^k$ is the time the $k$-th spike by neuron $j$ was emitted and the 
+delay between neuron $i$ and $j$ is set to $d_{ij}$. 
+
+
+Explain synapse dynamics, the change from PSP to PSC, etc.
+
+
+\subsection{Mean field model}
+The derivation of a mean field theory for the layered network goes along the 
+lines of the work by Brunel \cite{brunel2000}.
+It starts of with a simplified model of 
+$N$ neurons. Each neuron receives input from the network by $C$ synapses, $C_E$ and $C_I$ of 
+which connect to excitatory and inhibitory neurons, respectively. 
+Furthermore, each neurons receives $C_\text{ext} = C_E$ connections from 
+external excitatory neurons.
+The synapse numbers 
+are determined by the relative size of the two populations through the factor
+\begin{equation}
+    \epsilon = \frac{C_E}{N_E} = \frac{C_I}{N_I} \,.
+    \label{eq:epsilon}
+\end{equation}
+A central assumption is the sparsity of the network, expressed by $\epsilon \ll 1$.
+Guided by anatomical estimates for the neocortex, the population sizes are set to
+$N_e = 0.8N$ excitatory and $N_i = 0.2N$ inhibitory neurons. Taking \eqref{eq:epsilon}
+this implies 
+\begin{equation}
+    C_I = \gamma C_E 	
+ \label{eq:C_I}
+\end{equation}
+with $\gamma = 0.25$. The synaptic weights in this model are set to $J$ for 
+excitatory presynaptic neurons and to $-g\, J$ for inhibitory ones. 
+The delays are fixed uniformly to $d$ for all synapses. 
+
+At the heart of the mean field model
+is the transition from the deterministic description of membrane potential 
+dynamics according to \eqref{eq:leaky_integrator} and \eqref{eq:input_current} to
+a probabilistic formulation. Here, the input is modeled as a time-varying average part
+$\mu(t)$ plus a fluctuating gaussian part with amplitude $\sigma(t)$:
+\begin{equation}
+    I_i(t) = C_\text{m} \tau_\text{m} \left[ \mu(t) + \sigma(t)	\sqrt{\tau_\text{m}} \eta_i(t) \right] \, .
+    \label{eq:input_random}
+\end{equation}
+The random fluctuations are described by gaussian white noise $\eta_i(t)$ with 
+$\langle  \eta_i(t)\rangle = 0$. The model explicitly excludes correlations, 
+both in time and between different neurons, i.e.
+\begin{equation}
+    \langle \eta_i(t) \: \eta_j(t') \rangle = \delta_{ij} \: \delta(t - t')	\, . 
+    \label{eq:no_correlations}
+\end{equation}
+The latter assumptions is by no means trivial and has to be tested for the spiking model
+that is to be described with this mean field approach. 
+
+The average input $\mu(t)$ and amplitude of fluctuations $\sigma(t)$ are linked to the 
+average firing rate $\nu(t)$ by the equations
+\begin{equation}
+    \begin{split}
+        \mu(t)          &= \mu_l(t) + \mu_\text{ext} \\
+        \text{with} \qquad \mu_l(t)        &= C_E \, J (1 - \gamma g) \nu(t - d) \tau_\text{m} \\
+        \mu_\text{ext}  &= C_E J \nu_\text{ext} \tau_\text{m}
+        \label{eq:mu}
+    \end{split}
+\end{equation}
+\begin{equation}
+    \begin{split}
+        \sigma^2(t)     &= {\sigma_l}^2(t) + {\sigma_\text{ext}}^2 \\
+        \text{with} \qquad {\sigma_l}^2(t)       
+                        &= C_E \, J^2 (1 + \gamma g^2) \nu(t - d) \tau_\text{m} \\
+        {\sigma_\text{ext}}^2  &= C_E J^2 \nu_\text{ext} \tau_\text{m}
+        \label{eq:sigma}
+    \end{split}
+\end{equation}
+
+THIS IS EXTENDED TO:
+
+\begin{align}
+    \mu_a        &= 
+        \tau \sum_{b \in \text{pop.}} C_{ab} \, J_{ab} \, \nu_b 
+        + \tau C_{a, ext} \, J_{a, ext} \, \nu_{ext}
+\intertext{and fluctuation}
+    {\sigma_a}^2 &= 
+        \tau \sum_{b \in \text{pop.}} C_{ab} \, {J_{ab}}^2  \, \nu_b
+        +
+        \tau C_{a, ext} \,{J_{a, ext}}^2 \,\nu_{ext}
+\end{align}

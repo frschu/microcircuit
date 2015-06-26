@@ -1,19 +1,56 @@
 \section{Introduction}
-Although many efforts have been undertaken in recent years, the 
-local neocortical microcircuit remains to be only superficially 
-understood. This is the case both for its function and its structure, 
-and much more so for the relation of the two. 
+\label{sec:intro}
+\subsection{Hypotheses}
+- The original model can be implemented in Pynest, yielding a much more 
+comprehensible structure compared to the SLI implementation. 
 
-A full-scale spiking network model was established by Potjans and 
-Diesmann \cite{potjans2014} in 2014 in order 
-to examine the gap between connectivity data and measured spike rates
-in awake animals.
+- Some of the results of simulating the model can be approximated with a 
+mean field theory (most notably, firing rates and membrane potential
+distributions).
 
-In this thesis, the corresponding model is reimplemented and analyzed. 
-A mean-field approach is developed to predict the rates of the model
-based on self-consistency in a equilibrium state. This approach is based 
-on the theory developed by Brunel in 2000 \cite{brunel2000}. 
+- The remaining disagreement between simulation and model can be tracked 
+down to correlations between spike trains.
 
+- Else: Signal transmission? Autocorrelation???
+
+\subsection{Model derivation}
+The full-scale spiking model is based on the derivation and implementation 
+by Potjans and Diesmann \cite{2014}, seeking to account for the detailed 
+structure of the neocortical microcolumn reported in experimental data. 
+Most notably, the feature of various horizontal layers is recaptured, 
+separating the simulated nodes into four layers, each containing an 
+excitatory and an inhibitory population. 
+
+However, it remains a minimal model in the sense that the number of 
+parameters included is small. The neurons are modeled as spiking leaky 
+integrate-and-fire neurons, connected by static synapses of one type. 
+The connections between single nodes are determined randomly based on 
+connection probabilities for each corresponding pre- and postsynaptic 
+population and a fixed probabilistic rule. Excitatory and inhibitory 
+neurons are distinguished by a global inhibition dominance ratio, following
+the approach of balanced random network models.
+
+The model is expected to operate in a stable regime of asynchronous irregular 
+(AI) spiking activity \cite{brunel2000}. HOWEVER, THIS NEEDS TO BE INVESTIGATED!
+
+A mean field theory for balanced random network models has been derived by 
+Brunel \cite{brunel2000} for one excitatory and one inhibitory population. 
+The approach determines analytically some of the most relevant characteristics
+of the corresponding simulated networks, such as firing rates, coefficient 
+of variation of interspike intervals and membrane potential distributions, 
+as well as the power spectrum of global activity. It remains unclear, however, 
+how far these results can be applied to more complex networks, containing 
+larger number of populations. This study sets out to address these questions. 
+
+\subsection{Structure}
+The thesis is structured as follows. First, the implementation of Potjans and 
+Diesmann's model in Pynest is presented in detail. The results of simulations 
+are compared to the results running the original implementation with identical 
+parameters. Then, the mean field theory for two populations is generalized 
+to the network model. The parameters predicted with this model are compared 
+to the results of the simulation. Finally, the shortcomings of the mean field 
+approach are analyzed by questioning the validity of the underlying assumptions
+for the case of the network model. 
 
 
 

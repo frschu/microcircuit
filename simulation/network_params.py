@@ -26,12 +26,12 @@ import numpy as np
 # use 1 for the full-size network (77,169 neurons)
 area    = 1.0
 
-# Whether to scale number of synapses K linearly: K = K_full_scale * area.
-# When scale_K_linearly is false, K is derived from the connection probabilities and
+# Whether to scale number of synapses C linearly: C = C_full_scale * area.
+# When scale_C_linearly is false, C is derived from the connection probabilities and
 # scaled neuron numbers according to eq. (1) of the paper. In first order 
-# approximation, this corresponds to K = K_full_scale * area**2.
+# approximation, this corresponds to C = C_full_scale * area**2.
 # Note that this produces different dynamics compared to the original model.
-scale_K_linearly  = True
+scale_C_linearly  = True
 
 layers  = np.array(['L23', 'L4', 'L5', 'L6'])
 types = np.array(['e', 'i']) 
@@ -105,13 +105,13 @@ Vm0_std     = 10.0              # std of initial membrane potential (mV)
 
 # neuron model parameters
 model_params = {'tau_m': 10.,       # membrane time constant (ms)
-	            'tau_syn_ex': 0.5,  # excitatory synaptic time constant (ms)
-                'tau_syn_in': 0.5,  # inhibitory synaptic time constant (ms)
                 't_ref': 2.,        # absolute refractory period (ms)
-	            'E_L': -65.,        # resting membrane potential (mV)
-	            'V_th': -50.,       # spike threshold (mV)
+                'tau_syn_ex': 0.5,  # excitatory synaptic time constant (ms)
+                'tau_syn_in': 0.5,  # inhibitory synaptic time constant (ms)
                 'C_m': 250.,        # membrane capacitance (pF)
-	            'V_reset': -65.     # reset potential (mV)
+                'E_L': -65.,        # resting membrane potential (mV)
+                'V_th': -50.,       # spike threshold (mV)
+                'V_reset': -65.     # reset potential (mV)
                } 
 
 ###################################################

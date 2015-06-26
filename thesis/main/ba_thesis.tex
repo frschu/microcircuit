@@ -18,7 +18,7 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
-\documentclass[paper=a4, fontsize=12pt, xcolor=dvipsnames]{scrartcl} % A4 paper and 11pt font size
+\documentclass[paper=a4, fontsize=12pt, xcolor=dvipsnames, parskip=full]{scrartcl} % A4 paper and 11pt font size
 
 % Biblatex
 \usepackage[
@@ -41,15 +41,14 @@ backend=biber
 \usepackage{cmbright}
 \usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
 
-\usepackage{amsmath,amsfonts,amsthm} % Math packages
+\usepackage{amsmath, amsfonts, amsthm} % Math packages
 \usepackage{pgfplots}
 \usepackage{wrapfig}
 \usepackage{color, colortbl}  
 
 % Bibliographie auf deutsch
 \definecolor{gray1}{gray}{0.2}
-\definecolor{LightCyan}{rgb}{0.88,0.8,1}
-\usepackage[font={color=gray1},figurename=Fig.,labelfont={color=blue}]{caption}
+\usepackage[font={color=gray1}, figurename=Fig., labelfont={color=blue}]{caption}
 
 \usepackage{titlesec}
 
@@ -77,6 +76,9 @@ backend=biber
 \usepackage{tikz}
 \usepackage{sectsty} % Allows customizing section commands
 \usepackage{hyperref}
+\usepackage{array}
+\usepackage{slashbox}
+
 
 %\usepackage[pass,showframe]{geometry} % just to show the margins
 %\usepackage{booktabs}
@@ -125,6 +127,13 @@ backend=biber
 %--------------------------------------------------------------------------------------------
 \newcommand{\horrule}[1]{\color{gray1}\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
 
+% Right aligned table cells with fixed length; e.g. x{2.5cm}
+\newcolumntype{x}[1]{%
+>{\raggedleft\hspace{0pt}}p{#1}}%
+\newcommand{\tn}{\tabularnewline}
+\newcommand{\tnn}{\tabularnewline[0.3cm]} % newline for costume table cells 
+
+\definecolor{TableColor}{rgb}{0.88,0.8,1}
 
 \begin{document}
 
@@ -147,11 +156,12 @@ backend=biber
 %	CONTENT
 %----------------------------------------------------------------------------------------
 \setcounter{page}{1}
+\input{../chapters/abstract}
 \input{../chapters/intro}
-\input{../chapters/simulation}
-\input{../chapters/mean_field}
 \input{../chapters/results}
 \input{../chapters/discussion}
+\input{../chapters/methods}
+\input{../chapters/endnotes}
 
 \section{Bibliography}
 \printbibliography[heading=subbibintoc]

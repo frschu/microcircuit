@@ -1,0 +1,76 @@
+\begin{table}[htpb]
+    \centering
+    \caption{
+        Network parameters
+        }
+    \label{tab:network_params}
+    \begin{tabular}{p{3.5cm} *{8}{x{1.2cm}}}
+        \rowcolor{TableColor}\multicolumn{9}{l}{Populations and inputs} \tn
+        Name        
+            & L23e & L23i & L4e & L4i & L5e & L5i & L6e & L6i  \tn
+        Population size, $N$   
+            & 20683 & 5834 & 21915 & 5479 & 4850 & 1065 & 14395 & 2948 \tn
+        External inputs, $k_\text{ext}$ 
+            & 1600 & 1500 & 2100 & 1900 & 2000 & 1900 & 2900 & 2100 \tn
+        Background rate     
+        & 8 Hz \tnn
+
+        \rowcolor{TableColor}\multicolumn{9}{l}{Connection probabilities between pre- and postsynaptic populations} \tn
+        \backslashbox{post}{pre}
+            & L23e & L23i & L4e & L4i & L5e & L5i & L6e & L6i  \tn
+        L23e
+            & 0.101 & 0.169 & 0.044 & 0.082 & 0.032 & 0.000 & 0.008 & 0.000 \tn 
+        L23i
+            & 0.135 & 0.137 & 0.032 & 0.051 & 0.075 & 0.000 & 0.004 & 0.000 \tn 
+        L4e
+            & 0.008 & 0.006 & 0.050 & 0.135 & 0.007 & 0.000 & 0.045 & 0.000 \tn 
+        L4i
+            & 0.069 & 0.003 & 0.079 & 0.160 & 0.003 & 0.000 & 0.106 & 0.000 \tn 
+        L5e
+            & 0.100 & 0.062 & 0.051 & 0.006 & 0.083 & 0.373 & 0.020 & 0.000 \tn 
+        L5i
+            & 0.055 & 0.027 & 0.026 & 0.002 & 0.060 & 0.316 & 0.009 & 0.000 \tn 
+        L6e
+            & 0.016 & 0.007 & 0.021 & 0.017 & 0.057 & 0.020 & 0.040 & 0.225 \tn 
+        L6i
+            & 0.036 & 0.001 & 0.003 & 0.001 & 0.028 & 0.008 & 0.066 & 0.144 \tnn
+
+        \rowcolor{TableColor}\multicolumn{9}{l}{Further connectivity} \tn
+        $J \pm \delta J$    
+            &  \multicolumn{3}{l}{$87.8 \pm 8.8 \,\text{pA}$}
+            &  \multicolumn{5}{l}{Excitatory synaptic strengths} \tn
+        $g$    
+            &  \multicolumn{3}{l}{$-4$}
+            &  \multicolumn{5}{l}{Relative inhibitory synapse strength} \tn
+        $d_e \pm \delta d_e$    
+            &  \multicolumn{3}{l}{$1.5 \pm 0.75 \,\text{ms}$}
+            &  \multicolumn{5}{l}{Excitatory synaptic transmission delays} \tn
+        $d_i \pm \delta d_i$    
+            &  \multicolumn{3}{l}{$0.8 \pm 0.4 \,\text{ms}$}
+            &  \multicolumn{5}{l}{Inhibitory synaptic transmission delays} \tnn
+
+        \rowcolor{TableColor}\multicolumn{9}{l}{Neuron model} \tn
+        $\tau_\text{m}$    
+            &  \multicolumn{3}{l}{$10 \,\text{ms}$}
+            &  \multicolumn{5}{l}{Membrane time constant} \tn
+        $\tau_\text{ref}$    
+            &  \multicolumn{3}{l}{$\hphantom{0}2 \,\text{ms}$}
+            &  \multicolumn{5}{l}{Absolute refractory period} \tn
+        $\tau_\text{syn}$    
+        &  \multicolumn{3}{l}{$\hphantom{0}0.5 \,\text{ms}$}
+            &  \multicolumn{5}{l}{Postsynaptic current time constant} \tn
+        $C_\text{m}$    
+            &  \multicolumn{3}{l}{$250 \,\text{pF}$}
+            &  \multicolumn{5}{l}{Membrane capacity} \tn
+        $E_\text{L}$    
+            &  \multicolumn{3}{l}{$-65 \,\text{mV}$}
+            &  \multicolumn{5}{l}{Leaky rest potential} \tn
+        $V_\text{reset}$    
+            &  \multicolumn{3}{l}{$-65 \,\text{mV}$}
+            &  \multicolumn{5}{l}{Reset potential} \tn
+        $\theta$    
+            &  \multicolumn{3}{l}{$-50 \,\text{mV}$}
+            &  \multicolumn{5}{l}{Fixed firing threshold} \tn
+    \end{tabular}
+\end{table}
+

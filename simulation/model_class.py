@@ -102,19 +102,19 @@ class model:
         # Connection probabilities: conn_probs[post, pre] = conn_probs[target, source]
         conn_probs = net.conn_probs
         # Scale synapse numbers of the C_ab
-        if net.scale_K_linearly:
+        if net.scale_C_linearly:
             n_outer_full    = np.outer(full_scale_n_neurons, full_scale_n_neurons)
-            K_full_scale    = np.log(1. - conn_probs) / np.log(1. - 1. / n_outer_full)
-            K_scaled        = np.int_(K_full_scale * self.area)
+            C_full_scale    = np.log(1. - conn_probs) / np.log(1. - 1. / n_outer_full)
+            C_scaled        = np.int_(C_full_scale * self.area)
         else:
             n_outer         = np.outer(self.n_neurons, self.n_neurons)
-            K_scaled        = np.int_(np.log(1. - conn_probs) / np.log(1. - 1. / n_outer))
+            C_scaled        = np.int_(np.log(1. - conn_probs) / np.log(1. - 1. / n_outer))
 
         self.connection_rule = connection_rule
         if self.connection_rule == "fixed_total_number":
-            C_ab_micro = K_scaled   # total number, do not divide! 
+            C_ab_micro = C_scaled   # total number, do not divide! 
         elif self.connection_rule == "fixed_indegree":
-            C_ab_micro = (K_scaled.T / (full_scale_n_neurons * self.area)).T
+            C_ab_micro = (C_scaled.T / (full_scale_n_neurons * self.area)).T
         else:
             raise Exception("Unexpected connection type. Use 'fixed_total_number' for microcircuit " + 
                             "model or 'fixed_indegree' for Brunel's model!")
@@ -167,8 +167,8 @@ class model:
         self.Vm0_std        = net.Vm0_std            # std of initial membrane potential (mV)
         self.model_params   = net.model_params
         # Rescaling for model calculations: these values are not used in the simulation!
-        self.t_ref  = self.model_params["t_ref"] * 1e-3          # s
         self.tau_m  = self.model_params["tau_m"] * 1e-3          # s
+        self.t_ref  = self.model_params["t_ref"] * 1e-3          # s
         self.E_L    = self.model_params["E_L"]                  # mV
         self.V_r    = self.model_params["V_reset"] - self.E_L   # mV
         self.theta  = self.model_params["V_th"] - self.E_L      # mV
@@ -193,11 +193,11 @@ class model:
         
         # connection probabilities for thalamic input
         conn_probs_th = net.conn_probs_th
-        if net.scale_K_linearly:
+        if net.scale_C_linearly:
             if not self.n_th == 0:
-                K_th_full_scale = np.log(1. - conn_probs_th) / \
+                C_th_full_scale = np.log(1. - conn_probs_th) / \
                     np.log(1. - 1. / (self.n_th * full_scale_n_neurons))
-                self.C_th_scaled     = np.int_(K_th_full_scale * self.area)
+                self.C_th_scaled     = np.int_(C_th_full_scale * self.area)
         else:
             if not self.n_th == 0:
                 self.C_th_scaled     = np.int_(np.log(1. - conn_probs_th) / \
