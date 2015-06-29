@@ -113,11 +113,11 @@ the inverse of the formula for connection probabilities derived by Potjans et. a
     \label{tab:network_params}
     \begin{tabular}{p{3.5cm} *{8}{x{1.2cm}}}
         \rowcolor{TableColor}\multicolumn{9}{l}{Populations and inputs} \tn
-        Name        
+        Name $a$       
             & L23e & L23i & L4e & L4i & L5e & L5i & L6e & L6i  \tn
-        Population size, $N$   
+        Population size, $N_a$   
             & 20683 & 5834 & 21915 & 5479 & 4850 & 1065 & 14395 & 2948 \tn
-        External inputs, $k_\text{ext}$ 
+        Ext. inputs, $C_{a, \text{ext}}$ 
             & 1600 & 1500 & 2100 & 1900 & 2000 & 1900 & 2900 & 2100 \tn
         Background rate     
         & 8 Hz \tnn
@@ -146,6 +146,9 @@ the inverse of the formula for connection probabilities derived by Potjans et. a
         $J \pm \delta J$    
             &  \multicolumn{3}{l}{$87.8 \pm 8.8 \,\text{pA}$}
             &  \multicolumn{5}{l}{Excitatory synaptic strengths} \tn
+        $j_{02}$    
+            &  \multicolumn{3}{l}{$2$}
+            &  \multicolumn{5}{l}{Factor for connection L4e $\to$ L23e} \tn
         $g$    
             &  \multicolumn{3}{l}{$-4$}
             &  \multicolumn{5}{l}{Relative inhibitory synapse strength} \tn
@@ -192,6 +195,20 @@ spike trains,
 where $t_j^k$ is the time the $k$-th spike by neuron $j$ was emitted and the 
 delay between neuron $i$ and $j$ is set to $d_{ij}$. 
 
+The weight for each synapse is drawn from a normal distribution with fixed 
+mean for each population. Specifically, for all excitatory local populations, 
+this mean is set to $J = 0.15$ mV, (\emph{EQUIVALENT}) and for all inhibitory 
+ones to $-g J$. There is one important exception to this scheme, though. 
+The mean for the connection from L4e to L23e is increased by a factor of 
+$j_{02} = 2$. The original argument is based on missing constraints from experimental
+data and the observation that leaving out this factor leads to firing rates 
+of L32e neurons very close to zero 
+(consult the corresponding  paper \cite{potjans2014} for details). 
+The distributions from which weight are drawn are clipped, 
+such that a neuron assigned to the excitatory 
+population will not have associated outgoing synapses with $J_{ij} < 0$ 
+and vice versa for inhibitory ones. 
+
 
 Explain synapse dynamics, the change from PSP to PSC, etc.
 
@@ -200,27 +217,29 @@ Explain synapse dynamics, the change from PSP to PSC, etc.
 The derivation of a mean field theory for the layered network goes along the 
 lines of the work by Brunel \cite{brunel2000}.
 It starts of with a simplified model of 
-$N$ neurons. Each neuron receives input from the network by $C$ synapses, $C_E$ and $C_I$ of 
-which connect to excitatory and inhibitory neurons, respectively. 
+$N$ leaky integrate-and-fire neurons. 
+Each neuron receives input from the network by $C$ synapses, 
+$C_E$ from excitatory and $C_I$ from inhibitory ones. 
 Furthermore, each neurons receives $C_\text{ext} = C_E$ connections from 
 external excitatory neurons.
 The synapse numbers 
 are determined by the relative size of the two populations through the factor
 \begin{equation}
-    \epsilon = \frac{C_E}{N_E} = \frac{C_I}{N_I} \,.
+    \epsilon := \frac{C_E}{N_E} = \frac{C_I}{N_I} \,.
     \label{eq:epsilon}
 \end{equation}
 A central assumption is the sparsity of the network, expressed by $\epsilon \ll 1$.
 Guided by anatomical estimates for the neocortex, the population sizes are set to
-$N_e = 0.8N$ excitatory and $N_i = 0.2N$ inhibitory neurons. Taking \eqref{eq:epsilon}
-this implies 
+$N_e = 0.8N$ excitatory and $N_i = 0.2N$ inhibitory neurons. Taking the definition
+\eqref{eq:epsilon}, this implies 
 \begin{equation}
     C_I = \gamma C_E 	
  \label{eq:C_I}
 \end{equation}
 with $\gamma = 0.25$. The synaptic weights in this model are set to $J$ for 
-excitatory presynaptic neurons and to $-g\, J$ for inhibitory ones. 
-The delays are fixed uniformly to $d$ for all synapses. 
+excitatory presynaptic neurons and to $-g\, J$ for inhibitory ones, 
+whereas the delays are fixed uniformly to $d$ for all synapses. 
+
 
 At the heart of the mean field model
 is the transition from the deterministic description of membrane potential 
@@ -228,7 +247,7 @@ dynamics according to \eqref{eq:leaky_integrator} and \eqref{eq:input_current} t
 a probabilistic formulation. Here, the input is modeled as a time-varying average part
 $\mu(t)$ plus a fluctuating gaussian part with amplitude $\sigma(t)$:
 \begin{equation}
-    I_i(t) = C_\text{m} \tau_\text{m} \left[ \mu(t) + \sigma(t)	\sqrt{\tau_\text{m}} \eta_i(t) \right] \, .
+    \frac{\tau_\text{m}}{C_\text{m}} \, I_i(t) =  \mu(t) + \sigma(t) \sqrt{\tau_\text{m}} \eta_i(t) \, .
     \label{eq:input_random}
 \end{equation}
 The random fluctuations are described by gaussian white noise $\eta_i(t)$ with 
@@ -241,35 +260,165 @@ both in time and between different neurons, i.e.
 The latter assumptions is by no means trivial and has to be tested for the spiking model
 that is to be described with this mean field approach. 
 
-The average input $\mu(t)$ and amplitude of fluctuations $\sigma(t)$ are linked to the 
-average firing rate $\nu(t)$ by the equations
+The average input $\mu(t)$ is linked to the 
+average firing rate $\nu(t)$ by
 \begin{equation}
     \begin{split}
         \mu(t)          &= \mu_l(t) + \mu_\text{ext} \\
         \text{with} \qquad \mu_l(t)        &= C_E \, J (1 - \gamma g) \nu(t - d) \tau_\text{m} \\
-        \mu_\text{ext}  &= C_E J \nu_\text{ext} \tau_\text{m}
+        \mu_\text{ext}  &= C_E J \nu_\text{ext} \tau_\text{m} \,.
         \label{eq:mu}
     \end{split}
 \end{equation}
+Similarly, for the amplitude of fluctuations $\sigma(t)$:
 \begin{equation}
     \begin{split}
         \sigma^2(t)     &= {\sigma_l}^2(t) + {\sigma_\text{ext}}^2 \\
         \text{with} \qquad {\sigma_l}^2(t)       
                         &= C_E \, J^2 (1 + \gamma g^2) \nu(t - d) \tau_\text{m} \\
-        {\sigma_\text{ext}}^2  &= C_E J^2 \nu_\text{ext} \tau_\text{m}
+        {\sigma_\text{ext}}^2  &= C_E J^2 \nu_\text{ext} \tau_\text{m} \,.
         \label{eq:sigma}
     \end{split}
 \end{equation}
 
-THIS IS EXTENDED TO:
+Brunel then transforms equations \eqref{eq:input_random} and \eqref{eq:leaky_integrator}
+into a Fokker-Planck equation describing the probability distribution of the membrane 
+potential $P(V, t)$ in time: 
+\begin{equation}
+    \tau_\text{m} \, \frac{\partial P(V, t)}{\partial t} 
+        = \frac{\sigma^2(t)}{2}  \: \frac{\partial^2 P(V, t)}{\partial V^2} 
+         \quad + \quad \frac{\partial }{\partial V}  [(V- \mu(t)) P(V, t)] \, .
+    \label{eq:fokker_planck}
+\end{equation}
+A number of constraints at the boundaries are set:
+\begin{align}
+    P(\theta, t) 
+        &= 0 \phantom{\frac{\partial P}{\partial V}} 
+        & \text{spiking}
+        \label{eq:continuity}
+        \\[0.2cm]
+    \frac{\partial P(\theta, t)}{\partial V}    
+        &= - \frac{2 \nu(t) \tau_\text{m}}{\sigma^2(t)}  
+        &\text{\eqref{eq:continuity} in \eqref{eq:fokker_planck}}
+        \\ 
+    \frac{\partial P(V_r^+, t)}{\partial V} \: -  \: \frac{\partial P(V_r^-, t)}{\partial V} 
+        &= - \frac{2 \nu(t - \tau_\text{rp}) \tau_\text{m}}{\sigma^2(t)} 
+        & \text{neurons finishing ref. period} 
+        \\
+    \phantom{\frac{\partial P}{\partial V}} \lim_{V \to -\infty} P(V, t) = 0
+        &; \quad\lim_{V \to -\infty} V P(V, t) = 0
+        & \text{integrability}
+    \label{eq:constraints}
+\end{align}
 
+A stationary solution $P(V, t) = P_0(V)$ with constant 
+single neuron firing rate $\nu_0$ 
+satisfying the above boundary conditions is then presented:
+\begin{equation}
+    P_0(V) = 2 \frac{\nu_0 \tau_\text{m}}{\sigma_0} 
+        \exp{\left(- \frac{(V - \mu_0)^2}{{\sigma_0}^2} \right)}
+        \int_{\frac{V_r - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
+            \Theta \left(u - \frac{V - \mu_0}{\sigma_0} \right) e^{u^2} \, \text{d}u  \,. 
+    \label{eq:P_V_0}
+\end{equation}
+Here, $\Theta(x)$ is the Heaviside step function, i.~e. 
+\begin{equation}
+    \Theta(x) = \begin{cases} 1 & \text{if } x > 0 \\ 0 & \text{else } \end{cases}  \,.
+    \label{eq:heaviside}
+\end{equation}
+The stationary mean input and fluctuation amplitudes are obtained by inserting 
+$\nu_0$ into the equations \eqref{eq:mu} and \eqref{eq:sigma}, yielding 
+\begin{align}
+    \mu_0 	    &= C_E J \:\tau_\text{m} [\nu_\text{ext} + \nu_0(1 - g \gamma)]  \,, \\ 
+    \sigma_0 	&= C_E J^{\,2} \,\tau_\text{m} [\nu_\text{ext} + \nu_0(1 + g^2 \gamma)] \,.
+    \label{eq:mu_sigma_0}
+\end{align}
+
+$P(V, t)$ can be interpreted as a probability distribution, so it has to 
+satisfy the normalization condition
+\begin{equation}
+    \int_{-\infty}^{\theta} \! P(V, t) \, \text{d}V  + p_r(t) = 1 \, ,
+    \label{eq:P_V_prob}
+\end{equation}
+where 
+\begin{equation}
+    p_r(t) := \int_{t - \tau_\text{rp}}^{t} \! \nu(u) \, \text{d}u 
+    \label{eq:p_r}
+\end{equation}
+is the probability of neurons being the in refractory period.
+In the constant case, this is simply 
+\begin{equation}
+    p_r(t) = p_{r, 0} = \nu_0 \tau_\text{rp}  \,.
+    \label{eq:p_r_0}
+\end{equation}
+
+Inserting both $P_0(V)$ and $p_{r, 0}$ into the self-consistent condition \eqref{eq:P_V_prob}
+then leads to an expression for $\nu_0$:
+\begin{equation}
+    \begin{split}
+        \frac{1}{\nu} 	
+            &= \tau_\text{rp} + \frac{1}{\nu_0} \int_{-\infty}^{\theta} \! P_0(V) \, \text{d}V  \\ 
+            &= \tau_\text{rp} + \frac{2 \tau_\text{m}}{\sigma_0} 
+                \int_{-\infty}^{\theta} \! \left[ 
+                    \exp{\left(- \frac{(V - \mu_0)^2}{{\sigma_0}^2} \right)}
+                    \int_{\frac{V_r - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
+                        \Theta \left(u - \frac{V - \mu_0}{\sigma_0} \right) e^{u^2} \, \text{d}u 
+                    \right] \, \text{d}V  \\ 
+            &= \tau_\text{rp} + \frac{2 \tau_\text{m}}{\sigma_0} 
+                \int_{\frac{V_r - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
+                    \left[ 
+                        e^{u^2}
+                        \int_{-\infty}^{u \sigma_0 + \mu_0} \! 
+                        \exp{\left(- \frac{(V - \mu_0)^2}{{\sigma_0}^2} \right)}
+                        \, \text{d}V
+                    \right] \, \text{d}u  \\ 
+            &= \tau_\text{rp} + 2 \tau_\text{m}
+                \int_{\frac{V_r - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
+                    \left[ 
+                        e^{u^2}
+                        \int_{-\infty}^{u} \! e^{v^2} \, \text{d}v
+                    \right] \, \text{d}u  \\ 
+            &= \tau_\text{rp} + \tau_\text{m} \sqrt{\pi}
+                \int_{\frac{V_r - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
+                e^{u^2} \left(1 + \text{erf}(u)\right)
+                \, \text{d}u  
+        \label{eq:self_consistency}
+    \end{split}
+\end{equation}
+This equation can be solved numerically for varying parameters as done by Brunel in order to 
+characterize the different states the system can be found in. 
+
+In order to transfer these results to the model of the neocortical microcircuit, 
+the contributions to the input have to be adapted for each population. Instead of 
+parametrized $\mu_0$ and $\sigma_0$ in terms of the variables $C_E$, $J$, $g$ and $\gamma$, 
+a matrix notation as in equation \eqref{eq:synapse_numbers} is used: 
+Synapse numbers and weights are defined as $C_{ab}$ and $J_{ab}$, respectively, 
+where $a$ is the postsynaptic and $b$ the presynaptic population. 
+Finally, the external input is written in a similar notation: 
+An external excitatory population with single neuron firing rate $\nu_\text{ext}$ 
+is connected to a neuron in population $a$ by 
+$C_{a, \text{ext}}$ synapses of weight $J_{a, \text{ext}}$.
+Including these definitions, the mean input and fluctuation amplitude can 
+be written as 
 \begin{align}
     \mu_a        &= 
-        \tau \sum_{b \in \text{pop.}} C_{ab} \, J_{ab} \, \nu_b 
-        + \tau C_{a, ext} \, J_{a, ext} \, \nu_{ext}
-\intertext{and fluctuation}
+        \tau_\text{m} \sum_{b \in \text{pop.}} C_{ab} \, J_{ab} \, \nu_b 
+        + \tau_\text{m} C_{a, \text{ext}} \, J_{a, \text{ext}} \, \nu_\text{ext} \, ; \\
     {\sigma_a}^2 &= 
-        \tau \sum_{b \in \text{pop.}} C_{ab} \, {J_{ab}}^2  \, \nu_b
-        +
-        \tau C_{a, ext} \,{J_{a, ext}}^2 \,\nu_{ext}
+        \tau_\text{m} \sum_{b \in \text{pop.}} C_{ab} \, {J_{ab}}^2  \, \nu_b
+        + \tau_\text{m} C_{a, \text{ext}} \,{J_{a, \text{ext}}}^2 \,\nu_\text{ext}\,,
 \end{align}
+where the sums go over all internal populations. In this specific case of eight 
+populations one thus obtains eight equations for the 
+firing rate $\nu_a$ of a single neuron in population $a$, 
+\begin{equation}
+    \frac{1}{\nu_{a}} = \tau_{rp} 
+        + \tau_\text{m} \sqrt{\pi}
+            \int_{\frac{V_r - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+                e^{u^2} \left(1 + \text{erf}(u)\right) \,\text{d}u  \,.
+    \label{eq:self_consistency_a}
+\end{equation}
+These equations are coupled by the boundaries of the integrals. 
+This coupling at the given high dimensionality renders the numerical solving a 
+problem on its own – this is explored in the next section. 
+

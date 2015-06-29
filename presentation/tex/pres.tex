@@ -313,9 +313,10 @@ with average input
 \begin{frame}[t]{Extension to higher dimensions}
 For neuron $i$ in population $a$,
 \begin{equation}
-    \frac{1}{\nu_{a}} = \tau_{rp} + 
-        2 \, \tau \int_{\frac{V_r - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
-        e^{u^2} \left(1 + \text{erf}(u)\right) \,\text{d}u 
+    \frac{1}{\nu_{a}} = \tau_{rp} 
+        + \tau_\text{m} \sqrt{\pi}
+            \int_{\frac{V_r - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+                e^{u^2} \left(1 + \text{erf}(u)\right) \,\text{d}u 
 \end{equation}
 with average input
 \begin{align}
