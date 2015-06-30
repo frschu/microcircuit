@@ -87,13 +87,14 @@ the inverse of the formula for connection probabilities derived by Potjans et. a
         Type            &   Leaky integrate-and-fire, exponential-shaped current inputs\\
         Subthreshold \newline dynamics of \newline neuron~$i$
                         &   {$\!\begin{aligned} 
-                            \tau_\text{m} \,\frac{\text{d} V_i(t)}{\text{d} t} 
+                                \tau_\text{m} \,\dot{V}(t) 
                                     &= -(V_i(t) - E_\text{L}) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t)
                                         &\text{if}\quad& t > t^* + \tau_\text{rp} \\ 
-                                V_i(t)        &= V_\text{r}  &\text{else}& \\[0.2cm]
-                                I_i(t) &= C_\text{m} \sum_j J_{ij} \sum_k \delta (t - t_j^k - d_{ij})  
+                                V_i(t)        
+                                    &= V_\text{r}  &\text{else}& \\[0.2cm]
+                                I_{\text{syn}, ij}(t) 
+                                    &= w_{ij} \exp{\left(\frac{-t}{\tau_\text{syn}}\right)} \\[0.2cm]
                             \end{aligned}$}  \\
-                            &THIS IS NOT TRUE -- STATE THE ACTUAL ODE! \\
         Spiking         &   If $\,\,V_i(t_-) < \theta \quad \land \quad V_i(t_+) \ge \theta$: \\
                         &   \quad 1. set $t^* = t$    \\
                         &   \quad 2. emit spike with time stamp $t^*$ \tnn
@@ -143,7 +144,7 @@ the inverse of the formula for connection probabilities derived by Potjans et. a
             & 0.036 & 0.001 & 0.003 & 0.001 & 0.028 & 0.008 & 0.066 & 0.144 \tnn
 
         \rowcolor{TableColor}\multicolumn{9}{l}{Further connectivity} \tn
-        $J \pm \delta J$    
+        $w \pm \delta w$    
             &  \multicolumn{3}{l}{$87.8 \pm 8.8 \,\text{pA}$}
             &  \multicolumn{5}{l}{Excitatory synaptic strengths} \tn
         $j_{02}$    
@@ -185,11 +186,76 @@ the inverse of the formula for connection probabilities derived by Potjans et. a
 \end{table}
 
 \subsubsection{Synaptic input}
-The spikes of neurons are modeled as delta functions. Accordingly, the 
-input current of neuron $i$ can be described as the sum over arriving 
-spike trains, 
+The spikes of neurons are modeled as Dirac delta functions, such that a
+spike train originating at neuron $j$ is represented by the sum 
+$\sum_k \delta(t - t_j^k)$. The model implements static 
+postsynaptic current synapses with exponential shape, such that each 
+spike arriving at one neuron leads to a current 
 \begin{equation}
-    I_i(t) = C_\text{m} \sum_j J_{ij} \sum_k \delta (t - t_j^k - d_{ij}) \, ,
+I_{\text{syn}} = w \exp{\left(\frac{-t}{\tau_\text{syn}}\right)}	
+    \label{eq:synaptic_current}
+\end{equation}
+where $w$ is the weight of the synapse in the model, given in pA.
+The weight $w$ is identical to the amplitude of the postsynaptic 
+current (PSC) at the time the spike arrives. 
+Since measuring currents remains a difficult task for experimentalists, 
+the model relays on measurements of the amplitude of the postsynaptic 
+potential (PSP). In order to use the experimental observations, 
+an approximative transformation is implemented 
+by calculating the PSC induced if one spike with given PSP arrives at 
+a neuron with membrane potential at rest. 
+For $E_\text{L} = 0$, setting $I(t) = I_\text{syn}$ in equation \eqref{eq:leaky_integrator}
+yields:
+\begin{equation}
+    \dot{V}(t)
+    = - \frac{1}{\tau_\text{m}} V(t) + \frac{w}{C_m} \exp{\left(-\frac{t}{\tau_\text{syn}}\right)}
+    \label{eq:psc_ode}
+\end{equation}
+This has the solution 
+\begin{equation}
+    V(t) =   
+        \frac{w \tau_\text{m} \tau_\text{syn}} {C_\text{m} \left(\tau_\text{syn} - \tau_\text{m}\right)}	
+        \exp{\left( -\frac{t}{\tau_\text{syn}} \right)} 
+        + C_1 \exp{\left(-\frac{t}{\tau_\text{m}} \right)}
+    \label{eq:psc_ode_sol}
+\end{equation}
+with integration constant $C_1$.
+With the boundary condition $V(t = 0) = 0$, this constant is set to
+\begin{equation}
+    C_1 = \frac{w \tau_\text{m} \tau_\text{syn}}{C_\text{m} \Delta\tau}	
+    \label{eq:C_1}
+\end{equation}
+where $\Delta\tau := \tau_\text{m} - \tau_\text{syn}$ is introduced.
+Thus
+\begin{equation}
+    V(t) = C_1 \left[\exp\left(-\frac{t}{\tau_\text{m}}\right) - \exp\left(-\frac{t}{\tau_\text{syn}}\right)\right]	\,.  
+    \label{eq:V(t)}
+\end{equation}
+
+In order to get the PSP, we search for a maximum. Setting $\dot{V}(t) = 0$ 
+yields
+\begin{equation}
+    t_\text{max} 
+        = \log{\!\left(\frac{\tau_\text{syn}}{\tau_\text{m}}\right)} 
+            \left(\frac{1}{\tau_\text{m}} - \frac{1}{\tau_\text{syn}}\right)^{-1} \,.
+    \label{eq:t_max}
+\end{equation}
+Inserting into equation \eqref{eq:V(t)} leads to 
+\begin{equation}
+    \text{PSP} := V(t_\text{max}) 
+        = \frac{w \tau_\text{m} \tau_\text{syn}}{C_\text{m} \Delta\tau}	
+            \left[ 
+                \left( \frac{\tau_\text{syn}}{\tau_\text{m}} \right)^\frac{\tau_\text{syn}}{\Delta\tau} 
+            - \left( \frac{\tau_\text{syn}}{\tau_\text{m}} \right)^\frac{\tau_\text{m}}{\Delta\tau} 
+            \right]
+    \label{eq:PSP}
+\end{equation}
+For a given PSP, this equation is simply inverted in order to get the according 
+weight $w$. Finally, the 
+input current of neuron $i$ can be described as the sum over currents induced by
+arriving spike trains, 
+\begin{equation}
+    I_i(t) = \sum_j w_{ij} \sum_k \exp\left(\frac{t - t_j^k - d_{ij}}{\tau_\text{syn}}\right) \, ,
     \label{eq:input_current}
 \end{equation}
 where $t_j^k$ is the time the $k$-th spike by neuron $j$ was emitted and the 
@@ -197,20 +263,18 @@ delay between neuron $i$ and $j$ is set to $d_{ij}$.
 
 The weight for each synapse is drawn from a normal distribution with fixed 
 mean for each population. Specifically, for all excitatory local populations, 
-this mean is set to $J = 0.15$ mV, (\emph{EQUIVALENT}) and for all inhibitory 
-ones to $-g J$. There is one important exception to this scheme, though. 
+this mean is set such that $\text{PSP} = 0.15$ mV, and for all inhibitory 
+ones to $-g \,\text{PSP}$. There is one important exception to this scheme, though. 
 The mean for the connection from L4e to L23e is increased by a factor of 
 $j_{02} = 2$. The original argument is based on missing constraints from experimental
 data and the observation that leaving out this factor leads to firing rates 
 of L32e neurons very close to zero 
-(consult the corresponding  paper \cite{potjans2014} for details). 
+(consult the corresponding paper \cite{potjans2014} for details). 
 The distributions from which weight are drawn are clipped, 
 such that a neuron assigned to the excitatory 
 population will not have associated outgoing synapses with $J_{ij} < 0$ 
 and vice versa for inhibitory ones. 
 
-
-Explain synapse dynamics, the change from PSP to PSC, etc.
 
 
 \subsection{Mean field model}
@@ -240,11 +304,34 @@ with $\gamma = 0.25$. The synaptic weights in this model are set to $J$ for
 excitatory presynaptic neurons and to $-g\, J$ for inhibitory ones, 
 whereas the delays are fixed uniformly to $d$ for all synapses. 
 
-
 At the heart of the mean field model
 is the transition from the deterministic description of membrane potential 
-dynamics according to \eqref{eq:leaky_integrator} and \eqref{eq:input_current} to
-a probabilistic formulation. Here, the input is modeled as a time-varying average part
+dynamics to a probabilistic formulation. 
+The prior one is similar to a subnetwork of the layered network described in
+section \ref{sub:methods_simulation} in that the membrane potential follows
+the differential equation \eqref{eq:leaky_integrator}. The input is simplified 
+by assuming an instant change in membrane potential independent of the given one
+for each spike arriving at the neuron. It can be described by a sum over 
+Dirac delta-functions, 
+\begin{equation}
+    I_i(t) = \tau_\text{m} \sum_j J_{ij} \sum_k \delta(t - t_j^k - d_{ij}) \,.
+    \label{eq:input_const_volt}
+\end{equation}
+The synaptic weights $J_{ij}$ in this case are equal to the PSP and given in mV.  
+
+A number of conditions are necessary in order to make the transition from 
+this description to a probabilistic one:
+\begin{itemize}
+    \item The sparsity implies that 
+        two neurons share only a small number of common input such that pair correlations
+        are negligible for $C / N \to 0$; 
+    \item For the low single neuron firing rates $\nu$ compared to the 
+        inverse membrane time constant $\tau_\text{a}$
+        (e.~g. $\nu \sim10$ Hz and $1 / \tau_\text{m} \sim 1 / (20\,\text{ms}) = 50\, \text{Hz}$),
+        a neuron receives a large number of small contributions per integration 
+        time, each being very small compared to the threshold ($J \ll \theta$);
+\end{itemize}
+If these conditions are true, the input can be modeled as a time-varying average part
 $\mu(t)$ plus a fluctuating gaussian part with amplitude $\sigma(t)$:
 \begin{equation}
     \frac{\tau_\text{m}}{C_\text{m}} \, I_i(t) =  \mu(t) + \sigma(t) \sqrt{\tau_\text{m}} \eta_i(t) \, .
@@ -421,4 +508,5 @@ firing rate $\nu_a$ of a single neuron in population $a$,
 These equations are coupled by the boundaries of the integrals. 
 This coupling at the given high dimensionality renders the numerical solving a 
 problem on its own – this is explored in the next section. 
+
 

@@ -1,4 +1,4 @@
-'''network_params.py
+"""network_params.py
 
     Network parameters. 
     Based on network_params.sli (Potjans 2014)
@@ -15,7 +15,7 @@ n_pop = number of populations. Each layer contains neurons of all types.
 In order to introduce further types, all arrays have to be carefully adapted. 
 However, the script running the simulation should not depend on these adaptations 
 but work without further configuration (not yet tested).
-'''
+"""
 import numpy as np
 
 ###################################################
@@ -33,8 +33,8 @@ area    = 1.0
 # Note that this produces different dynamics compared to the original model.
 scale_C_linearly  = True
 
-layers  = np.array(['L23', 'L4', 'L5', 'L6'])
-types = np.array(['e', 'i']) 
+layers  = np.array(["L23", "L4", "L5", "L6"])
+types = np.array(["e", "i"]) 
 
 full_scale_n_neurons = np.array( \
   [20683,   # layer 2/3 e
@@ -48,10 +48,10 @@ full_scale_n_neurons = np.array( \
 
 
 # Synaptic weights
-# Synaptic weight in the model are PSCs, which are derived in 'model_class.py'.
+# Synaptic weight in the model are PSCs, which are derived in "model_class.py".
 g     = 4.           # weight for inhibitory synapses
 # Factor for mean EPSP amplitude for L4e->L2/3e connections.
-# See p. 801 of the paper, second paragraph under 'Model Parameterization',
+# See p. 801 of the paper, second paragraph under "Model Parameterization",
 # and the caption to Supplementary Fig. 7
 j02 = 2.
 # Mean reference PSP (EPSP amplitude except for L4e->L2/3e)
@@ -85,33 +85,33 @@ delay_rel_sd = 0.5
 # default connection dictionary
 connection_rule   = "fixed_total_number"
 # weight distribution of connections between populations
-weight_dict_exc = {'distribution': 'normal_clipped', 'low': 0.0} 
-weight_dict_inh = {'distribution': 'normal_clipped', 'high': 0.0} 
+weight_dict_exc = {"distribution": "normal_clipped", "low": 0.0} 
+weight_dict_inh = {"distribution": "normal_clipped", "high": 0.0} 
 # delay distribution of connections between populations
-delay_dict  = {'distribution': 'normal_clipped', 'low': 0.1} 
+delay_dict  = {"distribution": "normal_clipped", "low": 0.1} 
 # default synapse dictionary
-syn_dict = {'model': 'static_synapse'}
+syn_dict = {"model": "static_synapse"}
 
 
 ###################################################
 ###          Single-neuron parameters		###        
 ###################################################
 
-neuron_model = 'iaf_psc_exp'    # neuron model. For PSP-to-PSC conversion to
+neuron_model = "iaf_psc_exp"    # neuron model. For PSP-to-PSC conversion to
                                 # be correct, synapses should be current-based
                                 # with an exponential time course
 Vm0_mean    = -58.0             # mean of initial membrane potential (mV)
 Vm0_std     = 10.0              # std of initial membrane potential (mV)
 
 # neuron model parameters
-model_params = {'tau_m': 10.,       # membrane time constant (ms)
-                't_ref': 2.,        # absolute refractory period (ms)
-                'tau_syn_ex': 0.5,  # excitatory synaptic time constant (ms)
-                'tau_syn_in': 0.5,  # inhibitory synaptic time constant (ms)
-                'C_m': 250.,        # membrane capacitance (pF)
-                'E_L': -65.,        # resting membrane potential (mV)
-                'V_th': -50.,       # spike threshold (mV)
-                'V_reset': -65.     # reset potential (mV)
+model_params = {"tau_m": 10.,       # membrane time constant (ms)
+                "t_ref": 2.,        # absolute refractory period (ms)
+                "tau_syn_ex": 0.5,  # excitatory synaptic time constant (ms)
+                "tau_syn_in": 0.5,  # inhibitory synaptic time constant (ms)
+                "C_m": 250.,        # membrane capacitance (pF)
+                "E_L": -65.,        # resting membrane potential (mV)
+                "V_th": -50.,       # spike threshold (mV)
+                "V_reset": -65.     # reset potential (mV)
                } 
 
 ###################################################
