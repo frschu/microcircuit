@@ -119,6 +119,7 @@ def prepare_simulation(master_seed, n_populations):
     # set global kernel parameters
     nest.SetKernelStatus(
         {"communicate_allgather": sim.allgather,
+        "print_time": True
         "overwrite_files": sim.overwrite_existing_files,
         "resolution": sim.dt,
         "total_num_virtual_procs": sim.n_vp})
@@ -352,7 +353,7 @@ def save_data(grp, all_GIDs, populations, n_neurons_rec_spike, n_neurons_rec_vol
         for j, population in enumerate(populations):
             senders = nest.GetStatus(spike_detectors[j])[0]["events"]["senders"]
             times   = nest.GetStatus(spike_detectors[j])[0]["events"]["times"]
-            times   = np.uint(times / sim.dt) # in unit of dt!
+            times   = np.uint(times / sim.dt) # in units of dt!
 
             # Create array of indices for data: 
             # times_{ith neuron} = times[rec_neuron_i[i]:rec_neuron_i[i+1]]

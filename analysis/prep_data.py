@@ -24,7 +24,7 @@ reverse_order = True # do analysis such that plots resemble those of the paper (
 ######################################################
 data_path = os.path.join(sim.data_dir, "vary_d")
 data_path = os.path.join(sim.data_dir, "micro")
-sim_spec = "a1.0_t20.4_totalN_00"
+sim_spec = "a1.0_t300.2_totalN_0"
 
 # Original data
 file_name  = sim_spec + ".hdf5"  
