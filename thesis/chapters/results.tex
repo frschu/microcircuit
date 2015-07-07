@@ -2,8 +2,36 @@
 \label{sec:results}
 
 \subsection{Spiking network model}
+Comparison of spontaneous activity for Potjans' original model and 
+the pyNEST implementation. 
 
-\subsection{Comparing results to Potjans}
+Explain calculation of derived parameters (rates, CV of ISI, synchrony).
+
+
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../figures/spon_activity}
+    \caption{Spontaneous activity of network in the pyNEST implementation. 
+        Recordings $10\%$ of the neurons of all populations are displayed.
+        Firing rate, CV of interspike intervals and synchrony are calculated 
+        based on a simulation of 20 seconds of the full scale network. For 
+        each layer, the excitatory population is the upper one shown 
+        (with lighter color).
+    }
+    \label{fig:spon_activity}
+\end{figure}
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{../figures/spon_activity_sli}
+    \caption{Spontaneous activity of network of the original implementation (written in SLI). 
+        All parameters and analysis as in Figure \ref{fig:spon_activity}.
+    }
+    \label{fig:spon_activity_sli}
+\end{figure}
+
+Analyze statistical fluctuations of the derived parameters(rates, etc.) 
+-> box plots
 
 \subsection{Mean-field theory}
 
