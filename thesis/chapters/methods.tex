@@ -5,10 +5,10 @@
 \label{sub:methods_simulation}
 Following Nordlie et al.'s suggestions on 
 \emph{good model description practice} \cite{nordlie2009},
-the network model is described in prose in the following paragraphs while a detailed 
-overview is provided in two tables: The model is summarized in table 
+the network model is described in detail in the following paragraphs while a detailed 
+overview is provided in two tables: The model is summarized in Table 
 \ref{tab:model_description}, 
-whereas specific numerical values of the parameters are displayed in table 
+whereas specific numerical values of the parameters are displayed in Table 
 \ref{tab:network_params}. 
 
 \subsubsection{Neuron model}
@@ -21,8 +21,8 @@ for neuron $i$ are governed by the differential equation
     \label{eq:leaky_integrator}
 \end{equation}
 The membrane is specified by its resting potential $E_\text{L}$, 
-the time constant $\tau_\text{m}$ and the capacitance $C_\text{m}$.
-If at time $t$ the threshold is reached, the neuron emits a spike and remains 
+its time constant $\tau_\text{m}$ and the capacitance $C_\text{m}$.
+If, at time $t$, the threshold is reached, the neuron emits a spike and remains 
 in a refractory period for a fixed time $\tau_\text{rp}$, with the membrane 
 potential set to $V_\text{r}$. The total input to the neuron is represented by 
 the current $I_i(t)$. 
@@ -31,7 +31,7 @@ the current $I_i(t)$.
 The network consists of eight cortical populations arranged in four 
 layers. Each layer contains an excitatory as well as an inhibitory population. 
 A total of 77169 leaky integrate-and-fire neurons are distributed according to the population
-sizes given in table \ref{tab:network_params}. The total numbers of excitatory and inhibitory 
+sizes given in Table \ref{tab:network_params}. The total numbers of excitatory and inhibitory 
 neurons are 61843 and 15326, respectively, yielding a ratio of 4.04 of excitatory over inhibitory
 neurons. \\
 For each combination of pre- and postsynaptic population, pairs of neurons to be connected are drawn
@@ -71,12 +71,12 @@ the inverse of the formula for connection probabilities derived by Potjans et. a
         Layers          &   L2/3, L4, L5, L6 \\
         Cortical network&   one excitatory (e) and one inhibitory (i) population per layer\\
         Size            &   population specific size 
-                            (see table \ref{tab:network_params}) \tnn
+                            (see Table \ref{tab:network_params}) \tnn
 
         \rowcolor{TableColor} Connectivity & \\
         Type            &   Random connectivity with independently chosen pre- and postsynaptic
                             neurons; fixed total number of connections between two populations
-                            (see table \ref{tab:network_params}) \\
+                            (see Table \ref{tab:network_params}) \\
         Weights         &   Fixed; drawn from clipped Gaussian distributions 
                             ($w > 0$ for excitatory, $w~<~0$ for inhibitory)\\
         Delays          &   Fixed; drawn from clipped Gaussian distributions ($d~>~0$);
@@ -85,9 +85,9 @@ the inverse of the formula for connection probabilities derived by Potjans et. a
         \rowcolor{TableColor}\multicolumn{2}{l}{ Neuron and synapse model} \\
         Name            &   iaf neuron\\
         Type            &   Leaky integrate-and-fire, exponential-shaped current inputs\\
-        Subthreshold \newline dynamics of \newline neuron~$i$
+        Subthreshold dynamics of neuron~$i$
                         &   {$\!\begin{aligned} 
-                                \tau_\text{m} \,\dot{V}(t) 
+                                \tau_\text{m} \,\dot{V_i}(t) 
                                     &= -(V_i(t) - E_\text{L}) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t)
                                         &\text{if}\quad& t > t^* + \tau_\text{rp} \\ 
                                 V_i(t)        
@@ -186,16 +186,15 @@ the inverse of the formula for connection probabilities derived by Potjans et. a
 \end{table}
 
 \subsubsection{Synaptic input}
-The spikes of neurons are modeled as Dirac delta functions, such that a
-spike train originating at neuron $j$ is represented by the sum 
-$\sum_k \delta(t - t_j^k)$. The model implements static 
+The model implements  
 postsynaptic current synapses with exponential shape, such that each 
 spike arriving at one neuron leads to a current 
 \begin{equation}
-I_{\text{syn}} = w \exp{\left(\frac{-t}{\tau_\text{syn}}\right)}	
+I_{\text{syn}}(t) = w \exp{\left(\frac{-t}{\tau_\text{syn}}\right)}	
     \label{eq:synaptic_current}
 \end{equation}
-where $w$ is the weight of the synapse in the model, given in pA.
+where $w$ is the weight of the synapse in the model, given in pA
+and $\tau_\text{syn}$ is the synapse time constant.
 The weight $w$ is identical to the amplitude of the postsynaptic 
 current (PSC) at the time the spike arrives. 
 Since measuring currents remains a difficult task for experimentalists, 
@@ -204,17 +203,17 @@ potential (PSP). In order to use the experimental observations,
 an approximative transformation is implemented 
 by calculating the PSC induced if one spike with given PSP arrives at 
 a neuron with membrane potential at rest. 
-For $E_\text{L} = 0$, setting $I(t) = I_\text{syn}$ in equation \eqref{eq:leaky_integrator}
+For $E_\text{L} = 0$, setting $I(t) = I_\text{syn}(t)$ in equation \eqref{eq:leaky_integrator}
 yields:
 \begin{equation}
     \dot{V}(t)
-    = - \frac{1}{\tau_\text{m}} V(t) + \frac{w}{C_m} \exp{\left(-\frac{t}{\tau_\text{syn}}\right)}
+    = - \frac{1}{\tau_\text{m}} V(t) + \frac{w}{C_m} \exp{\left(-\frac{t}{\tau_\text{syn}}\right)} \,.
     \label{eq:psc_ode}
 \end{equation}
 This has the solution 
 \begin{equation}
     V(t) =   
-        \frac{w \tau_\text{m} \tau_\text{syn}} {C_\text{m} \left(\tau_\text{syn} - \tau_\text{m}\right)}	
+        - \frac{w \tau_\text{m} \tau_\text{syn}} {C_\text{m} \left(\tau_\text{m} - \tau_\text{syn}\right)}	
         \exp{\left( -\frac{t}{\tau_\text{syn}} \right)} 
         + C_1 \exp{\left(-\frac{t}{\tau_\text{m}} \right)}
     \label{eq:psc_ode_sol}

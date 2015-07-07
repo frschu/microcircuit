@@ -1,15 +1,15 @@
 \section{Introduction}
 \label{sec:intro}
 \subsection{Hypotheses}
-- The original model can be implemented in Pynest, yielding a much more 
-comprehensible structure compared to the SLI implementation. 
+- The original model can be implemented in PyNEST\cite{NEST}, yielding a 
+comprehensible structure.
 
-- Some of the results of simulating the model can be approximated with a 
+- Some of the results of Potjans' model can be approximated with a 
 mean field theory (most notably, firing rates and membrane potential
 distributions).
 
-- The remaining disagreement between simulation and model can be tracked 
-down to correlations between spike trains.
+- The remaining disagreement between spiking model and mean field 
+model can be tracked down to correlations between spike trains.
 
 - Else: Signal transmission? Autocorrelation???
 
@@ -18,17 +18,21 @@ The full-scale spiking model is based on the derivation and implementation
 by Potjans and Diesmann \cite{potjans2014}, seeking to account for the detailed 
 structure of the neocortical microcolumn reported in experimental data. 
 Most notably, the feature of various horizontal layers is recaptured, 
-separating the simulated nodes into four layers, each containing an 
+separating the simulated neurons into four layers, each containing an 
 excitatory and an inhibitory population. 
+
+%Describe Potjans' derivation!
 
 However, it remains a minimal model in the sense that the number of 
 parameters included is small. The neurons are modeled as spiking leaky 
-integrate-and-fire neurons, connected by static synapses of one type. 
+integrate-and-fire neurons, connected by non adapting current based synapses. 
 The connections between single nodes are determined randomly based on 
 connection probabilities for each corresponding pre- and postsynaptic 
-population and a fixed probabilistic rule. Excitatory and inhibitory 
-neurons are distinguished by a global inhibition dominance ratio, following
-the approach of balanced random network models.
+population and a fixed probabilistic rule. The network is constructed 
+according to Dale's principle, such that neurons are either
+excitatory or inhibitory. The synaptic weights and delays are drawn
+from distributions specific to each neuron type. 
+
 
 The model is expected to operate in a stable regime of asynchronous irregular 
 (AI) spiking activity \cite{brunel2000}. HOWEVER, THIS NEEDS TO BE INVESTIGATED!
@@ -44,7 +48,7 @@ larger number of populations. This study sets out to address these questions.
 
 \subsection{Structure}
 The thesis is structured as follows. First, the implementation of Potjans and 
-Diesmann's model in Pynest is presented in detail. The results of simulations 
+Diesmann's model in PyNEST is presented in detail. The results of simulations 
 are compared to the results running the original implementation with identical 
 parameters. Then, the mean field theory for two populations is generalized 
 to the network model. The parameters predicted with this model are compared 
