@@ -80,6 +80,8 @@ docs/_build/
 *.fdb_latexmk
 *.synctex.gz
 *.bcf
+*.run.xml
+
 
 # ipython notebook
 *.ipynb_checkpoints/

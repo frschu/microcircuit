@@ -14,17 +14,16 @@ import h5py
 import sys, os
 import time
 sys.path.append(os.path.abspath('../simulation/')) # include path with simulation specifications
-# Import specific moduls
-import sim_params as sim; reload(sim)
 
 reverse_order = True # do analysis such that plots resemble those of the paper (starting with L6i)
 
 ######################################################
 # File and path
 ######################################################
-data_path = os.path.join(sim.data_dir, "vary_d")
-data_path = os.path.join(sim.data_dir, "micro")
-sim_spec = "a1.0_t300.2_totalN_0"
+data_file = "micro"
+data_sup_path = "/export/data-schuessler/data_microcircuit/"
+data_path = os.path.join(data_sup_path, data_file)
+sim_spec = "membrane_potential"
 
 # Original data
 file_name  = sim_spec + ".hdf5"  
@@ -34,19 +33,37 @@ res_file_name = sim_spec + "_res.hdf5"
 data_file = h5py.File(os.path.join(data_path, file_name), "r")
 res_file = h5py.File(os.path.join(data_path, res_file_name), "w")
 
-
 ######################################################
 # Basic data
 ######################################################
 # Simulation attributes
-t_sim   = data_file.attrs["t_sim"]  
-t_trans = data_file.attrs["t_trans"]
-dt      = data_file.attrs["dt"]    
+area          = data_file.attrs["area"]   
+t_sim         = data_file.attrs["t_sim"]  
+t_trans       = data_file.attrs["t_trans"]
+dt            = data_file.attrs["dt"]    
 populations   = data_file.attrs["populations"].astype("|U4")
+layers        = data_file.attrs["layers"].astype("|U4")        
+types         = data_file.attrs["types"].astype("|U4")     
 n_populations = data_file.attrs["n_populations"]
+n_layers      = data_file.attrs["n_layers"]       
+n_types       = data_file.attrs["n_types"] 
 
 t_measure = t_sim - t_trans
 
+# Pass data to res_file:
+res_file.attrs["area"]             = data_file.attrs["area"]   
+res_file.attrs["t_sim"]            = data_file.attrs["t_sim"]  
+res_file.attrs["t_trans"]          = data_file.attrs["t_trans"]
+res_file.attrs["dt"]               = data_file.attrs["dt"]    
+res_file.attrs["populations"]      = data_file.attrs["populations"]
+res_file.attrs["layers"]           = data_file.attrs["layers"]       
+res_file.attrs["types"]            = data_file.attrs["types"]     
+res_file.attrs["n_populations"]    = data_file.attrs["n_populations"]
+res_file.attrs["n_layers"]         = data_file.attrs["n_layers"]       
+res_file.attrs["n_types"]          = data_file.attrs["n_types"] 
+
+
+# For further analysis
 if reverse_order:
     populations = populations[::-1]
 
@@ -83,11 +100,12 @@ for sim_spec2 in data_file.keys():
     if "spikes" in data_file[sim_spec2]:
         # Data
         grp = data_file[sim_spec2 + "/spikes"]
-    
-        res_raster = res_grp.create_group("raster") 
         dt = grp.attrs["dt"]
         n_neurons_rec_spike = grp.attrs["n_neurons_rec_spike"][:]
-    
+
+        # Raster plot data
+        res_raster = res_grp.create_group("raster") 
+
         if reverse_order:
             n_neurons_rec_spike = n_neurons_rec_spike[::-1]
         offsets = np.append([0], np.cumsum(n_neurons_rec_spike)) * max_plot
@@ -116,7 +134,6 @@ for sim_spec2 in data_file.keys():
             rates = n_spikes / t_measure # Hz
     
             cv_isi_all = np.empty(0)    
-            rates = []
             hist_spikes_i = np.zeros(n_bins_spikes)
             
             for j in range(n_rec_spikes_i):
@@ -125,7 +142,6 @@ for sim_spec2 in data_file.keys():
                 
                 # raster, histogram, etc
                 n_spikes = len(times)
-                rates.append(n_spikes / t_measure)
                 hist_spikes_i += np.histogram(times, bins=n_bins_spikes, range=(t_trans, t_sim), density=False)[0]
                 if n_spikes > 1:
                     isi         = np.diff(times)
@@ -152,6 +168,10 @@ for sim_spec2 in data_file.keys():
             synchrony[i]    = np.var(hist_spikes_i) / np.mean(hist_spikes_i)
             n_rec_spikes[i] = n_rec_spikes_i
             hist_spikes[i]  = hist_spikes_i
+
+            # Save single rates
+            res_grp.create_dataset("single_rates/" + str(population), data=rates)
+
             
         res_raster.attrs["t_min_raster"] = t_min_raster
         res_raster.attrs["t_max_raster"] = t_max_raster
@@ -180,7 +200,7 @@ for sim_spec2 in data_file.keys():
         dt_volt = volt_grp.attrs["dt_volt"]
         t_min_volt  = volt_grp.attrs["t_min"]
         t_max_volt  = volt_grp.attrs["t_max"]
-        times_volt  = np.arange(t_min_volt, t_max_volt, dt_volt) *1e-3 # s
+        times_volt  = np.arange(t_min_volt + dt_volt, t_max_volt, dt_volt) *1e-3 # s
         
         volt_plot         = np.zeros((n_populations, n_hist_max, len(times_volt)))    
         volt_histo_means     = np.zeros((n_populations, n_bins_volt))

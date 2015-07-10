@@ -1,3 +1,6 @@
+"""style.py
+Contains standard style for figures.
+"""
 from matplotlib.colors import colorConverter
 from matplotlib import rcParams
 try:
@@ -46,3 +49,4 @@ rcParams['figure.figsize'] = (xfactor*6.2, xfactor*3.83)
 
 def fixticks(ax):    
     for t in ax.xaxis.get_ticklines(): t.set_color('0.8')
+

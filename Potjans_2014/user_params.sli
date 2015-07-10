@@ -20,12 +20,13 @@
  *
  */
 
+(network_params) run
 (sim_params) run
 
 run_mode (production) eq
 {
     % absolute path to which the output files should be written
-    /output_sup_path (/users/schuessler/uni/microcircuit/data/test/)
+    /output_sup_path (/users/schuessler/uni/microcircuit/data/sli/)
     def
     
     % add simulation specifications to data file
@@ -50,12 +51,9 @@ run_mode (production) eq
         sim_spec (_dc) join def
     } if
     /simulation_name
-    sim_spec (_0) join
-    sim_number cvs join
+    sim_spec
     def
-    /simulation_path output_sup_path simulation_name join def
-    /output_path simulation_path (/sli/) join def
-    simulation_path MakeDirectory
+    /output_path output_sup_path simulation_name join def
     output_path MakeDirectory
 } if
 

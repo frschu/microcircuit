@@ -29,7 +29,7 @@ import sim_params as sim; reload(sim)
 #######################################################
 # Pre-loop functions
 #######################################################
-def initialize_data_file(sub_path, model, verbose):
+def initialize_data_file(sub_path, model, verbose=True, name=None):
     """Creates data_path and file_name for HDF5-file where all data is saved to.
 
     file_name contains global conditions of simulations: 
@@ -45,13 +45,16 @@ def initialize_data_file(sub_path, model, verbose):
         os.makedirs(data_path)
     
     # File name
-    sim_spec = "a%.1f_t%.1f"%(model.area, sim.t_sim * 1e-3)
-    if not model.n_th == 0:
-        sim_spec += "_th"
-    if not model.dc_amplitude == 0:
-        sim_spec += "_dc"
-    if model.connection_rule=="fixed_total_number":
-        sim_spec += "_totalN"
+    if name==None:
+        sim_spec = "a%.1f_t%.1f"%(model.area, sim.t_sim * 1e-3)
+        if not model.n_th == 0:
+            sim_spec += "_th"
+        if not model.dc_amplitude == 0:
+            sim_spec += "_dc"
+        if model.connection_rule=="fixed_indegree":
+            sim_spec += "_fixindeg"
+    else:
+        sim_spec = name
     file_name   = sim_spec + "_00.hdf5"
     
     # don't overwrite existing files...
@@ -119,7 +122,7 @@ def prepare_simulation(master_seed, n_populations):
     # set global kernel parameters
     nest.SetKernelStatus(
         {"communicate_allgather": sim.allgather,
-        "print_time": True
+        "print_time": True, 
         "overwrite_files": sim.overwrite_existing_files,
         "resolution": sim.dt,
         "total_num_virtual_procs": sim.n_vp})
@@ -149,7 +152,7 @@ def derive_parameters(model):
     if sim.record_fraction_neurons_voltage:
         n_neurons_rec_voltage = (model.n_neurons * sim.frac_rec_voltage).astype(int)
     else:
-        n_neurons_rec_voltage = (np.ones_like(model.n_neurons) * sim._rec_voltage).astype(int)
+        n_neurons_rec_voltage = (np.ones_like(model.n_neurons) * sim.n_rec_voltage).astype(int)
 
     return n_neurons_rec_spike, n_neurons_rec_voltage
 
@@ -392,10 +395,10 @@ def save_data(grp, all_GIDs, populations, n_neurons_rec_spike, n_neurons_rec_vol
         voltage_grp.attrs["t_max"]  = stop 
         voltage_grp.attrs["n_neurons_rec_voltage"] = n_neurons_rec_voltage
 
-        for j, population in enumerate(model.populations):
-            volts       = nest.GetStatus((multimeters[j],))[0]["events"]["V_m"]
-            senders     = nest.GetStatus((multimeters[j],))[0]["events"]["senders"]
-            n_events    = nest.GetStatus((multimeters[j],))[0]["n_events"]   # number of 
+        for j, population in enumerate(populations):
+            volts       = nest.GetStatus(multimeters[j])[0]["events"]["V_m"]
+            senders     = nest.GetStatus(multimeters[j])[0]["events"]["senders"]
+            n_events    = nest.GetStatus(multimeters[j])[0]["n_events"]   # number of 
             n_rec       = n_neurons_rec_voltage[j]
             n_times     = n_events / n_rec
             # Create mask in order to get sorted_volts[GID, times_index]

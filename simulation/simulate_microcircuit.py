@@ -30,7 +30,7 @@ import sim_params as sim; reload(sim)
 import functions; reload(functions)
 import model_class; reload(model_class)
 verbose     = False                     # whether to print every connection made
-
+name    = "membrane_potential"
 #######################################################
 # Instantiate model
 #######################################################
@@ -45,7 +45,7 @@ model           = model_class.model(connection_rule=connection_rule,
 # Create data file
 #######################################################
 sub_path = "micro"
-data_file, file_name, data_path = functions.initialize_data_file(sub_path, model, verbose)
+data_file, file_name, data_path = functions.initialize_data_file(sub_path, model, verbose, name)
 seed_file, master_seed          = functions.initialize_seeds()
 info_file                       = functions.initialize_info_file(file_name, data_path)
 

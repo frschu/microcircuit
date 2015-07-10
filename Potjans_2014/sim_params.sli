@@ -35,7 +35,7 @@
                       % (production) for writing files
                       % to a chosen absolute path. 
 
-/t_sim 1000.0 def     % simulated time (ms)
+/t_sim 60200.0 def     % simulated time (ms)
 /dt 0.1 def           % simulation step (ms). Default is 0.1 ms.
 /allgather true def   % communication protocol
 
@@ -47,7 +47,7 @@
 
 /n_mpi_procs 1 def	                    % number of MPI processes
 
-/n_threads_per_proc 1 def	            % number of threads per MPI process
+/n_threads_per_proc 8 def	            % number of threads per MPI process
                                             % use for instance 24 for a full-scale simulation
 
 
@@ -69,30 +69,30 @@
 % whether to record spikes from a fixed fraction of neurons in each population
 % If false, a fixed number of neurons is recorded in each population.
 % record_fraction_neurons_spikes true with f_rec_spikes 1. records all spikes
-/record_fraction_neurons_spikes true def
+/record_fraction_neurons_spikes false def
 
 record_fraction_neurons_spikes
 {
-    /frac_rec_spikes 0.1 def
+    /frac_rec_spikes 0.025 def
 }{
-    /n_rec_spikes 100 def
+    /n_rec_spikes 1000 def
 } ifelse
 
 % whether to record voltage from a fixed fraction of neurons in each population
-/record_fraction_neurons_voltage true def
+/record_fraction_neurons_voltage false def
 
 record_fraction_neurons_voltage
 {
     /frac_rec_voltage 0.02 def
 }{
-    /n_rec_voltage 20 def
+    /n_rec_voltage 0 def
 } ifelse
 
 % whether to write any recorded cortical spikes to file
 /save_cortical_spikes true def
 
 % whether to write any recorded membrane potentials to file
-/save_voltages true def
+/save_voltages false def
 
 % whether to record thalamic spikes (only used when n_thal in
 % network_params.sli is nonzero)

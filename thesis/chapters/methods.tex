@@ -34,7 +34,7 @@ whereas specific numerical values of the parameters are displayed in Table
         Measurements    &   Spike activity, membrane potentials \tnn
 
         \rowcolor{TableColor} Populations & \\
-        Layers          &   L23, L4, L5, L6 \\
+        Layers          &   L2/3, L4, L5, L6 \\
         Cortical network&   one excitatory (e) and one inhibitory (i) population per layer\\
         Size            &   population specific size 
                             (see Table \ref{tab:network_params}) \tnn
@@ -78,8 +78,14 @@ A simplified diagram of the network is given in Figure \ref{fig:diagram}.
 \begin{figure}[htpb]
     \centering
     \includegraphics[width=0.5\linewidth]{../figures/diagram}
-    \caption{Diagram of the layered cortical network. The displayed connections are only exemplary. 
-    The external input is simulated by poissonian spike trains.}
+    \caption{Diagram of the layered cortical network. 
+        Layers 23, 4, 5, and 6 are composed of one excitatory
+        (triangles) and one inhibitory population (circles) each.
+        The connections are only shown for probabilities $>0.04$. 
+        The external input is simulated by poissonian spike trains 
+        and fed to all four layers containing populations. 
+        Layer 1 does not contain neuron populations.
+    }
     \label{fig:diagram}
 \end{figure}
 
@@ -105,7 +111,7 @@ For excitatory presynaptic neurons, this mean value is set to $87,8$ pA (see bel
 a derivation). The mean for inhibitory ones is determined by multiplying 
 with a factor $-g$, where the relative inhibitory synapse strength is set to 
 $g = 4$. There is one important exception to this scheme.
-The mean for the connection from L4e to L23e is increased by a factor of 
+The mean for the connection from L4e to L2/3e is increased by a factor of 
 $j_{02} = 2$ (consult the corresponding paper \cite{potjans2014} for details). 
 The standard deviation is set to $10\%$ of the mean. 
 The distributions from which weights are drawn are clipped, 
@@ -236,7 +242,7 @@ Table \ref{tab:network_params}.
     \begin{tabular}{p{3.5cm}| *{8}{x{1.2cm}}}
         \rowcolor{TableColor}\multicolumn{9}{l}{Populations and input} \tn 
         Name $a$       
-            & L23e & L23i & L4e & L4i & L5e & L5i & L6e & L6i  \tn \hline
+            & L2/3e & L2/3i & L4e & L4i & L5e & L5i & L6e & L6i  \tn \hline
         Population size, $N_a$   
             & 20683 & 5834 & 21915 & 5479 & 4850 & 1065 & 14395 & 2948 \tn
         Ext. inputs, $C_{a, \text{ext}}$ 
@@ -246,10 +252,10 @@ Table \ref{tab:network_params}.
 
         \rowcolor{TableColor}\multicolumn{9}{l}{Connection probabilities between pre- and postsynaptic populations} \tn
         \diagbox[width=3.9cm]{post~~~~}{pre~~~}&
-              L23e & L23i & L4e & L4i & L5e & L5i & L6e & L6i  \tn \hline
-        L23e
+              L2/3e & L2/3i & L4e & L4i & L5e & L5i & L6e & L6i  \tn \hline
+        L2/3e
             & 0.101 & 0.169 & 0.044 & 0.082 & 0.032 & 0.000 & 0.008 & 0.000 \tn 
-        L23i
+        L2/3i
             & 0.135 & 0.137 & 0.032 & 0.051 & 0.075 & 0.000 & 0.004 & 0.000 \tn 
         L4e
             & 0.008 & 0.006 & 0.050 & 0.135 & 0.007 & 0.000 & 0.045 & 0.000 \tn 
@@ -270,7 +276,7 @@ Table \ref{tab:network_params}.
             &  \multicolumn{5}{l}{Excitatory synaptic strengths} \tn
         $j_{02}$    
             &  \multicolumn{3}{l}{$2$}
-            &  \multicolumn{5}{l}{Factor for connection L4e $\to$ L23e} \tn
+            &  \multicolumn{5}{l}{Factor for connection L4e $\to$ L2/3e} \tn
         $g$    
             &  \multicolumn{3}{l}{$4$}
             &  \multicolumn{5}{l}{Relative inhibitory synapse strength} \tn
@@ -322,6 +328,7 @@ dt, exact integration?
 number of kernels?
 
 Put scripts online...
+
 
 \subsection{Mean field model}
 The derivation of a mean field theory goes along the 
@@ -450,7 +457,7 @@ the rate of neurons firing at $t - \tau_\text{rp}$ expressed by
 Finally, $P(V, t)$ is assumed to converge sufficiently quickly to zero:
 
 \begin{equation}
-    \lim_{V \to -\infty} P(V, t) = 0 
+\lim_{V \to -\infty} P(V, t) = 0 \, ;
     \quad 
     \lim_{V \to -\infty} V P(V, t) = 0 \,.
 \end{equation}
@@ -546,10 +553,10 @@ Including these definitions, the mean input and fluctuation amplitude can
 be written as 
 \begin{align}
     \mu_a        &= 
-        \tau_\text{m} \sum_{b \in \text{pop.}} C_{ab} \, J_{ab} \, \nu_b 
+        \tau_\text{m} \sum_{b \,\in \,\text{pop.}} C_{ab} \, J_{ab} \, \nu_b 
         + \tau_\text{m} C_{a, \text{ext}} \, J_{a, \text{ext}} \, \nu_\text{ext} \, ; \\
     {\sigma_a}^2 &= 
-        \tau_\text{m} \sum_{b \in \text{pop.}} C_{ab} \, {J_{ab}}^2  \, \nu_b
+        \tau_\text{m} \sum_{b \,\in \,\text{pop.}} C_{ab} \, {J_{ab}}^2  \, \nu_b
         + \tau_\text{m} C_{a, \text{ext}} \,{J_{a, \text{ext}}}^2 \,\nu_\text{ext}\,,
 \end{align}
 where the sums go over all internal populations. In this specific case of eight 

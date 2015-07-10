@@ -1,4 +1,3 @@
-
 from matplotlib.colors import colorConverter
 from matplotlib import rcParams
 try:

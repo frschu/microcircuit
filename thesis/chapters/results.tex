@@ -2,37 +2,127 @@
 \label{sec:results}
 
 \subsection{Spiking network model}
-Comparison of spontaneous activity for Potjans' original model and 
-the pyNEST implementation. 
+The simulation of the spiking network model will be analyzed in the following manner. 
+At first, the results are directly compared to those obtained by the original 
+model of Potjans and Diesmann. This comparison is done on a statistical level, 
+as direct (spike per spike) comparison is not feasible due to internal differences
+in the algorithms. 
+Then, some aspects of the results are analyzed more thoroughly, such as 
+the interspike interval distributions, global activity and 
+membrane potential distribution. These results are compared with 
+theoretical approximations such as the distributions expected for Poisson processes. 
 
-Explain calculation of derived parameters (rates, CV of ISI, synchrony).
+A comparison between the pyNEST implementation and the original one written in SLI
+is first supplied in form of raster plots, see Figure \ref{fig:raster_plot}. 
+Both results have a very similar structure: Common features are the observable low 
+rates of populations $L2/3e$ and $L6e$ as well some signs of synchrony within populations. Single neurons fire at a rate much lower than the activity of the 
+entire population, as would be expected for networks in the AI regime \cite{brunel2000}. 
+
+A more thorough comparison is done on the bases of three statistical quantities: 
+Figure \ref{fig:spon_activity} shows single neurons firing rates, coefficient of 
+variation of interspike intervals as well as a measure for synchrony for both 
+simulations. The latter one is calculated by dividing the variance of population
+activity subdivided in bins of 3 ms by its mean. 
 
 
-
+\emph{SHORT EXPLANATION OF SHOWN QUANTITIES:\\
+Raster plot, box plot of single neuron firing rates, CV of ISI, synchrony.\\
+FURTHER: \\
+Plots directly comparing these quantities;\\
+Plots for statistical fluctuations -> box plots} 
 \begin{figure}[htpb]
     \centering
-    \includegraphics[width=0.8\linewidth]{../figures/spon_activity}
-    \caption{Spontaneous activity of network in the pyNEST implementation. 
-        Recordings $10\%$ of the neurons of all populations are displayed.
-        Firing rate, CV of interspike intervals and synchrony are calculated 
-        based on a simulation of 20 seconds of the full scale network. For 
-        each layer, the excitatory population is the upper one shown 
-        (with lighter color).
+    \includegraphics[width=1.0\linewidth]{\figdir raster_plot}
+    \caption{Raster plot showing spontaneous activity of network for 
+        (A) the pyNEST implementation and (B) the SLI implementation.
+        The simulation and network parameters for both simulations are 
+        the same. 
+        For each layer, the excitatory population is the upper one shown 
+        (total of 1924 neurons) for $400$ ms (with a transient period of 100 ms). 
     }
-    \label{fig:spon_activity}
+    \label{fig:raster_plot}
 \end{figure}
 \begin{figure}[htpb]
     \centering
-    \includegraphics[width=0.8\linewidth]{../figures/spon_activity_sli}
-    \caption{Spontaneous activity of network of the original implementation (written in SLI). 
-        All parameters and analysis as in Figure \ref{fig:spon_activity}.
+    \includegraphics[width=1.0\linewidth]{\figdir spontaneous_activity}
+    \caption{
+        Derived statistical quantities for spontaneous activity of network for
+        (\textbf{A - C}) the pyNEST implementation and (\textbf{D - E}) the SLI implementation, 
+        using the same simulation and network parameters.
+        All quantities are derived by measuring 1000 spike trains of
+        each population in a simulation for 60 s. 
+        \quad (\textbf{A, D}) Boxplot of single neuron firing rates. The boxes show the extends of 
+        Q1 and Q3, median is indicated by a black line, whiskers extend to 1.5 IQR. 
+        Outliers are displayed as plus-signs. 
+        \quad (\textbf{B, E}) Coefficient of variation (CV) of interspike intervals (ISI) indicating 
+        the irregularity of single neuron spiking. 
+        \quad (\textbf{C, F}) Synchrony of the recorded subset of each population quantified by the 
+        variance of the summed spike count histograms (bin width 3 ms) divided by
+        its mean. 
     }
-    \label{fig:spon_activity_sli}
+    \label{fig:spontaneous_activity}
 \end{figure}
 
-Analyze statistical fluctuations of the derived parameters(rates, etc.) 
--> box plots
+More detailed view on results:
+Synchrony of populations in terms of population activity, Figure \ref{fig:population_activity}. 
+The observed global oscillation indicates non-negligible correlations
+and thus contradicts the assumption of uncorrelated gaussian white noise 
+(in the mean field model).
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{\figdir population_activity}
+    \caption{Population activity of all eight populations.
+        (A) Number of spikes per 1 ms over the time of 1 s;
+        (B) Power spectral density (PSC) of population activity minus mean activity. 
+        Lighter and heavily oscillating background is the complete PSD, thick darker 
+        line represents filtered data (Savitzky-Golay filter of 5th degree over 301 data points).
+        The peaks indicate global oscillations at $\approx 82$ Hz (origin not clear).
+    }
+    \label{fig:population_activity}
+\end{figure}
 
-\subsection{Mean-field theory}
 
-\subsection{Stability of the network}
+
+\subsection{Mean field theory}
+The results regarding the mean field approach consist of a solution to the problem 
+of convergence of the numerical solving and a direct comparison of the predicted rates
+with the ones obtained in the spiking network model simulation.
+
+Transition: \\
+Rates for Brunel's model known/ much easier to solve (only one rate) \\
+Step-wise transition from Brunel's model to Potjans, see Figure \ref{fig:transition_mf_vs_model} \\
+Finally: \\ 
+differences between modeling with "fixed indegree" and "fixed total number",
+figures \ref{fig:compare_sim_mf_fixed_indegree} and 
+\ref{fig:compare_sim_mf_fixed_total_number}.
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{\figdir transition_mf_vs_model}
+    \caption{Transition from Brunels model of equal populations to the neocortical network model. 
+        Single neuron firing rates obtained by simulation (dotted lines) and 
+        numerical solution of the mean field model. Distance $d$ indicates the 
+        normalized $L^2$-norm in the parameter space ($8 \times 8$ synapse numbers $+ j_{02}$, see text
+        for further explanation). 
+    }
+    \label{fig:transition_mf_vs_model}
+\end{figure}
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{\figdir compare_sim_mf_fixed_indegree}
+    \caption{Comparison between mean field theory and spiking network model. 
+        Bars indicate the single neuron firing rates predicted by the mean field 
+        theory, crosses the calculated ones for 20 simulations where the connection
+        rule was set to "fixed indegree".
+    }
+    \label{fig:compare_sim_mf_fixed_indegree}
+\end{figure}
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{\figdir compare_sim_mf_fixed_total_number}
+    \caption{Comparison between mean field theory and spiking network model.
+        Similar to Figure \ref{fig:compare_sim_mf_fixed_indegree} except for the connection 
+        rule which was set to "fixed\_total\_number". The measured rates of the simulation 
+        fluctuate more strongly but around the same mean. 
+    }
+    \label{fig:compare_sim_mf_fixed_total_number}
+\end{figure}
