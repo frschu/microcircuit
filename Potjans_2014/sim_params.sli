@@ -47,7 +47,7 @@
 
 /n_mpi_procs 1 def	                    % number of MPI processes
 
-/n_threads_per_proc 8 def	            % number of threads per MPI process
+/n_threads_per_proc 12 def	            % number of threads per MPI process
                                             % use for instance 24 for a full-scale simulation
 
 

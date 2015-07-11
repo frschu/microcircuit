@@ -277,6 +277,7 @@
 	           /label spike_detector_label layer_index cvs join (_) join
                    population_index cvs join
 	           /to_file save_cortical_spikes
+               /to_memory false
 	        >> SetStatus 
             spike_detector_GIDs [layer_index population_index]
             this_spike_detector put
@@ -288,6 +289,7 @@
 	           /label voltmeter_label layer_index cvs join (_) join
                    population_index cvs join
 	           /to_file save_voltages
+               /to_memory false
                /start 0.0
 	        >> SetStatus
             voltmeter_GIDs [layer_index population_index] this_voltmeter put
