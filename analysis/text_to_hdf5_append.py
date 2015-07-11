@@ -33,7 +33,6 @@ def get_GIDs_times(model, population, data_path, t_trans):
     file_names_all  = os.listdir(data_path)
     file_names = [file_name for file_name in file_names_all if file_name.startswith(prefix)]
     for file_name in file_names:
-        print(file_name)
         with open(os.path.join(data_path, file_name), "r") as file:
             for line in file:
                 GID, time = line.split()
@@ -68,7 +67,7 @@ sim_spec = "a1.0_t60.2"
 sub_path        = "sli"
 data_sup_path = sim.data_dir
 data_path = os.path.join(data_sup_path, sub_path)
-file_name   = sim_spec + ".hdf5"
+file_name   = sim_spec + "_all.hdf5"
 
 sli_data_path = os.path.join(data_path, sim_spec)
 path_hdf5_file = os.path.join(data_path, file_name)
@@ -79,7 +78,8 @@ with h5py.File(path_hdf5_file, "r+") as data_file:
     for key in data_file.keys():
         max_grp = max(max_grp, int(key))
 
-    grp         = data_file.create_group(str(max_grp))
+    print("new group: ", max_grp)
+    grp         = data_file.create_group(str(max_grp + 1))
     spikes_grp = grp.create_group("spikes")
     spikes_grp.attrs["dt"]  = sim.dt 
     spikes_grp.attrs["info"]  = "times_{ith neuron} = times[rec_neuron_i[i]:rec_neuron_i[i+1]]"

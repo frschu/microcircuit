@@ -244,7 +244,7 @@ class model:
         return self.tau_m * (np.dot(self.mat1, v) + self.mu_ext)
 
     def sd(self, v):
-        """Mean input in Brunel's model"""
+        """Fluctuation of input in Brunel's model"""
         return np.sqrt(self.tau_m * (np.dot(self.mat2, v) + self.var_ext))
 
     def root_v0(self, v):
@@ -254,8 +254,8 @@ class model:
         """
         from scipy.integrate import quad
         from scipy.special import erf
-        mu_v = self.tau_m * (np.dot(self.mat1, v) + self.mu_ext)
-        sd_v = np.sqrt(self.tau_m * (np.dot(self.mat2, v) + self.var_ext))
+        mu_v  = self.mu(v)
+        sd_v  = self.sd(v)
         low = (self.V_r - mu_v) / sd_v
         up  = (self.theta - mu_v) / sd_v
         bounds      = np.array([low, up]).T
@@ -363,10 +363,11 @@ class model:
     def prob_V(self, V_array, mu, sd, v):
         """Membrane potential probability distribution P(V_m) according to Brunel"""
         from scipy.integrate import quad
-        step        = lambda x: 0.5 * (np.sign(x) + 1)
-        P_integrand = lambda u: step(u - self.V_r) * np.exp(u**2)
+        step        = lambda x: 0.5 * (np.sign(x) + 1)  # Heaviside step function
+        red         = lambda V: (V - mu) / sd           # reduced voltage
+        P_integrand = lambda u: step(u - red(self.V_r)) * np.exp(u**2) # integrand
         
-        low = (self.V_r - mu) / sd
+        low = red(V_r)
         up  = (self.theta - mu) / sd
         integral    = quad(P_integrand, low, up)[0]
         

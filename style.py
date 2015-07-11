@@ -21,6 +21,8 @@ try:
     palette = lambda: itertools.cycle(sns.xkcd_palette(color_names) )
 except:
     print('seaborn not installed')
+    color_names= ["b", "r", "g", "y", "m", "brown", "c", "orange"]
+    colors = [colorConverter.to_rgb(color_name) for color_name in color_names]
 
 
 fontsize_labels = 16    # size used in latex document

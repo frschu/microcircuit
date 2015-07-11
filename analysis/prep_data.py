@@ -200,7 +200,7 @@ for sim_spec2 in data_file.keys():
         dt_volt = volt_grp.attrs["dt_volt"]
         t_min_volt  = volt_grp.attrs["t_min"]
         t_max_volt  = volt_grp.attrs["t_max"]
-        times_volt  = np.arange(t_min_volt + dt_volt, t_max_volt, dt_volt) *1e-3 # s
+        times_volt  = np.arange(t_min_volt, t_max_volt, dt_volt) *1e-3 # s
         
         volt_plot         = np.zeros((n_populations, n_hist_max, len(times_volt)))    
         volt_histo_means     = np.zeros((n_populations, n_bins_volt))
@@ -231,7 +231,7 @@ for sim_spec2 in data_file.keys():
     t_calc = time.time() - t0
     print("Time for calculation: ", t_calc)
           
-#data_file.close()
+data_file.close()
 res_file.close()
 
 # Free memory from its chains

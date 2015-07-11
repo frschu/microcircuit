@@ -47,6 +47,14 @@ def add_subplot(fig, n_rows_cols=(1, 1), index_row_col=(0, 0), rowspan=1, colspa
     ax = fig.add_subplot(subplotspec)
     return ax
 
+def saving_fig(fig, figure_path, fig_name, verbose=True):
+    if verbose:
+        print("save figure to " + fig_name) 
+    fig.savefig(os.path.join(figure_path, fig_name + ".pdf"), 
+            bbox_inches='tight', format="pdf")
+    fig.savefig(os.path.join(figure_path, fig_name + ".png"), 
+            bbox_inches='tight', format="png")      
+
 def rlbl(str_or_array):
     """Relabel array of or single population(s)"""
     def single_rlbl(pop_or_layer):
