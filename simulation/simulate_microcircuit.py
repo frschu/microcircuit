@@ -30,13 +30,13 @@ import sim_params as sim; reload(sim)
 import functions; reload(functions)
 import model_class; reload(model_class)
 verbose     = False                     # whether to print every connection made
-name    = "membrane_potential"
+name    = "membrane_potential"          # ONLY PUT THIS IF YOU DONT WANT TO HAVE A NFILE NAME AUTOMATICALLY ASSIGNED
 #######################################################
 # Instantiate model
 #######################################################
 T0 = time.time()
 # Unchanged parameters
-connection_rule = "fixed_total_number" # "fixed_indegree", "fixed_total_number"
+connection_rule = "fixed_indegree" # "fixed_indegree", "fixed_total_number"
 PSC_rel_sd      = 0.1 # 0.1 for  Potjans' model
 model           = model_class.model(connection_rule=connection_rule,
                                     PSC_rel_sd=PSC_rel_sd) 
@@ -45,7 +45,7 @@ model           = model_class.model(connection_rule=connection_rule,
 # Create data file
 #######################################################
 sub_path = "micro"
-data_file, file_name, data_path = functions.initialize_data_file(sub_path, model, verbose, name)
+data_file, file_name, data_path = functions.initialize_data_file(sub_path, model, verbose, name=name)
 seed_file, master_seed          = functions.initialize_seeds()
 info_file                       = functions.initialize_info_file(file_name, data_path)
 

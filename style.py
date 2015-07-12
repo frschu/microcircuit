@@ -26,10 +26,10 @@ except:
 
 
 fontsize_labels = 16    # size used in latex document
-#rcParams['text.usetex'] = True
-#rcParams['text.latex.preamble'] = [r'\usepackage[cmbright]{sfmath}']
+rcParams['text.usetex'] = True
+rcParams['text.latex.preamble'] = [r'\usepackage[cmbright]{sfmath}']
 rcParams['font.family']= 'sans-serif'
-#rcParams['font.sans-serif']= 'cmbright'
+rcParams['font.sans-serif']= 'cmbright'
 rcParams['font.weight'] = "light"
 rcParams['figure.autolayout'] = True
 rcParams['font.size'] = fontsize_labels
@@ -52,3 +52,10 @@ rcParams['figure.figsize'] = (xfactor*6.2, xfactor*3.83)
 def fixticks(ax):    
     for t in ax.xaxis.get_ticklines(): t.set_color('0.8')
 
+# Set specific colors.
+import numpy as np
+n_layers = 4
+n_types = 2
+layer_colors = colors[:n_layers]
+colors = np.array([color for color in layer_colors for i in range(n_types)])
+colors[1::2] = colors[1::2] * 0.4   #### adapt for more than two types!\

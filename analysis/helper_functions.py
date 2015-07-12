@@ -10,7 +10,7 @@ import sys, os
 sys.path.append(os.path.abspath('../')) # include path with style
 import style; reload(style)
 
-def basic_data(path_res_file, reverse_order=True):
+def basic_data(path_res_file):
     with h5py.File(path_res_file, "r") as res_file:
         # Simulation attributes
         area    = res_file.attrs["area"]   
@@ -26,19 +26,9 @@ def basic_data(path_res_file, reverse_order=True):
 
         t_measure = t_sim - t_trans
 
-        # labels & colors: need to be adapted if n_types != (e, i)
-        layer_colors = style.colors[:n_layers]
-        colors = np.array([color for color in layer_colors for i in range(n_types)])
-        colors[1::2] = colors[1::2] * 0.4   #### adapt for more than two types!
-        if reverse_order:
-            populations = populations[::-1]
-            layers = layers[::-1]
-            types = types[::-1]
-            colors = colors[::-1]
     return (area, t_sim, t_trans, t_measure, dt, 
             populations, layers, types, 
-            n_populations, n_layers, n_types, 
-            colors)
+            n_populations, n_layers, n_types)
 
 def add_subplot(fig, n_rows_cols=(1, 1), index_row_col=(0, 0), rowspan=1, colspan=1):
     """Add subplot specific to figure."""

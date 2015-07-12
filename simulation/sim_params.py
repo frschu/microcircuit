@@ -56,12 +56,12 @@ frac_rec_spike = 0.1
 n_rec_spike = 1000
 
 # Cortical voltages
-record_voltage = False
+record_voltage = True
 record_fraction_neurons_voltage = False
 frac_rec_voltage = 0.02 
 n_rec_voltage = 100 
-t_rec_volt_start  = 0.0 # ms; time up to which voltages are recorded
-t_rec_volt_stop   = 1e3 + t_trans # ms; time up to which voltages are recorded
+t_rec_volt_start  = t_trans         # ms; time up to which voltages are recorded
+t_rec_volt_stop   = 1e3 + t_trans   # ms; time up to which voltages are recorded
 
 
 ###########################################################################

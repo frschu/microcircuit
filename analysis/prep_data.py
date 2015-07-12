@@ -3,7 +3,7 @@
     Calculates date for further analysis;
 
     Specifically: 
-        raster plot data, population activity, mean rates. cv_isi, synchrony.
+        population activity, mean rates. cv_isi, synchrony.
         histogram of membrane potentials
 
     Writes data to ..._res.hdf5 file.
@@ -15,15 +15,15 @@ import sys, os
 import time
 sys.path.append(os.path.abspath('../simulation/')) # include path with simulation specifications
 
-reverse_order = True # do analysis such that plots resemble those of the paper (starting with L6i)
-
 ######################################################
 # File and path
 ######################################################
 data_file = "micro"
 data_sup_path = "/export/data-schuessler/data_microcircuit/"
 data_path = os.path.join(data_sup_path, data_file)
+sim_spec = "a1.0_t20.4_00"
 sim_spec = "membrane_potential"
+#sim_spec = "spontaneous_activity"
 
 # Original data
 file_name  = sim_spec + ".hdf5"  
@@ -62,20 +62,9 @@ res_file.attrs["n_populations"]    = data_file.attrs["n_populations"]
 res_file.attrs["n_layers"]         = data_file.attrs["n_layers"]       
 res_file.attrs["n_types"]          = data_file.attrs["n_types"] 
 
-
-# For further analysis
-if reverse_order:
-    populations = populations[::-1]
-
-
 ######################################################
 # Spikes and membrane potentials
 ######################################################
-# Raster plot
-t_min_raster = 0.2
-t_max_raster = min(t_sim, 1)
-max_plot = 0.1 # part of recorded neurons plotted in raster plot
-
 # Spike histogram
 bin_width_spikes = dt * 1e-3  # s
 n_bins_spikes    = int(t_measure / bin_width_spikes) 
@@ -98,18 +87,12 @@ for sim_spec2 in data_file.keys():
     # Analyze spikes
     ######################################################
     if "spikes" in data_file[sim_spec2]:
+        print("spikes")
         # Data
         grp = data_file[sim_spec2 + "/spikes"]
         dt = grp.attrs["dt"]
         n_neurons_rec_spike = grp.attrs["n_neurons_rec_spike"][:]
 
-        # Raster plot data
-        res_raster = res_grp.create_group("raster") 
-
-        if reverse_order:
-            n_neurons_rec_spike = n_neurons_rec_spike[::-1]
-        offsets = np.append([0], np.cumsum(n_neurons_rec_spike)) * max_plot
-        
         # Mean and Std of firing rates and CV of ISI
         rates_mean  = np.zeros(n_populations)
         rates_std   = np.zeros(n_populations)
@@ -121,78 +104,64 @@ for sim_spec2 in data_file.keys():
         no_isi = []
         
         for i, population in enumerate(populations):
-            res_raster_pop = res_raster.create_group(str(population))
-            
+            print(population)
             # Get data
             subgrp = grp[str(population)]
             raw_times_all   = subgrp["times"][:] * dt * 1e-3 # in seconds
             indices         = subgrp["rec_neuron_i"][:]
-            n_rec_spikes_i  = len(indices) - 1
             
-            # Firing rate:
-            n_spikes = np.diff(indices)
-            rates = n_spikes / t_measure # Hz
-    
-            cv_isi_all = np.empty(0)    
-            hist_spikes_i = np.zeros(n_bins_spikes)
+            rates           = []
+            cv_isi_all      = []
+            hist_spikes_i   = np.zeros(n_bins_spikes)
             
-            for j in range(n_rec_spikes_i):
+            for j in range(n_neurons_rec_spike[i]):
                 times = raw_times_all[indices[j]:indices[j+1]]
-                times = times[times > t_trans]
+                times = times[times > t_trans] # ignore transitional period!
                 
-                # raster, histogram, etc
+                # histogram, isi
                 n_spikes = len(times)
+                rates.append(n_spikes / t_measure) # Hz; single neuron firing rate
                 hist_spikes_i += np.histogram(times, bins=n_bins_spikes, range=(t_trans, t_sim), density=False)[0]
                 if n_spikes > 1:
                     isi         = np.diff(times)
                     mean_isi    = np.mean(isi)
                     var_isi     = np.var(isi)
                     cv_isi      = var_isi / mean_isi**2
-                    cv_isi_all  = np.append(cv_isi_all, cv_isi)
+                    cv_isi_all.append(cv_isi)
                 else:
                     no_isi.append(str(population) + '_' + str(j))
                 
-                # data for raster plot
-                if j < len(indices) * max_plot:
-                    raster_mask         = (times > t_min_raster) * (times < t_max_raster)
-                    n_spikes_raster     = min(n_spikes, sum(raster_mask))
-                    neuron_ids_raster   = [j]*n_spikes_raster + offsets[i]
-                    raster_data         = np.vstack((times[raster_mask], neuron_ids_raster))
-                    res_raster_pop.create_dataset(str(j), data=raster_data)
-    
+            rates = np.array(rates)
+            cv_isi_all = np.array(cv_isi_all)
+
             # Means
             rates_mean[i]   = np.mean(rates)
             rates_std[i]    = np.std(rates)
             cv_isi_mean[i]  = np.mean(cv_isi_all)
             cv_isi_std[i]   = np.std(cv_isi_all)
             synchrony[i]    = np.var(hist_spikes_i) / np.mean(hist_spikes_i)
-            n_rec_spikes[i] = n_rec_spikes_i
             hist_spikes[i]  = hist_spikes_i
 
             # Save single rates
             res_grp.create_dataset("single_rates/" + str(population), data=rates)
-
-            
-        res_raster.attrs["t_min_raster"] = t_min_raster
-        res_raster.attrs["t_max_raster"] = t_max_raster
-        res_raster.attrs["ymax_raster"] = offsets[-1]
-        res_raster.attrs["yticks"] = (offsets[1:] - offsets[:-1]) * 0.5 + offsets[:-1]
             
         res_grp.create_dataset("rates_mean", data=rates_mean)
         res_grp.create_dataset("rates_std", data=rates_std)
         res_grp.create_dataset("cv_isi_mean", data=cv_isi_mean)
         res_grp.create_dataset("cv_isi_std", data=cv_isi_std)
         res_grp.create_dataset("synchrony", data=synchrony)
-        res_grp.create_dataset("n_rec_spikes", data=n_rec_spikes)
+        res_grp.create_dataset("n_neurons_rec_spike", data=n_neurons_rec_spike)
         res_grp.create_dataset("hist_spikes", data=hist_spikes)
         dset_hist_times = res_grp.create_dataset("hist_times", data=bin_edges_spikes)
         dset_hist_times.attrs["bin_size"] = bin_width_spikes
     
-
+    t1 = time.time()
+    t_spikes = t1 - t0
     ######################################################
     # Membrane potentials
     ######################################################
     if "voltage" in data_file[sim_spec2]:
+        print("voltage")
         # Data
         volt_grp = data_file[sim_spec2 + "/voltage"]
         
@@ -211,25 +180,30 @@ for sim_spec2 in data_file.keys():
             volt_all = volt_grp[population][:]
             n_hist = min(n_hist_max, len(volt_all))
             volt_plot[i][:n_hist] = volt_all[:n_hist]
-            
-            volt_histo_means[i] = np.histogram(volt_all, bin_edges_volt, density=True)[0]
             for j in range(n_hist):
-                volt_histo_single[i, j] = np.histogram(volt_all[j], bin_edges_volt, density=True)[0]
-    
+                volt_histo_single[i, j] = np.histogram(volt_all[j], bin_edges_volt,
+                                                       density=False)[0]
+            volt_histo_means[i] = np.histogram(volt_all, bin_edges_volt, density=False)[0]
+
         dset_times_volt     = res_grp.create_dataset("times_volt", data=times_volt)
         dset_times_volt.attrs["t_min_volt"] = t_min_volt * 1e-3 # s
         dset_times_volt.attrs["t_max_volt"] = t_max_volt * 1e-3 # s
+        dset_times_volt.attrs["dt_volt"] = dt_volt * 1e-3 # s
         res_grp.create_dataset("volt_plot", data=volt_plot)
-    
-        dset_volt           = res_grp.create_dataset("volt_histo_means", data=volt_histo_means)
-        dset_volt.attrs["V_min"] = V_min
-        dset_volt.attrs["V_max"] = V_max
-        dset_volt.attrs["n_bins_volt"] = n_bins_volt
-        dset_volt.attrs["n_hist_max"] = n_hist_max
+        res_grp.create_dataset("volt_histo_means", data=volt_histo_means)
         res_grp.create_dataset("volt_histo_single", data=volt_histo_single)
+        res_grp.attrs["n_hist_max"] = n_hist_max
+        res_grp.attrs["V_min"] = V_min
+        res_grp.attrs["V_max"] = V_max
+        res_grp.attrs["n_bins_volt"] = n_bins_volt
+        res_grp.attrs["n_neurons_rec_voltage"] = volt_grp.attrs["n_neurons_rec_voltage"]
+
+        t_volt = time.time() - t1
+        print("Time for voltage   : ", t_volt)
     
     t_calc = time.time() - t0
-    print("Time for calculation: ", t_calc)
+    print("Time for spikes    : ", t_spikes)
+    print("Total time for calc: ", t_calc)
           
 data_file.close()
 res_file.close()
@@ -237,8 +211,4 @@ res_file.close()
 # Free memory from its chains
 raw_times_all = None
 times = None
-raster_mask = None
-n_spikes_raster = None
-neuron_ids_raster = None
-raster_data = None
 

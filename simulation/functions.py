@@ -384,7 +384,7 @@ def save_data(grp, all_GIDs, populations, n_neurons_rec_spike, n_neurons_rec_vol
         multimeters = all_GIDs[2]
         voltage_grp = grp.create_group("voltage")
 
-        # Times can be reconstructed with times = np.arange(start + dt_volt, stop, dt_volt)
+        # Times can be reconstructed with times = np.arange(start, stop, dt_volt)
         start       = nest.GetStatus(multimeters[0])[0]["start"]   # ms
         stop        = nest.GetStatus(multimeters[0])[0]["stop"]   # ms
         if stop == float("inf"):
