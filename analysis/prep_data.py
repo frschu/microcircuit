@@ -21,9 +21,9 @@ sys.path.append(os.path.abspath('../simulation/')) # include path with simulatio
 data_file = "micro"
 data_sup_path = "/export/data-schuessler/data_microcircuit/"
 data_path = os.path.join(data_sup_path, data_file)
-sim_spec = "a1.0_t20.4_00"
-sim_spec = "membrane_potential"
-#sim_spec = "spontaneous_activity"
+#sim_spec = "a1.0_t20.4_00"
+#sim_spec = "a1.0_t20.2_fixindeg_01" 
+sim_spec = "spontaneous_activity_sli"
 
 # Original data
 file_name  = sim_spec + ".hdf5"  
@@ -208,6 +208,7 @@ for sim_spec2 in data_file.keys():
 data_file.close()
 res_file.close()
 
+print("sim_spec = " + sim_spec)
 # Free memory from its chains
 raw_times_all = None
 times = None
