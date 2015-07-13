@@ -360,14 +360,16 @@ def save_data(grp, all_GIDs, populations, n_neurons_rec_spike, n_neurons_rec_vol
 
             # Create array of indices for data: 
             # times_{ith neuron} = times[rec_neuron_i[i]:rec_neuron_i[i+1]]
-            rec_neuron_i    = np.zeros(n_neurons_rec_spike[j] + 1)
-
+            n_spikes_per_neuron = np.zeros(n_neurons_rec_spike[j])
+            rec_neuron_i        = np.zeros(n_neurons_rec_spike[j] + 1)
+    
             # Get corresponding reduced GIDs: nth neuron recorded
-            n_spikes_per_neuron = np.unique(senders, return_counts=True)[1]
-            max_index       = len(n_spikes_per_neuron) + 1
+            n_spikes_fired = np.unique(senders, return_counts=True)[1]
+            max_index       = len(n_spikes_fired) 
+            n_spikes_per_neuron[:max_index] = n_spikes_fired
+            n_spikes_per_neuron = np.random.permutation(n_spikes_per_neuron) # shuffle
             nth_neuron      = np.cumsum(n_spikes_per_neuron)
-            rec_neuron_i[1 : max_index] = nth_neuron        # leave out 0th index
-            rec_neuron_i[max_index : ]  = nth_neuron[-1]    # in case some neurons didn't fire at all
+            rec_neuron_i[1 : ] = nth_neuron        # leave out 0th index
 
             # sort times
             sorted_times = times[np.argsort(senders)] 

@@ -1,0 +1,1 @@
+b'compare_sim_mf.ipynb\ncorrelations.ipynb\ndata_to_npy_functions.py\ndata_to_npy.py\ndummy.py\nfigures\nfirst_steps.py\nhelper_functions.py\nisi_statistics.ipynb\nmembrane_potential.ipynb\npopulation_activity.ipynb\nprep_data.py\n__pycache__\nspike_count_statistics.ipynb\nspontaneous_activity.py\ntext_to_hdf5_append.py\ntext_to_hdf5.py\ntransition.ipynb\ntrans_mean_field.py\n'

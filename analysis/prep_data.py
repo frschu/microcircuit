@@ -101,7 +101,6 @@ for sim_spec2 in data_file.keys():
         synchrony   = np.zeros(n_populations)
         n_rec_spikes = np.zeros(n_populations)
         hist_spikes = np.zeros((n_populations, n_bins_spikes))
-        no_isi = []
         
         for i, population in enumerate(populations):
             print(population)
@@ -112,6 +111,7 @@ for sim_spec2 in data_file.keys():
             
             rates           = []
             cv_isi_all      = []
+            no_isi          = 0
             hist_spikes_i   = np.zeros(n_bins_spikes)
             
             for j in range(n_neurons_rec_spike[i]):
@@ -122,14 +122,14 @@ for sim_spec2 in data_file.keys():
                 n_spikes = len(times)
                 rates.append(n_spikes / t_measure) # Hz; single neuron firing rate
                 hist_spikes_i += np.histogram(times, bins=n_bins_spikes, range=(t_trans, t_sim), density=False)[0]
-                if n_spikes > 1:
+                if n_spikes > 2:
                     isi         = np.diff(times)
                     mean_isi    = np.mean(isi)
                     var_isi     = np.var(isi)
                     cv_isi      = var_isi / mean_isi**2
                     cv_isi_all.append(cv_isi)
                 else:
-                    no_isi.append(str(population) + '_' + str(j))
+                    no_isi += 1
                 
             rates = np.array(rates)
             cv_isi_all = np.array(cv_isi_all)
@@ -142,8 +142,9 @@ for sim_spec2 in data_file.keys():
             synchrony[i]    = np.var(hist_spikes_i) / np.mean(hist_spikes_i)
             hist_spikes[i]  = hist_spikes_i
 
-            # Save single rates
+            # Save single rates and CV_ISI
             res_grp.create_dataset("single_rates/" + str(population), data=rates)
+            res_grp.create_dataset("single_cv_isi/" + str(population), data=cv_isi_all)
             
         res_grp.create_dataset("rates_mean", data=rates_mean)
         res_grp.create_dataset("rates_std", data=rates_std)
