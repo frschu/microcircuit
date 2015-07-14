@@ -313,11 +313,36 @@ Table \ref{tab:network_params}.
 \end{table}
 
 \subsubsection{Model validation}
-some numbers and plots: 
+In order to verify that the model behaves as assumed, a number of basic parameters 
+is examined before stating more central results. As the implementation of the neuron model
+is part of the NEST software and thus well established, the validation starts at the level 
+of connections. Figure \ref{fig:syn_numbers} shows the connection probability as stated in
+table \ref{tab:network_params}, the number of synapses for each pair of pre- and postsynaptic 
+population and finally 
+the mean number of synapses each neuron receives from a specific population. The total number 
+of synapses int the model is almost 0.3 billion synapses.  
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=1.0\linewidth]{\figdir syn_numbers}
+    \caption{
+        Connection between populations. (\textbf{A}) Visualization of 
+        connection probability. (\textbf{B}) Calculated total synapse number between a pre- 
+        and a postsynaptic population. These numbers are used for connecting the network, 
+        using the connection rule "fixed\_total\_number". (\textbf{C}) Mean number of synapses
+        a neuron in a specific postsynaptic population is receiving from all neurons of a 
+        presynaptic population. These numbers are only applied when using the connection
+        rule "fixed\_indegree" (for comparison between spiking network model and mean field theory).
+    }
+    \label{fig:syn_numbers}
+\end{figure}
+
+
+
+\emph{some numbers and plots: 
 single neuron response to poissonian input???
 synapse numbers
 number of autapses/repeated synapses
-firing rates
+firing rates}
 
 \subsubsection{Model implementation}
 Tools: pyNest, python, numpy/scipy, hdf5
@@ -573,3 +598,10 @@ These equations are coupled by the boundaries of the integrals.
 
 
 
+
+
+\subsection{Analysis}
+Python: \cite{python}
+numpy scipy \cite{scipy}
+matplotlib: \cite{matplotlib}
+Colors: \cite{brewercolor}

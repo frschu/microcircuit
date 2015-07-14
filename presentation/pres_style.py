@@ -2,9 +2,18 @@ from matplotlib.colors import colorConverter
 from matplotlib import rcParams
 import sys, os
 sys.path.append(os.path.abspath('../')) # include path with simulation specifications
+from imp import reload
+import style; reload(style)
 from style import *
 
 fontsize_labels = 24    # size used in latex document
+rcParams['font.size'] = fontsize_labels
+rcParams['axes.labelsize'] = fontsize_labels
+rcParams['xtick.labelsize'] = fontsize_labels
+rcParams['ytick.labelsize'] = fontsize_labels
+rcParams['legend.fontsize'] = fontsize_labels
+rcParams['axes.titlesize'] = fontsize_labels
+
 xfactor = 2
 rcParams['figure.figsize'] = (xfactor*6.2, xfactor*3.83)  
 

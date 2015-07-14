@@ -30,13 +30,13 @@ import sim_params as sim; reload(sim)
 import functions; reload(functions)
 import model_class; reload(model_class)
 verbose     = False                     # whether to print every connection made
-name    = "membrane_potential"          # ONLY PUT THIS IF YOU DONT WANT TO HAVE A NFILE NAME AUTOMATICALLY ASSIGNED
+name    = "spon_act_10_times"          # ONLY PUT THIS IF YOU DONT WANT TO HAVE A NFILE NAME AUTOMATICALLY ASSIGNED
 #######################################################
 # Instantiate model
 #######################################################
 T0 = time.time()
 # Unchanged parameters
-connection_rule = "fixed_indegree" # "fixed_indegree", "fixed_total_number"
+connection_rule = "fixed_total_number" # "fixed_indegree", "fixed_total_number"
 PSC_rel_sd      = 0.1 # 0.1 for  Potjans' model
 model           = model_class.model(connection_rule=connection_rule,
                                     PSC_rel_sd=PSC_rel_sd) 
@@ -53,7 +53,7 @@ info_file                       = functions.initialize_info_file(file_name, data
 # Looping
 #######################################################
 # The steps on the way from Brunel to microcircuit
-n_runs = 1
+n_runs = 10
 
 for run_i in range(n_runs):
     ######################################################

@@ -3,59 +3,62 @@ Contains standard style for figures.
 """
 from matplotlib.colors import colorConverter
 from matplotlib import rcParams
+
+# Colors are layered: two types a four layers
+# Source: http://colorbrewer2.org/
+colors =   [
+            "#08519c",
+            "#9ecae1",
+            "#a63603",
+            "#fdae6b",
+            "#54278f",
+            "#bcbddc",
+            "#006d2c",
+            "#a1d99b"
+            ]
+
 try:
     import seaborn as sns
     sns.set(style='ticks', palette='Set1') 
     sns.despine()
-    # These are the colors. Notice how this is programmed:
-    # You initialize your colors by 
-    # colorset = palette()
-    # then you can cycle through the colors:
-    # color = next(colorset)
-    # if you want your set to be reset, just create
-    # a new palette() instance! This way the colors do not interfere.
-    color_names = ['windows blue', "pale red", "faded green", "amber", 
-              'dark green', 'dark fuchsia', 'browny orange', 
-              'puke green', 'dark royal blue', 'dusty purple', 'red orange']
-    colors = sns.xkcd_palette(color_names)
-    palette = lambda: itertools.cycle(sns.xkcd_palette(color_names) )
 except:
     print('seaborn not installed')
-    color_names= ["b", "r", "g", "y", "m", "brown", "c", "orange"]
-    colors = [colorConverter.to_rgb(color_name) for color_name in color_names]
 
+xfactor = 3
+rcParams['figure.figsize'] = (xfactor*6.2, xfactor*3.83)  
 
-fontsize_labels = 16    # size used in latex document
+fontsize_labels         = 20    # size used in latex document
+fontsize_labels_axes    = fontsize_labels + 2
+fontsize_labels_title   = fontsize_labels + 4
+axes_color = "0.8" 
+
 rcParams['text.usetex'] = True
 rcParams['text.latex.preamble'] = [r'\usepackage[cmbright]{sfmath}']
 rcParams['font.family']= 'sans-serif'
 rcParams['font.sans-serif']= 'cmbright'
 rcParams['font.weight'] = "light"
-rcParams['figure.autolayout'] = True
-rcParams['font.size'] = fontsize_labels
-rcParams['axes.labelsize'] = fontsize_labels
-rcParams['xtick.labelsize'] = fontsize_labels
-rcParams['ytick.labelsize'] = fontsize_labels
-rcParams['legend.fontsize'] = fontsize_labels
-rcParams['legend.markerscale'] = 4
-rcParams['axes.titlesize'] = fontsize_labels
+rcParams['figure.autolayout']   = True
+rcParams['font.size']           = fontsize_labels
+rcParams['xtick.labelsize']     = fontsize_labels
+rcParams['ytick.labelsize']     = fontsize_labels
+rcParams['legend.fontsize']     = fontsize_labels
+rcParams['axes.labelsize']      = fontsize_labels_axes
+rcParams['axes.titlesize']      = fontsize_labels_title
+rcParams['legend.markerscale']  = 4
 rcParams['text.color'] = "0.3"
 rcParams['xtick.color'] = "0.3"
 rcParams['ytick.color'] = "0.3"
 rcParams['axes.labelcolor'] = "0.3"
-rcParams['axes.edgecolor'] = "0.8"
+rcParams['axes.edgecolor'] = axes_color
 rcParams['axes.grid'] = True
 
-xfactor = 3
-rcParams['figure.figsize'] = (xfactor*6.2, xfactor*3.83)  
-
 def fixticks(ax):    
-    for t in ax.xaxis.get_ticklines(): t.set_color('0.8')
-
-# Set specific colors.
-import numpy as np
-n_layers = 4
-n_types = 2
-layer_colors = colors[:n_layers]
-colors = np.array([color for color in layer_colors for i in range(n_types)])
-colors[1::2] = colors[1::2] * 0.4   #### adapt for more than two types!\
+    ax.grid(False)      # Turn of grid (distracts!)
+    # Set spines to color of axes
+    for t in ax.xaxis.get_ticklines(): t.set_color(axes_color)
+    for t in ax.yaxis.get_ticklines(): t.set_color(axes_color)
+    # Remove top and right axes & spines
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
