@@ -66,20 +66,20 @@ file_name   = "synapse_numbers.hdf5"
 neuron_GIDs = all_GIDs[0]
 # Histogram template
 bin_size        = 10
-hist_max        = 3000 * 3
+hist_max        = 3000
 n_bins_hist     = int(hist_max / bin_size) # maximal mean times 3
-
-# Subset of target neurons to take the histogram from:
-n_neurons = 1000
 
 with h5py.File(os.path.join(data_path, file_name), "w") as data_file:
     data_file.attrs["structure"] = "n_connection_histogram = data_file[target_pop + '/' + source_pop]"
-    data_file.attrs["n_neurons"] = n_neurons
+    data_file.attrs["n_neurons"] = model.n_neurons 
+    data_file.attrs["bin_size"]  = bin_size
+    data_file.attrs["hist_max"]  = hist_max
     for target_index, target_pop in enumerate(model.populations):
         if verbose: print("to target " + target_pop)
         if verbose: print("from source")
-        target_GIDs = neuron_GIDs[target_index][:n_neurons]
+        target_GIDs = neuron_GIDs[target_index]
         target_group = data_file.create_group(target_pop)
+        n_neurons = len(target_GIDs)
 
         for source_index, source_pop in enumerate(model.populations):
             source_GIDs = neuron_GIDs[source_index] 
@@ -91,7 +91,7 @@ with h5py.File(os.path.join(data_path, file_name), "w") as data_file:
 
                 # Calculate histograms
                 n_conns_hist = np.histogram(n_conns, bins=n_bins_hist, 
-                                            range=(0, hist_max), density=False)[0] / n_neurons
+                                            range=(0, hist_max), density=False)[0]
                 target_group.create_dataset(source_pop, data=n_conns_hist)
 
 T_count   = time.time() - t_count_0

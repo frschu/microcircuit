@@ -221,6 +221,8 @@ The model is solely driven by poissonian spike trains. Each neuron receives inde
 input at a rate specific to its population. This rate is determined by a global 
 background rate of $8$ Hz multiplied by an external indegree $C_{a, \text{ext}}$ for
 population $a$. This mimics a multiple number of synapses each transmitting the same input. 
+At creation, the neurons are initialized by drawing their membrane potential from a normal
+distribution with mean $-58$ mV and a standard deviation of $10$ mV. 
 
 The activity of the network is measured in terms of spike trains (measuring the spike times 
 of single neurons up to the maximal simulation resolution $dt$) and membrane potentials in mV. 
@@ -335,14 +337,75 @@ of synapses int the model is almost 0.3 billion synapses.
     }
     \label{fig:syn_numbers}
 \end{figure}
+With the connection rule applied in the simulation ("fixed\_total\_number"\cite{NEST}),
+the number of synapses per postsynaptic neuron is expected to follow a binomial distribution:
+for pre- and postsynaptic populations $a$ and $b$, respectively, 
+each time a pair is drawn, one postsynaptic neuron is chosen with a probability 
+$1 / N_b$, $N_b$ being the population size. This is repeated until $C_{ab}$ synapses are
+created. 
+Choosing this neuron exactly $k$ times and taking 
+permutations into account then has the probability
+\begin{equation}
+    p_{\,\text{Binom}}\left(k; n=C_{ab}, p=\frac{1}{N_b}\right) = 
+        {C_{ab}\choose{k}} 
+        \left( \frac{1}{N_b} \right)^{k} 
+        \left( 1 - \frac{1}{N_b} \right)^{C_{ab} - k} \,.
+    \label{eq:binomial}
+\end{equation}
+In Figure \ref{fig:syn_numbers_distribution}, the actual distribution of synapse numbers 
+for the connection $L4e \to L4i$ is shown in a normalized histogram. 
+The agreement between the numbers from the simulation and the theoretical expectation is quite
+well. 
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=1.0\linewidth]{\figdir syn_numbers_distribution}
+    \caption{
+        Distribution of synapse numbers for the connection $L4e \to L4i$. 
+        The steps indicate the normalized histogram (bin width = 10) obtained 
+        from a simulation, the dashed line is a binomial distribution, the 
+        underlying distribution for the given connection rule. 
+    }
+    \label{fig:syn_numbers_distribution}
+\end{figure}
 
+To further validate the model on a basic level, a look at membrane potentials of 
+single neurons is taken. Figure \ref{fig:single_membrane_potential} shows the membrane 
+potentials of two neurons during the first 1.2 s of simulation and further 
+the normalized histograms compared to the normalized histogram of a larger subset of the 
+respective population. The neuron of the upper plots appertains to the population
+$L5i$, the other one to population $L6e$. Potjans and Diesmann state that
+these two populations have among the highest / lowest rates of the simulation\cite{potjans2014}.
+This is reflected in the average membrane potential which for the neuron of $L5i$
+is much closer to the threshold $\theta = -50$ mV, whereas for the $L5e$ neuron, it is
+closer to the resting potential $E_L = -65$ mV. Furthermore, it is observable, that a single 
+neurons' membrane potential is not necessarily distributed as the population mean. 
+This is due to the large variation in single neuron firing rates reported already in the 
+original publication \cite{potjans2014}. Observing the first 100 ms of the membrane potential 
+indicates that the used initialization leads to a large hyperpolarization at least in these two 
+sample neurons. Thus, for the further analysis, a transient period of 0.2 seconds is cut off the
+data each time. 
 
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=1.0\linewidth]{\figdir single_membrane_potential}
+    \caption{
+        Membrane potentials of two exemplary neurons of the populations 
+        $L5i$ (\textbf{A, C}) and $L6e$ (\textbf{B, D}). The data is taken from 
+        a simulation of 1.2 s, recording the membrane potential every 1 ms. 
+        In all four plots, the threshold $\theta = -50$ mV is indicated by a dashed line, 
+        the resting potential $E_L = -65$ mV by a line of dashes and dots. 
+        \quad (\textbf{A, B}) Membrane potential over the time of simulation. 
+        The upper membrane potential reaches $\theta$ much more often than the lower one 
+        (leading to a spike each time). The initial membrane potential 
+        is drawn from a normal distribution.
+        \quad (\textbf{C, D}) Normalized histograms of membrane potentials of the
+        two neurons (steps) as well as the averaged ones for a subset of $100$ neurons 
+        (dashed colored lines). Note that contributions due to neurons being in refractory 
+        period after spiking are not removed, yielding peaks at $V_r = -65$ mV. 
+    }
+    \label{fig:single_membrane_potential}
+\end{figure}
 
-\emph{some numbers and plots: 
-single neuron response to poissonian input???
-synapse numbers
-number of autapses/repeated synapses
-firing rates}
 
 \subsubsection{Model implementation}
 Tools: pyNest, python, numpy/scipy, hdf5

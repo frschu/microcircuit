@@ -8,22 +8,21 @@
 
     Writes data to ..._res.hdf5 file.
 """
-from imp import reload
 import numpy as np
 import h5py
 import sys, os
 import time
-sys.path.append(os.path.abspath('../simulation/')) # include path with simulation specifications
 
 ######################################################
 # File and path
 ######################################################
 data_file = "micro"
 data_sup_path = "/export/data-schuessler/data_microcircuit/"
+#data_sup_path    = "/users/schuessler/uni/microcircuit/data"
 data_path = os.path.join(data_sup_path, data_file)
 #sim_spec = "a1.0_t20.4_00"
 #sim_spec = "a1.0_t20.2_fixindeg_01" 
-sim_spec = "spontaneous_activity_sli"
+sim_spec = "spon_act_10_times"
 
 # Original data
 file_name  = sim_spec + ".hdf5"  

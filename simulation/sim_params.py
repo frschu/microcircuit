@@ -31,7 +31,7 @@ master_seed = 0    # changes rng_seeds and grng_seed
 
 n_mpi_procs = 1         # number of MPI processes
 
-n_threads_per_proc = 4 	# number of threads per MPI process
+n_threads_per_proc = 12 	# number of threads per MPI process
                             # use for instance 24 for a full-scale simulation
 
 n_vp = int(n_threads_per_proc * n_mpi_procs)# number of virtual processes
