@@ -30,7 +30,8 @@ import sim_params as sim; reload(sim)
 import functions; reload(functions)
 import model_class; reload(model_class)
 verbose     = False                     # whether to print every connection made
-name    = "spon_act_10_times"          # ONLY PUT THIS IF YOU DONT WANT TO HAVE A NFILE NAME AUTOMATICALLY ASSIGNED
+name    = "spon_act_statistic"          # ONLY PUT THIS IF YOU DONT WANT TO HAVE A NFILE NAME AUTOMATICALLY ASSIGNED
+append_data = True # whether to append the selected data_file (if it existist, otherwise might cause error!)
 #######################################################
 # Instantiate model
 #######################################################
@@ -45,7 +46,7 @@ model           = model_class.model(connection_rule=connection_rule,
 # Create data file
 #######################################################
 sub_path = "micro"
-data_file, file_name, data_path = functions.initialize_data_file(sub_path, model, verbose, name=name)
+data_file, file_name, data_path = functions.initialize_data_file(sub_path, model, verbose, name=name, append=append_data)
 seed_file, master_seed          = functions.initialize_seeds()
 info_file                       = functions.initialize_info_file(file_name, data_path)
 
@@ -95,7 +96,13 @@ for run_i in range(n_runs):
     # Save recorded data
     ###################################################
     print("Save data")
-    group_name  = "%i"%(run_i)  
+    if append_data: 
+        max_grp = 0
+        for key in data_file.keys():
+            max_grp = max(max_grp, int(key))
+        group_name  = "%i"%(max_grp + 1)  
+    else:
+        group_name  = "%i"%(run_i)  
     print(group_name)
     now         = str(datetime.datetime.now())[:-7]
     grp         = data_file.create_group(group_name)

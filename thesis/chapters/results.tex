@@ -53,7 +53,16 @@ fluctuations relative to the mean are roughly equal for all populations, with ou
 up to $\pm 10 \%$ above or below the median. Thus, the highest absolute fluctuations are observed 
 for the layers $L5e, L5i$ and $L6i$.} 
 
-The CV of ISI is calculated for each neuron that fired more than twice. 
+The CV of ISI is calculated for each neuron that fired more than twice.
+It is defined as 
+\begin{equation}
+    %c_{v, \text{ISI}} 
+    \text{CV of ISI} = \frac{\sigma_\text{ISI}}{\mu_\text{ISI}} \,,
+    \label{eq:cv_isi}
+\end{equation}
+where $\sigma_\text{ISI}$ and $\mu_\text{ISI}$ are the standard deviation and mean of 
+the interspike intervals (i.~e. the difference in times between two successive spikes of one neuron), 
+respectively. 
 It indicates the irregularity of single neuron activity.\cite{potjans2014} 
 \emph{Brunel2000: neurons in AI state show CV > 1 (Fig. 1, p.189)}
 Although the results of both implementations agree, there is a disagreement with the results presented 
@@ -84,7 +93,7 @@ only 5 s of simulation? -> methods: check synchrony for measurement time and bin
         Derived statistical quantities for spontaneous activity of network for
         (\textbf{A - C}) the pyNEST implementation and (\textbf{D - E}) the SLI implementation, 
         using the same simulation and network parameters.
-        Each implementation is run $10$ times independently, 
+        Each implementation is run $20$ times independently, 
         measuring 1000 spike trains of each population in a simulation for 60 s 
         after a transient period of 0.2 s. 
         Statistical fluctuations 
@@ -138,50 +147,132 @@ and thus contradicts the assumption of uncorrelated gaussian white noise
 (in the mean field model).}
 
 \subsection{Mean field theory}
-The results regarding the mean field approach consist of a solution to the problem 
-of convergence of the numerical solving and a direct comparison of the predicted rates
-with the ones obtained in the spiking network model simulation.
+The primary results of the mean field theory cut down to the prediction of 
+population mean of single neuron firing rates by solving equation 
+\eqref{eq:self_consistency_a} and furthers predicting the 
+distributions of membrane potential using the predicted rates and 
+equation \eqref{eq:P_V_a}. These results are directly compared to 
+the rates and membrane potentials recorded from the spiking network 
+model simulation analyzed in the previous sections. Furthermore, 
+a number of parameters that are different between the two models 
+or don't appear in the mean field model are examined more closely. 
+This is done by analyzing data from additional simulations with 
+parameters changed accordingly. 
+\emph{+ correlations...}
 
-Transition: \\
-Rates for Brunel's model known/ much easier to solve (only one rate) \\
-Step-wise transition from Brunel's model to Potjans, see Figure \ref{fig:transition_mf_vs_model} 
-in the appendix. \\
-Differences between modeling with "fixed indegree" and "fixed total number",
-figures \ref{fig:compare_sim_mf_fixed_indegree} and 
-\ref{fig:compare_sim_mf_fixed_total_number}.
-Prediction of membrane potential distributions, see Figure
-\ref{fig:membrane_potential}. 
-
-\begin{figure}[htpb]
+The predicted firing rates are displayed in a bar plot in Figure 
+\ref{fig:compare_sim_mf_fixed_total_number}. Rates measured in 
+simulation and previously stated in Figure \ref{fig:spontaneous_activity}
+are shown for comparison. As visible, the results of the mean field model 
+match those of the simulation qualitatively: The sequence of populations 
+ordered by increasing firing rates is reproduced with the exception of
+the two highest rates, i.~e. the two populations of layer $5$. 
+The most apparent difference is the seen for the populations firing at the lowest 
+rates, $L2/3e$  and $L6e$. The measured rates are almost equal while the 
+predicted rates are very different, $r_{L6e} = 1.6$ Hz is almost three times 
+as large as $r_{L2/3e}$. Another observable feature is that the predicted rates
+for six of the eight populations are smaller than the measured ones. 
+The comparison can further be quantified: The difference $\Delta \mathbf{r}$ 
+between the mean of simulated rates $\mathbf{r}_\text{sim}$ and predicted rates 
+$\mathbf{r}_\text{mf}$, defined for each population $a$ as 
+\begin{equation}
+    \Delta r_a := 
+    r_{\text{mf}, a} - r_{\text{sim}, a}
+    \label{eq:diff_r}
+\end{equation}
+is shown in table \ref{tab:diff_r}. For the absolute values, mean and standard 
+deviation are $|\Delta r| = (0.46 \pm  0.13)$ Hz, such that the relative differences 
+are much larger for populations firing at low rate. 
+\emph{
+    Discuss these results in Discussion: origin of discrepancies:
+    bad agreement for j02 = 2; larger rates: origin?
+}
+% Table of results of comparison
+\begin{table}[htpb]
     \centering
-    \includegraphics[width=0.8\linewidth]{\figdir compare_sim_mf_fixed_indegree}
-    \caption{Comparison between mean field theory and spiking network model. 
-        Bars indicate the single neuron firing rates predicted by the mean field 
-        theory, crosses the calculated ones for 20 simulations where the connection
-        rule was set to "fixed indegree".
-    }
-    \label{fig:compare_sim_mf_fixed_indegree}
-\end{figure}
+    \caption{Difference between predicted and simulated population means for single 
+    neuron firing rates; absolute and relative to simulated rates.}
+    \label{tab:diff_r}
+    \begin{tabular}{p{2.5cm}| *{8}{x{1.2cm}}}
+        \rowcolor{TableColor}
+        Population $a$       
+        & L2/3e & L2/3i & L4e & L4i & L5e & L5i & L6e & L6i  \tn[0.2cm]
+        $\Delta r_a$ / Hz
+            & -0.41 & -0.61 & -0.38 & -0.36 &  0.37 & -0.70 &  0.54 & -0.32 \tn[0.2cm]
+        $\Delta r_a \:/\: r_{\text{sim}, a}$
+            & -0.42 & -0.20 & -0.09 & -0.06 &  0.05 & -0.08 &  0.49 & -0.04 \tn[0.2cm]
+    \end{tabular}
+\end{table}
+
+% Comparison mean field / simulation
 \begin{figure}[htpb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir compare_sim_mf_fixed_total_number}
-    \caption{Comparison between mean field theory and spiking network model.
-        Similar to Figure \ref{fig:compare_sim_mf_fixed_indegree} except for the connection 
-        rule which was set to "fixed\_total\_number". The measured rates of the simulation 
-        fluctuate more strongly but around the same mean. 
+    \caption{
+        Comparison between mean field theory and spiking network model. 
+        Bars indicate the single neuron firing rates predicted by the mean field 
+        theory, crosses the calculated ones of 20 simulation (as previously shown in
+        Figure \ref{fig:simulation_activity}). The connection
+        rule was set to "fixed\_total\_number".
+        Comparison between mean field theory and spiking network model.
     }
     \label{fig:compare_sim_mf_fixed_total_number}
 \end{figure}
 
+The membrane potential distributions corresponding to the predicted rates are
+shown in Figure \ref{fig:membrane_potential}. 
+These values are confronted with the normalized histograms of recorded 
+membrane potentials of a subpopulation of $n_\text{rec} = 100$ neurons for 
+each population. The contribution due to neurons in refractory period is removed
+(see Analysis in Methods, \ref{subsec:analysis} for details). 
+Similar to the firing rates, 
+the agreement is quite good and the largest deviations are observable for  
+the populations $L2/3e$ and $L6e$, corresponding to the lowest firing rates and
+largest relative differences as calculated before. A common feature found for all
+populations is that the predicted distributions are narrower than the recorded ones. 
+
+% remove refractory period
+
+% Membrane potentials
 \begin{figure}[htpb]
     \centering
-    \includegraphics[width=1.0\linewidth]{\figdir membrane_potential}
-    \caption{Distribution of membrane potentials for each population. 
+    \includegraphics[width=0.8\linewidth]{\figdir membrane_potential}
+    \caption{
+        Distribution of membrane potentials for each population. 
         Shown are both the results of simulation (continuous line) and 
         the predictions of the mean field theory. The simulation results 
-        are histograms (bins width = 0.25 mV) of membrane potential recordings 
-        of 100 neurons for one second (after a transitional period of 0.2 s), 
+        are histograms (bins width $\Delta V_\text{m} = 0.25$ mV) 
+        of membrane potential recordings 
+        of 100 neurons, recorded every 1.0 ms for a simulation time of 1.0 s 
+        (after a transitional period of 0.2 s), 
         adjusted for neurons in refractory period (see text). 
+        The binning in voltage is the same as applied in Figure 
+        \ref{fig:single_membrane_potential}. 
+        The voltage for neurons in refractory period $V_\text{r} = -65$ mV 
+        is indicated by the dashed and dotted line. The threshold is at 
+        $\theta = -50$ mV. 
     }
     \label{fig:membrane_potential}
 \end{figure}
+
+
+
+Differences between modeling with "fixed indegree" and "fixed total number",
+figures \ref{fig:compare_sim_mf_fixed_indegree} and 
+\ref{fig:compare_sim_mf_fixed_total_number}.
+
+\begin{figure}[htpb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{\figdir compare_sim_mf_fixed_indegree}
+    \caption{
+        Comparison between mean field theory and spiking network model.
+        Mean field rates are the same as in Figure 
+        \ref{fig:compare_sim_mf_fixed_total_number} the simulation data is 
+        taken from 20 simulations with the connection 
+        rule set to "fixed\_total\_number", all other parameters as before.
+        The measured rates of the simulation 
+        fluctuate less strongly but around the same mean. 
+    }
+    \label{fig:compare_sim_mf_fixed_indegree}
+\end{figure}
+

@@ -31,7 +31,10 @@ for run_i in range(n_runs):
     tsim = time.time() - t0sim
 
     # Save data
-    start_file = False # do not overwrite existing hdf5 file but append! ("r+")
+    if run_i == 0:
+        start_file = True # open new file (overwrites!)
+    else:
+        start_file = False # do not overwrite existing hdf5 file but append! ("r+")
     t0save = time.time()
     tth.save_sli_to_hdf5(sim_spec=sim_spec, start_file=start_file)
     tsave = time.time() - t0save

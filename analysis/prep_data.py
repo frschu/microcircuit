@@ -22,11 +22,20 @@ data_sup_path = "/export/data-schuessler/data_microcircuit/"
 data_path = os.path.join(data_sup_path, data_file)
 #sim_spec = "a1.0_t20.4_00"
 #sim_spec = "a1.0_t20.2_fixindeg_01" 
-sim_spec = "spon_act_10_times"
+sim_spec = "spontaneous_activity_sli"
+sim_spec = "spon_act_statistic_sli"
+
 
 # Original data
 file_name  = sim_spec + ".hdf5"  
 res_file_name = sim_spec + "_res.hdf5"
+# Attributes are not save for sli simulations
+if sim_spec.endswith("sli"):
+    sim_spec_attrs = sim_spec[:-4]
+    #sim_spec_attrs = "spon_act_10_times" # in case the non-sli file is not existing (yet)
+else:
+    sim_spec_attrs = sim_spec
+attrs_file_name = sim_spec_attrs + ".hdf5"
 
 # Open file: data and results
 data_file = h5py.File(os.path.join(data_path, file_name), "r")
@@ -35,31 +44,33 @@ res_file = h5py.File(os.path.join(data_path, res_file_name), "w")
 ######################################################
 # Basic data
 ######################################################
-# Simulation attributes
-area          = data_file.attrs["area"]   
-t_sim         = data_file.attrs["t_sim"]  
-t_trans       = data_file.attrs["t_trans"]
-dt            = data_file.attrs["dt"]    
-populations   = data_file.attrs["populations"].astype("|U4")
-layers        = data_file.attrs["layers"].astype("|U4")        
-types         = data_file.attrs["types"].astype("|U4")     
-n_populations = data_file.attrs["n_populations"]
-n_layers      = data_file.attrs["n_layers"]       
-n_types       = data_file.attrs["n_types"] 
+with h5py.File(os.path.join(data_path, attrs_file_name), "r") as attrs_file:
+    # Simulation attributes
+    area          = attrs_file.attrs["area"]   
+    t_sim         = attrs_file.attrs["t_sim"]  
+    t_trans       = attrs_file.attrs["t_trans"]
+    dt            = attrs_file.attrs["dt"]    
+    populations   = attrs_file.attrs["populations"].astype("|U4")
+    layers        = attrs_file.attrs["layers"].astype("|U4")        
+    types         = attrs_file.attrs["types"].astype("|U4")     
+    n_populations = attrs_file.attrs["n_populations"]
+    n_layers      = attrs_file.attrs["n_layers"]       
+    n_types       = attrs_file.attrs["n_types"] 
 
-t_measure = t_sim - t_trans
+    t_measure = t_sim - t_trans
 
-# Pass data to res_file:
-res_file.attrs["area"]             = data_file.attrs["area"]   
-res_file.attrs["t_sim"]            = data_file.attrs["t_sim"]  
-res_file.attrs["t_trans"]          = data_file.attrs["t_trans"]
-res_file.attrs["dt"]               = data_file.attrs["dt"]    
-res_file.attrs["populations"]      = data_file.attrs["populations"]
-res_file.attrs["layers"]           = data_file.attrs["layers"]       
-res_file.attrs["types"]            = data_file.attrs["types"]     
-res_file.attrs["n_populations"]    = data_file.attrs["n_populations"]
-res_file.attrs["n_layers"]         = data_file.attrs["n_layers"]       
-res_file.attrs["n_types"]          = data_file.attrs["n_types"] 
+    # Pass data to res_file:
+    res_file.attrs["area"]             = attrs_file.attrs["area"]   
+    res_file.attrs["t_sim"]            = attrs_file.attrs["t_sim"]  
+    res_file.attrs["t_trans"]          = attrs_file.attrs["t_trans"]
+    res_file.attrs["dt"]               = attrs_file.attrs["dt"]    
+    res_file.attrs["populations"]      = attrs_file.attrs["populations"]
+    res_file.attrs["layers"]           = attrs_file.attrs["layers"]       
+    res_file.attrs["types"]            = attrs_file.attrs["types"]     
+    res_file.attrs["n_populations"]    = attrs_file.attrs["n_populations"]
+    res_file.attrs["n_layers"]         = attrs_file.attrs["n_layers"]       
+    res_file.attrs["n_types"]          = attrs_file.attrs["n_types"] 
+
 
 ######################################################
 # Spikes and membrane potentials
@@ -76,7 +87,7 @@ V_max = -50
 bin_edges_volt = np.linspace(V_min, V_max, n_bins_volt + 1)
 n_hist_max  = 10 # maximum number of single histogram to be shown
 
-for sim_spec2 in data_file.keys():
+for k, sim_spec2 in enumerate(data_file.keys()):
     print(sim_spec2)
     t0 = time.time()
     # Results
@@ -124,8 +135,8 @@ for sim_spec2 in data_file.keys():
                 if n_spikes > 2:
                     isi         = np.diff(times)
                     mean_isi    = np.mean(isi)
-                    var_isi     = np.var(isi)
-                    cv_isi      = var_isi / mean_isi**2
+                    std_isi      = np.std(isi)
+                    cv_isi      = std_isi / mean_isi
                     cv_isi_all.append(cv_isi)
                 else:
                     no_isi += 1
@@ -142,8 +153,9 @@ for sim_spec2 in data_file.keys():
             hist_spikes[i]  = hist_spikes_i
 
             # Save single rates and CV_ISI
-            res_grp.create_dataset("single_rates/" + str(population), data=rates)
-            res_grp.create_dataset("single_cv_isi/" + str(population), data=cv_isi_all)
+            if k ==0:
+                res_grp.create_dataset("single_rates/" + str(population), data=rates)
+                res_grp.create_dataset("single_cv_isi/" + str(population), data=cv_isi_all)
             
         res_grp.create_dataset("rates_mean", data=rates_mean)
         res_grp.create_dataset("rates_std", data=rates_std)

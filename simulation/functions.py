@@ -29,7 +29,7 @@ import sim_params as sim; reload(sim)
 #######################################################
 # Pre-loop functions
 #######################################################
-def initialize_data_file(sub_path, model, verbose=True, name=None):
+def initialize_data_file(sub_path, model, verbose=True, name=None, append=False):
     """Creates data_path and file_name for HDF5-file where all data is saved to.
 
     file_name contains global conditions of simulations: 
@@ -58,15 +58,21 @@ def initialize_data_file(sub_path, model, verbose=True, name=None):
     file_name   = sim_spec + "_00.hdf5"
     
     # don't overwrite existing files...
-    if file_name in os.listdir(data_path):
-        max_n = 0
-        for some_file in os.listdir(data_path):
-            if some_file.startswith(sim_spec):
-                max_n = max(max_n, int(some_file[len(sim_spec)+1: len(sim_spec) + 3])) 
-        file_name = sim_spec + "_" + str(max_n + 1).zfill(2) + ".hdf5"
+    if not append:
+        if file_name in os.listdir(data_path):
+            max_n = 0
+            for some_file in os.listdir(data_path):
+                if some_file.startswith(sim_spec):
+                    max_n = max(max_n, int(some_file[len(sim_spec)+1: len(sim_spec) + 3])) 
+            file_name = sim_spec + "_" + str(max_n + 1).zfill(2) + ".hdf5"
     if verbose: print("Filename: micro/" + file_name)
     
-    data_file = h5py.File(os.path.join(data_path, file_name), "w")
+    if append:
+        write_mode = "r+"
+    else:
+        write_mode = "w"
+
+    data_file = h5py.File(os.path.join(data_path, file_name), write_mode)
     
     # Attributes
     data_file.attrs["area"]     = model.area

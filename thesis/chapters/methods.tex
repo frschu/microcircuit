@@ -556,8 +556,8 @@ satisfying the above boundary conditions is then presented:
 \begin{equation}
     P_0(V) = 2 \frac{\nu_0 \tau_\text{m}}{\sigma_0} 
         \exp{\left(- \frac{(V - \mu_0)^2}{{\sigma_0}^2} \right)}
-        \int_{\frac{V_r - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
-            \Theta \left(u - \frac{V - \mu_0}{\sigma_0} \right) e^{u^2} \, \text{d}u  \,. 
+        \int_{\frac{V - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
+            \Theta \left(u - \frac{V_r - \mu_0}{\sigma_0} \right) e^{u^2} \, \text{d}u  \,. 
     \label{eq:P_V_0}
 \end{equation}
 Here, $\Theta(x)$ is the Heaviside step function, i.~e. 
@@ -601,7 +601,7 @@ then leads to an expression for $\nu_0$:
                 \int_{-\infty}^{\theta} \! \left[ 
                     \exp{\left(- \frac{(V - \mu_0)^2}{{\sigma_0}^2} \right)}
                     \int_{\frac{V - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
-                        \Theta \left(u - \frac{V - \mu_0}{\sigma_0} \right) e^{u^2} \, \text{d}u 
+                        \Theta \left(u - \frac{V_r - \mu_0}{\sigma_0} \right) e^{u^2} \, \text{d}u 
                     \right] \, \text{d}V  \\ 
             &= \tau_\text{rp} + \frac{2 \tau_\text{m}}{\sigma_0} 
                 \int_{\frac{V_r - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
@@ -657,14 +657,78 @@ firing rate $\nu_a$ of a single neuron in population $a$,
                 e^{u^2} \left(1 + \text{erf}(u)\right) \,\text{d}u  \,.
     \label{eq:self_consistency_a}
 \end{equation}
-These equations are coupled by the boundaries of the integrals. 
+These equations are coupled by the boundaries of the integrals. Note that the index $0$ 
+is ommitted to facilitate readability, as the results are only concerned with stationary
+solutions. Ultimately, after the rates $\nu_a$ are found, theses values can also be 
+plugged into an equation for the distribution of membrane potentials. Extending the 
+corresponding expression \eqref{eq:P_V_0} to more populations and again dropping the 
+index $0$ yields
+\begin{equation}
+    P_a(V) = 2 \frac{\nu_a \tau_\text{m}}{\sigma_a} 
+        \exp{\left(- \frac{(V - \mu_a)^2}{{\sigma_a}^2} \right)}
+        \int_{\frac{V - \mu_a}{\sigma_a}}^{\frac{\theta - \mu_a}{\sigma_a}} \! 
+            \Theta \left(u - \frac{V_r - \mu_a}{\sigma_a} \right) e^{u^2} \, \text{d}u  \,.
+    \label{eq:P_V_a}
+\end{equation}
+In a reasonable regime, this function resembles a gaussian curve with discontinuity in the first 
+derivative at $V_r$.
 
+\subsection{Numerics for mean field theory}
+The coupled integrals of equation \eqref{eq:self_consistency_a} are solved numerically. 
+The functions used are taken from the numpy-scipy environment \cite{scipy} 
+for python \cite{python}.
+The numerical implementation of $\text{erf}(u)$ has a limited domain for the applied 
+precision, such that for large values $u > 0$, the evaluation of 
+$\text{erf}(\pm u)$ yields exactly $\pm 1.0$. For negative values, the integrand 
+\begin{equation}
+    f(u) = e^{u^2} \left(1 + \text{erf}(u)\right)
+    \label{eq:integrand}
+\end{equation}
+thus becomes zero. In order to avoid this 
+numerical error, the series expansion 
+\begin{equation}
+    f_\text{Laurent}(u) = 
+        \frac{1}{\sqrt{\pi}} 
+        \left( \frac{1}{u} - \frac{1}{2u^3} + \frac{3}{4u^5} - \frac{15}{8u^7} \right) +  
+        \mathcal{O}\left( \frac{1}{u^9} \right) 
+    \label{eq:expand_integrand}
+\end{equation}
+of $f(u)$ at $u = -\infty$ is applied whenever $u < -4$. 
 
-
-
+A solution is not necessarily found for any initial guess. In order to achieve convergence, two possibilities 
+can be applied: In the case of rates known from simulation, these serve as an initial guess. 
+A test with simulated rates from 20 independent simulations for 20 seconds each lead to convergence%
+\footnote{convergence is here defined by a maximum relative distance 
+    $\|\boldsymbol\nu_{i + 1} - \boldsymbol\nu_i\| / \|\boldsymbol\nu_i\| \le 10^{-13}$ between two 
+    successively computed vectors $\boldsymbol\nu_i$ with entries $\nu_{i, a}$\cite{scipy}} % 
+after a number of $42 \pm 12$ steps (mean and standard deviation). 
+The second solution entirely independent of simulation data is solving the simplified model 
+with only two populations corresponding to equation \eqref{eq:self_consistency} first.
+Convergence is found for a much broader range of initial guesses. The model can then be split 
+into eight populations and all parameters can be iteratively transformed to the ones of the 
+model in question. 
+\emph{I could add a plot to the appendix...}
 
 \subsection{Analysis}
-Python: \cite{python}
-numpy scipy \cite{scipy}
-matplotlib: \cite{matplotlib}
-Colors: \cite{brewercolor}
+\label{subsec:analysis}
+The analysis of the data is done in using python \cite{python} and heavily relies upon 
+the numpy-scipy framework \cite{scipy}. Plots are created using matplotlib \cite{matplotlib}, 
+colors are chosen based on ColorBrewer\cite{brewercolor}.
+
+Analyzing the membrane potentials of simulated neurons requires a specific treatment 
+for neurons residing in refractory period at the $V_\text{r} = -65$ mV. 
+Each neuron $i$ of population $a$ with firing rate $\nu_{a, i}$ measured over 
+a recording time $T$ spends a time of \:$T \tau_\text{rp} \,\nu_{a, i}$\: in refractory 
+period. If $T$ is divided into $n_T$ time bins, this corresponds to 
+$n_T \, \tau_\text{rp} \,\nu_{a, i}$ time bins. The total number of entries 
+corresponding to neurons in refractory period $n_{tot, \,\text{rp}, \,a}$ is then 
+calculated by summing over all neurons, i.~e.
+\begin{equation}
+    n_{tot, \,\text{rp}, \,a}
+        = n_T \, \tau_\text{rp} \,\sum_{i = 1}^{n_\text{rec}}\nu_{a, i} \, .
+    \label{eq:n_tot_rp}
+\end{equation}
+This number is subtracted from the bin at $V_\text{m} = E_L$. Normalization is then
+achieved by dividing each entry by the factor $n_T \, n_\text{rec} \, \Delta V_\text{m}$, 
+with the bin widths $\Delta V_\text{m}$ of the voltage histogram.
+
