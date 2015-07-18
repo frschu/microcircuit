@@ -64,7 +64,7 @@ where $\sigma_\text{ISI}$ and $\mu_\text{ISI}$ are the standard deviation and me
 the interspike intervals (i.~e. the difference in times between two successive spikes of one neuron), 
 respectively. 
 It indicates the irregularity of single neuron activity.\cite{potjans2014} 
-\emph{Brunel2000: neurons in AI state show CV > 1 (Fig. 1, p.189)}
+\\\emph{Brunel2000: neurons in AI state show CV > 1 (Fig. 1, p.189)}
 Although the results of both implementations agree, there is a disagreement with the results presented 
 in the original paper, where a CV of ISI larger 0.8 for all populations is stated
 under similar simulation conditions\cite{potjans2014}. 
@@ -75,7 +75,7 @@ for the populations with low rates ($L2/3e, L6e$), the finite simulation time le
 of the CV of ISI as a significant ratio of the neurons in the population is either not included at all 
 ($n_i < 2$) or the part of the distribution covering higher CV of ISIs is not represented well~%
 \cite{grun2010analysis}. 
-\emph{IS THERE anything to be said about fluctuations?}
+\\\emph{IS THERE anything to be said about fluctuations?}
 
 The synchrony measure explores the activity of each population as a whole. The respective population
 activity is calculated by subdividing the time of measurement into equal bins (bin width = $3$ ms) 
@@ -84,7 +84,8 @@ Dividing the variance by the squared mean yields the synchrony measure.
 A population firing totally asynchronously would yield a synchrony of zero as there would 
 be no global oscillations i.~e. zero variance observed.
 As with the CV of ISI, the results of both implementations agree, but do not reproduce the ones stated 
-by Potjans and Diesmann \cite{potjans2014}. \emph{CAN THIS be traced back to the fact that they used 
+by Potjans and Diesmann \cite{potjans2014}. 
+\\\emph{CAN THIS be traced back to the fact that they used 
 only 5 s of simulation? -> methods: check synchrony for measurement time and bin width!}. 
 \begin{figure}[htpb]
     \centering
@@ -128,7 +129,7 @@ of first order quantities.
         are similar to the ones of Figure \ref{fig:spontaneous_activity} 
         (boxes: Q1-Q3, median:black line, mean: star, 
         whiskers to 1.5 of IQR, outliers: crosses). 
-        \emph{DISCUSSION?
+        \\\emph{DISCUSSION?
         Both quantities show very large fluctuations. One of the suspected
         causes is the connection rule applied, yielding a binomial distribution 
         of synapse numbers within one population
@@ -137,7 +138,6 @@ of first order quantities.
     }
     \label{fig:single_neuron_activity}
 \end{figure}
-
 
 \emph{MORE DETAILED view on results:
 Synchrony of populations in terms of population activity, 
@@ -172,18 +172,19 @@ rates, $L2/3e$  and $L6e$. The measured rates are almost equal while the
 predicted rates are very different, $r_{L6e} = 1.6$ Hz is almost three times 
 as large as $r_{L2/3e}$. Another observable feature is that the predicted rates
 for six of the eight populations are smaller than the measured ones. 
-The comparison can further be quantified: The difference $\Delta \mathbf{r}$ 
-between the mean of simulated rates $\mathbf{r}_\text{sim}$ and predicted rates 
-$\mathbf{r}_\text{mf}$, defined for each population $a$ as 
-\begin{equation}
-    \Delta r_a := 
-    r_{\text{mf}, a} - r_{\text{sim}, a}
-    \label{eq:diff_r}
-\end{equation}
-is shown in table \ref{tab:diff_r}. For the absolute values, mean and standard 
-deviation are $|\Delta r| = (0.46 \pm  0.13)$ Hz, such that the relative differences 
-are much larger for populations firing at low rate. 
-\emph{
+The comparison can further be quantified: The difference 
+$    \Delta r_a := r_{\text{mf}, a} - r_{\text{sim}, a} $
+between the mean of simulated rates $r_{\text{sim}, a}$ and predicted rates 
+$r_{\text{mf}, a}$ for each population $a$ is shown in table \ref{tab:diff_r}. 
+%\begin{equation}
+    %\Delta r_a := 
+    %r_{\text{mf}, a} - r_{\text{sim}, a}
+    %\label{eq:diff_r}
+%\end{equation}
+For the absolute values, mean and standard 
+deviation are $(0.46 \pm  0.13)$ Hz. The relative differences 
+are much larger for populations firing at low rate.  
+\\\emph{
     Discuss these results in Discussion: origin of discrepancies:
     bad agreement for j02 = 2; larger rates: origin?
 }
@@ -193,7 +194,7 @@ are much larger for populations firing at low rate.
     \caption{Difference between predicted and simulated population means for single 
     neuron firing rates; absolute and relative to simulated rates.}
     \label{tab:diff_r}
-    \begin{tabular}{p{2.5cm}| *{8}{x{1.2cm}}}
+    \begin{tabular}{p{2.4cm}| *{8}{x{1.12cm}}}
         \rowcolor{TableColor}
         Population $a$       
         & L2/3e & L2/3i & L4e & L4i & L5e & L5i & L6e & L6i  \tn[0.2cm]
@@ -229,9 +230,12 @@ Similar to the firing rates,
 the agreement is quite good and the largest deviations are observable for  
 the populations $L2/3e$ and $L6e$, corresponding to the lowest firing rates and
 largest relative differences as calculated before. A common feature found for all
-populations is that the predicted distributions are narrower than the recorded ones. 
-
-% remove refractory period
+populations is that the predicted distributions are narrower than the recorded ones.
+Furthermore, the predicted maximum is shifted towards the threshold. The effect
+of neurons coming out of refractory period is underestimated in some cases, 
+visible for example in populations $L2/3i$ and $L4i$ where the mean distributions 
+show a step while the kink in the theoretical curves is hardly detectable. 
+In the case of population $L5i$ and $L6i$, however, this behavior is captured well. 
 
 % Membrane potentials
 \begin{figure}[htpb]
@@ -239,9 +243,9 @@ populations is that the predicted distributions are narrower than the recorded o
     \includegraphics[width=0.8\linewidth]{\figdir membrane_potential}
     \caption{
         Distribution of membrane potentials for each population. 
-        Shown are both the results of simulation (continuous line) and 
-        the predictions of the mean field theory. The simulation results 
-        are histograms (bins width $\Delta V_\text{m} = 0.25$ mV) 
+        Shown are both the results of simulation (histogram) and 
+        the predictions of the mean field theory (continuous line). 
+        The simulation results are histograms (bins width $\Delta V_\text{m} = 0.25$ mV) 
         of membrane potential recordings 
         of 100 neurons, recorded every 1.0 ms for a simulation time of 1.0 s 
         (after a transitional period of 0.2 s), 
@@ -255,7 +259,37 @@ populations is that the predicted distributions are narrower than the recorded o
     \label{fig:membrane_potential}
 \end{figure}
 
-
+\subsection{Simulation closer to mean field theory }
+In order to assess some of the discrepancies between the predictions of the mean field 
+model and data from simulation, a number of parameters in the simulation are adjusted 
+such that they resemble the ones chosen in the mean field theory more closely. 
+Differentiating parameters in the previous comparison are listed in the 
+Table~\ref{tab:diff_params}.
+\begin{table}[htpb]
+    \centering
+    \caption{Parameters chosen differently between simulation and mean field model previously.}
+    \label{tab:diff_params}
+    \begin{tabular}{p{3.0cm} *{2}{|p{5.3cm}}}
+        \rowcolor{TableColor}
+        Parameter & Simulation & Mean field theory   \tn[0.2cm] 
+        Network size &
+            finite; $N_a$ & 
+            none (neglecting finite size effects)
+            \tn[0.1cm] %\hline
+        Connection rule & 
+        "fixed\_total\_number"; binomial distribution of synapse numbers & 
+            "fixed\_indegree"; same synapse number per neuron 
+            \tn[0.1cm] %\hline
+        Synapse type & 
+            current based &
+            voltage based
+            \tn[0.1cm] %\hline
+        Synaptic weights & 
+            clipped normal distribution & 
+            Dirac delta distribution 
+            \tn[0.1cm]
+    \end{tabular}
+\end{table}
 
 Differences between modeling with "fixed indegree" and "fixed total number",
 figures \ref{fig:compare_sim_mf_fixed_indegree} and 

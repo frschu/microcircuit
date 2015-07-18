@@ -365,28 +365,28 @@ def save_data(grp, all_GIDs, populations, n_neurons_rec_spike, n_neurons_rec_vol
             times   = np.uint(times / sim.dt) # in units of dt!
 
             # Create array of indices for data: 
-            # times_{ith neuron} = times[rec_neuron_i[i]:rec_neuron_i[i+1]]
+            # times["ith neuron that fired"] = times[rec_neuron_i[i]:rec_neuron_i[i+1]]
             n_spikes_per_neuron = np.zeros(n_neurons_rec_spike[j])
             rec_neuron_i        = np.zeros(n_neurons_rec_spike[j] + 1)
-    
-            # Get corresponding reduced GIDs: nth neuron recorded
-            n_spikes_fired = np.unique(senders, return_counts=True)[1]
-            max_index       = len(n_spikes_fired) 
-            n_spikes_per_neuron[:max_index] = n_spikes_fired
-            n_spikes_per_neuron = np.random.permutation(n_spikes_per_neuron) # shuffle
-            nth_neuron      = np.cumsum(n_spikes_per_neuron)
-            rec_neuron_i[1 : ] = nth_neuron        # leave out 0th index
+            # Now the indices:
+            n_spikes_fired = np.unique(senders, return_counts=True)[1] # n spikes, sorted by sender GID
+            max_index       = len(n_spikes_fired)               # number of neurons that fired >= 1 spike
+            n_spikes_per_neuron[:max_index] = n_spikes_fired    # the rest remains zero
+            rec_neuron_i[1 : ] = np.cumsum(n_spikes_per_neuron) # lower and upper bounds, 0th remains 0.
 
-            # sort times
+            # Sort times
             sorted_times = times[np.argsort(senders)] 
             for i in range(len(rec_neuron_i) - 1):
                 i0, i1 = (rec_neuron_i[i], rec_neuron_i[i+1])
                 sorted_times[i0:i1] = np.sort(sorted_times[i0:i1])
 
-            # save data to HDF5 file:
+            # Save data to HDF5 file:
             spikes_subgrp   = spikes_grp.create_group(population)
             dset_times      = spikes_subgrp.create_dataset("times", data=sorted_times)
-            dset_indices    = spikes_subgrp.create_dataset("rec_neuron_i", data=rec_neuron_i)
+            if len(sorted_times) > 0:
+                dset_times      = spikes_subgrp.create_dataset("times", data=sorted_times)
+            else:
+                dset_times      = spikes_subgrp.create_dataset("times", data=np.array([0]))
             
     if sim.record_voltage:
         multimeters = all_GIDs[2]

@@ -22,8 +22,8 @@ data_sup_path = "/export/data-schuessler/data_microcircuit/"
 data_path = os.path.join(data_sup_path, data_file)
 #sim_spec = "a1.0_t20.4_00"
 #sim_spec = "a1.0_t20.2_fixindeg_01" 
-sim_spec = "spontaneous_activity_sli"
-sim_spec = "spon_act_statistic_sli"
+#sim_spec = "spontaneous_activity_sli"
+sim_spec = "spon_act_statistic"
 
 
 # Original data

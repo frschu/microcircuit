@@ -14,7 +14,7 @@ from imp import reload
 import sim_params as sim; reload(sim)
 import functions; reload(functions)
 import model_class; reload(model_class)
-verbose     = False                     # whether to print every connection made
+verbose     = True                     # whether to print every connection made
 #######################################################
 # Instantiate model
 #######################################################
@@ -83,16 +83,16 @@ with h5py.File(os.path.join(data_path, file_name), "w") as data_file:
 
         for source_index, source_pop in enumerate(model.populations):
             source_GIDs = neuron_GIDs[source_index] 
+            if verbose: print("\t" + source_pop)
             
-            if target_index == 3 and source_index == 2:
-                # Get connections for entire populations
-                conns   = nest.GetConnections(source=source_GIDs, target=target_GIDs)
-                n_conns = np.unique(nest.GetStatus(conns, "target"), return_counts=True)[1]
+            # Get connections for entire populations
+            conns   = nest.GetConnections(source=source_GIDs, target=target_GIDs)
+            n_conns = np.unique(nest.GetStatus(conns, "target"), return_counts=True)[1]
 
-                # Calculate histograms
-                n_conns_hist = np.histogram(n_conns, bins=n_bins_hist, 
-                                            range=(0, hist_max), density=False)[0]
-                target_group.create_dataset(source_pop, data=n_conns_hist)
+            # Calculate histograms
+            n_conns_hist = np.histogram(n_conns, bins=n_bins_hist, 
+                                        range=(0, hist_max), density=False)[0]
+            target_group.create_dataset(source_pop, data=n_conns_hist)
 
 T_count   = time.time() - t_count_0
 print("T_count    = ", T_count)

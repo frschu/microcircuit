@@ -1,18 +1,25 @@
 \section{Abstract}
 \label{abstract}
-Although many efforts have been undertaken in recent years, the 
-local neocortical microcircuit remains to be only superficially 
-understood. This is the case both for its function and its structure, 
-and much more so for the relation of the two. 
-
-A full-scale spiking network model was established by Potjans and 
-Diesmann \cite{potjans2014} in 2014 in order 
-to examine the gap between connectivity data and measured spike rates
-in awake animals.
-
-In this thesis, the corresponding model is reimplemented and analyzed. 
-A mean-field theory is developed to predict the rates of the model
-based on self-consistency in a equilibrium state. This approach is based 
-on the theory developed by Brunel in 2000 \cite{brunel2000}. 
-
-
+In the search for understanding the basic functions of the neocortex, 
+linking the anatomical structure to population dynamics has been a mayor
+focus for research. Experimental data in form of local connectivity data
+and cell-type specific activity is increasing at a fast past but still 
+mainly inconclusive. Simultaneously, spiking network simulations using 
+leaky integrate-and-fire neurons arranged in excitatory and inhibitory 
+populations have been successfully developed and used as 
+explanatory schemes. A sensible analytical framework, however, 
+ is under construction but still lacking a firm establishment. 
+A full-scale spiking network model of the local cortical microcircuit
+was established by Potjans and Diesmann~\cite{potjans2014} in 2014, 
+using a large number of the experimental data available and reproducing
+some of the main features of spiking activity. 
+On the analytical side, a rate based mean field theory for spiking neuron
+networks has been developed by Brunel in 2000~\cite{brunel2000} 
+and widely applied since then. 
+Here, the spiking network model of the microcircuit is reimplemented, 
+compared with the original one and further analyzed.
+Aiming for a more thorough understanding as well as a computationally less
+expensive tool, the existing mean field theory is extended to the given network. 
+The predictions are tested against simulated data, namely predicting 
+firing rates, membrane potential distributions as well as a measure 
+for the irregularity of spikes (CV of ISI). 

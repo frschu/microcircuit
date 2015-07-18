@@ -82,12 +82,12 @@ def save_sli_to_hdf5(sim_spec="a1.0_t60.2", start_file=False):
     with h5py.File(path_hdf5_file, write_mode) as data_file:
         # Get last group number
         max_grp = 0
-        if write_mode == "r+":
+        if write_mode == "r+": # take the highest existing number + 1 as new group name
             for key in data_file.keys():
-                max_grp = max(max_grp, int(key))
+                max_grp = max(max_grp, int(key) + 1)
     
         print("new group: ", max_grp)
-        grp         = data_file.create_group(str(max_grp + 1))
+        grp         = data_file.create_group(str(max_grp))
         spikes_grp = grp.create_group("spikes")
         spikes_grp.attrs["dt"]  = sim.dt 
         spikes_grp.attrs["info"]  = "times_{ith neuron} = times[rec_neuron_i[i]:rec_neuron_i[i+1]]"
@@ -99,25 +99,22 @@ def save_sli_to_hdf5(sim_spec="a1.0_t60.2", start_file=False):
             times   = np.uint(times / sim.dt) # in units of dt!
     
             # Create array of indices for data: 
-            # times_{ith neuron} = times[rec_neuron_i[i]:rec_neuron_i[i+1]]
+            # times["ith neuron that fired"] = times[rec_neuron_i[i]:rec_neuron_i[i+1]]
             n_spikes_per_neuron = np.zeros(n_neurons_rec_spike[j])
             rec_neuron_i        = np.zeros(n_neurons_rec_spike[j] + 1)
+            # Now the indices:
+            n_spikes_fired = np.unique(senders, return_counts=True)[1] # n spikes, sorted by sender GID
+            max_index       = len(n_spikes_fired)               # number of neurons that fired >= 1 spike
+            n_spikes_per_neuron[:max_index] = n_spikes_fired    # the rest remains zero
+            rec_neuron_i[1 : ] = np.cumsum(n_spikes_per_neuron) # lower and upper bounds, 0th remains 0.
     
-            # Get corresponding reduced GIDs: nth neuron recorded
-            n_spikes_fired = np.unique(senders, return_counts=True)[1]
-            max_index       = len(n_spikes_fired) 
-            n_spikes_per_neuron[:max_index] = n_spikes_fired
-            n_spikes_per_neuron = np.random.permutation(n_spikes_per_neuron)
-            nth_neuron      = np.cumsum(n_spikes_per_neuron)
-            rec_neuron_i[1 : ] = nth_neuron        # leave out 0th index
-    
-            # sort times
+            # Sort times
             sorted_times = times[np.argsort(senders)] 
             for i in range(len(rec_neuron_i) - 1):
                 i0, i1 = (rec_neuron_i[i], rec_neuron_i[i+1])
                 sorted_times[i0:i1] = np.sort(sorted_times[i0:i1])
     
-            # save data to HDF5 file:
+            # Save data to HDF5 file:
             spikes_subgrp   = spikes_grp.create_group(population)
             if len(sorted_times) > 0:
                 dset_times      = spikes_subgrp.create_dataset("times", data=sorted_times)

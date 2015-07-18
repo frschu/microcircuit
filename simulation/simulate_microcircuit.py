@@ -30,8 +30,12 @@ import sim_params as sim; reload(sim)
 import functions; reload(functions)
 import model_class; reload(model_class)
 verbose     = False                     # whether to print every connection made
-name    = "spon_act_statistic"          # ONLY PUT THIS IF YOU DONT WANT TO HAVE A NFILE NAME AUTOMATICALLY ASSIGNED
-append_data = True # whether to append the selected data_file (if it existist, otherwise might cause error!)
+
+# ONLY PUT THIS IF YOU DONT WANT TO HAVE A NFILE NAME AUTOMATICALLY ASSIGNED
+name    = "spon_act_statistic"          
+# whether to append the selected data_file (if it existist, otherwise might cause error!)
+append_data = False 
+
 #######################################################
 # Instantiate model
 #######################################################
@@ -54,7 +58,7 @@ info_file                       = functions.initialize_info_file(file_name, data
 # Looping
 #######################################################
 # The steps on the way from Brunel to microcircuit
-n_runs = 10
+n_runs = 20
 
 for run_i in range(n_runs):
     ######################################################

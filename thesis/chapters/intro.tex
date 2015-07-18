@@ -1,60 +1,80 @@
 \section{Introduction}
 \label{sec:intro}
-\subsection{Hypotheses}
-- The original model can be implemented in PyNEST\cite{NEST}, yielding a 
+
+HYPOTHESES
+
+- The original model can be implemented in PyNEST, yielding a 
 comprehensible structure.
 
 - Some of the results of Potjans' model can be approximated with a 
 mean field theory (most notably, firing rates and membrane potential
 distributions).
 
-- The remaining disagreement between spiking model and mean field 
-model can be tracked down to correlations between spike trains.
 
-- Else: Signal transmission? Autocorrelation???
+-----------------------------------------------------\\
 
-\subsection{Model derivation}
-The full-scale spiking model is based on the derivation and implementation 
-by Potjans and Diesmann \cite{potjans2014}, seeking to account for the detailed 
-structure of the neocortical microcolumn reported in experimental data. 
-Most notably, the feature of various horizontal layers is recaptured, 
-separating the simulated neurons into four layers, each containing an 
-excitatory and an inhibitory population. 
-
-%Describe Potjans' derivation!
-
-However, it remains a minimal model in the sense that the number of 
-parameters included is small. The neurons are modeled as spiking leaky 
-integrate-and-fire neurons, connected by non adapting current based synapses. 
-The connections between single nodes are determined randomly based on 
-connection probabilities for each corresponding pre- and postsynaptic 
-population and a fixed probabilistic rule. The network is constructed 
-according to Dale's principle, such that neurons are either
-excitatory or inhibitory. The synaptic weights and delays are drawn
-from distributions specific to each neuron type. 
+\emph{Biology -> questions -> models / simulation -> mean field}
 
 
-The model is expected to operate in a stable regime of asynchronous irregular 
-(AI) spiking activity \cite{brunel2000}. HOWEVER, THIS NEEDS TO BE INVESTIGATED!
+Biology
+Neocortex: 
+enable higher cognitive function
+six-layered organization, 
+regionalization into areas 
+(sensory, motor, associative)
+\cite{lui2011development}
+microcircuit
+signal processing: input to layer IV, ...
+rates, oscillations
 
-A mean field theory for balanced random network models has been derived by 
-Brunel \cite{brunel2000} for one excitatory and one inhibitory population. 
-The approach determines analytically some of the most relevant characteristics
-of the corresponding simulated networks, such as firing rates, coefficient 
-of variation of interspike intervals and membrane potential distributions, 
-as well as the power spectrum of global activity. It remains unclear, however, 
-how far these results can be applied to more complex networks, containing 
-larger number of populations. This study sets out to address these questions. 
+Connectivity map
+local connectivity data (different animals, different methods)
+long range neglected
 
-\subsection{Structure}
-The thesis is structured as follows. First, the implementation of Potjans and 
-Diesmann's model in PyNEST is presented in detail. The results of simulations 
-are compared to the results running the original implementation with identical 
-parameters. Then, the mean field theory for two populations is generalized 
-to the network model. The parameters predicted with this model are compared 
-to the results of the simulation. Finally, the shortcomings of the mean field 
-approach are analyzed by questioning the validity of the underlying assumptions
-for the case of the network model. 
+Spiking network model
+leaky integrate and fire neuron
+Dale's principle
+current based synapses
+sparse random connectivity: network characterized by few parameters
+NEST
+reproduces rates
+
+Mean field
+analytical framework
+
+underlying questions: 
+    what drives the network?
+    is it stable?
+    can / are information processed via rates?
+
+more technical:
+    can measures of data from spiking network simulations be predicted?
+    is this a useful tool for exploring states of the network?
+
+origin:
+series of papers by Brunel, culminating in a central paper: Brunel2000 
+prework: Tuckwell, Risken 
+
+
+%It remains unclear, however, 
+%how far these results can be applied to more complex networks, containing 
+%larger number of populations. This study sets out to address these questions. 
+
+
+The thesis is structured as follows. The first section contains a detailed account 
+of the spiking network model as well as a derivation of the mean field model 
+for eight populations.  
+The results are then presented starting by comparing the simulation results to 
+those of the implementation of the original paper by Potjans and 
+Diesmann~\cite{potjans2014} as well as a closer look on the statistical properties 
+of a number of measures. This is followed by comparing simulation results to those
+obtained with the mean field model. In order to assess the differences between 
+predicted and measured quantities, 
+Further simulations with parameters adjusted 
+to the mean field model are evaluated, 
+\\\emph{showing the strong/weak dependence on the assumptions made for the mean
+field theory.}
+
 
 
 

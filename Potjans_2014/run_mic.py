@@ -22,7 +22,7 @@ for i, line in enumerate(lines):
 master_seed = int(ms_line[1])
 
 t0 = time.time()
-n_runs = 10
+n_runs = 20
 for run_i in range(n_runs):
     print(run_i)
     # Simulate
@@ -47,7 +47,7 @@ for run_i in range(n_runs):
     ms_line_complete = ""
     for snip in ms_line:
         ms_line_complete += snip + " "
-    lines[46] = ms_line_complete
+    lines[i_ms] = ms_line_complete
     with open(sim_params, 'w') as file:
         file.writelines(lines)
 

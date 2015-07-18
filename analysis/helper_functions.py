@@ -10,6 +10,10 @@ import sys, os
 sys.path.append(os.path.abspath('../')) # include path with style
 import style; reload(style)
 
+def pn(name): 
+    """label name printing for hdf5.File.visit(pn)"""
+    print(name) 
+
 def basic_data(path_res_file):
     with h5py.File(path_res_file, "r") as res_file:
         # Simulation attributes
@@ -65,3 +69,10 @@ def rlbl(str_or_array):
         return_obj = single_rlbl(str_or_array) 
     return return_obj
     
+def adjust_steps(data):
+    """Drawstyle "steps" shifts data to the left by one bin. 
+    This function takes data and slides it by on bin to the right. 
+    Size is unchanged, s.t. the last entry is dropped.
+    """
+    data_out = np.append(data[0], data[:-1])
+    return data_out

@@ -24,13 +24,14 @@ try:
 except:
     print('seaborn not installed')
 
-xfactor = 3
+xfactor = 1.5
 rcParams['figure.figsize'] = (xfactor*6.2, xfactor*3.83)  
 
 fontsize_labels         = 20    # size used in latex document
 fontsize_labels_axes    = fontsize_labels + 2
 fontsize_labels_title   = fontsize_labels + 4
-axes_color = "0.8" 
+axes_color = "#bdbdbd" 
+text_color = "#636363"
 
 rcParams['text.usetex'] = True
 rcParams['text.latex.preamble'] = [r'\usepackage[cmbright]{sfmath}']
@@ -45,10 +46,10 @@ rcParams['legend.fontsize']     = fontsize_labels
 rcParams['axes.labelsize']      = fontsize_labels_axes
 rcParams['axes.titlesize']      = fontsize_labels_title
 rcParams['legend.markerscale']  = 4
-rcParams['text.color'] = "0.3"
-rcParams['xtick.color'] = "0.3"
-rcParams['ytick.color'] = "0.3"
-rcParams['axes.labelcolor'] = "0.3"
+rcParams['text.color']  = text_color
+rcParams['xtick.color'] = text_color
+rcParams['ytick.color'] = text_color
+rcParams['axes.labelcolor'] = text_color
 rcParams['axes.edgecolor'] = axes_color
 rcParams['axes.grid'] = True
 
