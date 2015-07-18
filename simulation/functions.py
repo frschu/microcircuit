@@ -382,7 +382,6 @@ def save_data(grp, all_GIDs, populations, n_neurons_rec_spike, n_neurons_rec_vol
 
             # Save data to HDF5 file:
             spikes_subgrp   = spikes_grp.create_group(population)
-            dset_times      = spikes_subgrp.create_dataset("times", data=sorted_times)
             if len(sorted_times) > 0:
                 dset_times      = spikes_subgrp.create_dataset("times", data=sorted_times)
             else:

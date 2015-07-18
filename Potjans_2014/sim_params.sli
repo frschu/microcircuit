@@ -43,8 +43,8 @@
 % actual seeds will be master_seed ... master_seed + 2*n_vp
 %  ==>> different master seeds must be spaced by at least 2*n_vp + 1
 % see Gewaltig et al. (2012) for details       
-/master_seed 841 def   % changes rng_seeds and grng_seed
-
+/master_seed 985 def   % changes rng_seeds and grng_seed
+ 
 /n_mpi_procs 1 def	                    % number of MPI processes
 
 /n_threads_per_proc 4 def	            % number of threads per MPI process
