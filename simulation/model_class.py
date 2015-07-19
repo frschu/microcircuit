@@ -12,10 +12,11 @@ import network_params as net; reload(net)
 class model:
     def __init__(self, 
                  area=net.area,                             # simulation size
+                 neuron_model=net.neuron_model,               # "iaf_psc_delta" or "iaf_psc_exp"
                  n_neurons="micro", C_ab="micro",           # else: "brunel" or arrays
                  connection_rule=net.connection_rule,      # "fixed_total_number" or "fixed_indegree"
                  j02=net.j02, 
-                 PSC_rel_sd=net.PSC_rel_sd, 
+                 weight_rel_sd=net.weight_rel_sd, 
                  delay_rel_sd=net.delay_rel_sd,  
                  g=net.g, rate_ext=net.rate_ext):                       # set to zero for Brunel
 
@@ -26,7 +27,8 @@ class model:
         - single-neuron parameters
         - stimulus parameters
         
-        Specify area, neuron_numbers, C_ab, j02, connection_rule, PSC_rel_sd, g, rate_ext.
+        Specify area, neuron_model, neuron_numbers, C_ab, 
+            j02, connection_rule, weight_rel_sd, g, rate_ext_factor.
         Default values correspond to Potjans' model.
 
         Neuron numbers and synapse numbers (C_ab) can be specified separately.
@@ -39,7 +41,7 @@ class model:
         Brunel's model:
         j02     = 1.0
         connection_rule = fixed_indegree
-        PSC_rel_sd      = 0.0
+        weight_rel_sd      = 0.0
         g, rate_ext varied accordingly
 
         Naming: C_ab, C_aext, J_ab, J_ext, rate_ext
@@ -61,11 +63,8 @@ class model:
         self.n_types        = len(self.types)
         
         # Neuron numbers
-        full_scale_n_neurons = net.full_scale_n_neurons
-        self.n_total    = int(np.sum(full_scale_n_neurons) * self.area)
-
         if n_neurons == "micro":
-            self.n_neurons  = np.int_(full_scale_n_neurons * self.area)
+            self.n_neurons  = np.int_(net.full_scale_n_neurons * self.area)
         elif n_neurons == "brunel":
             # Provide an array of equal number of neurons in each exc./inh. population
             gamma       = 0.25
@@ -84,26 +83,15 @@ class model:
             else: 
                 raise Exception("'n_neurons' expects either numpy.ndarray or string "+
                                 "in {'micro', 'brunel'}")
+        self.n_total    = np.sum(self.n_neurons)
 
-        # Weights
-        self.g      = g
-        self.j02    = j02
-
-        g_all       = np.tile([1., -self.g], (self.n_populations, self.n_layers))
-        L23e_index  = np.where(self.populations == "L23e")[0][0]
-        L4e_index   = np.where(self.populations == "L4e")[0][0]
-        g_all[L23e_index, L4e_index] *= self.j02
-        
-        self.J           = net.PSP_e           # mv; mean EPSP, used as reference PSP
-        self.J_ab   = self.J * g_all
-        self.PSC_rel_sd = PSC_rel_sd # Standard deviation of PSC amplitudes relative to mean PSC amplitudes
         
         # Synapse numbers
         # Connection probabilities: conn_probs[post, pre] = conn_probs[target, source]
         conn_probs = net.conn_probs
         # Scale synapse numbers of the C_ab
         if net.scale_C_linearly:
-            n_outer_full    = np.outer(full_scale_n_neurons, full_scale_n_neurons)
+            n_outer_full    = np.outer(net.full_scale_n_neurons, net.full_scale_n_neurons)
             C_full_scale    = np.log(1. - conn_probs) / np.log(1. - 1. / n_outer_full)
             C_scaled        = np.int_(C_full_scale * self.area)
         else:
@@ -114,7 +102,7 @@ class model:
         if self.connection_rule == "fixed_total_number":
             C_ab_micro = C_scaled   # total number, do not divide! 
         elif self.connection_rule == "fixed_indegree":
-            C_ab_micro = (C_scaled.T / (full_scale_n_neurons * self.area)).T
+            C_ab_micro = (C_scaled.T / (net.full_scale_n_neurons * self.area)).T
         else:
             raise Exception("Unexpected connection type. Use 'fixed_total_number' for microcircuit " + 
                             "model or 'fixed_indegree' for Brunel's model!")
@@ -136,7 +124,34 @@ class model:
                 raise Exception("'C_ab' expects either numpy.ndarray or string "+
                                 "in {'micro', 'brunel'}")
 
+
+        ######################################################
+        # Synaptic weights. Depend on neuron_model!         ##
+        ######################################################
+        self.g      = g
+        self.j02    = j02
+
+        g_all       = np.tile([1., -self.g], (self.n_populations, self.n_layers))
+        L23e_index  = np.where(self.populations == "L23e")[0][0]
+        L4e_index   = np.where(self.populations == "L4e")[0][0]
+        g_all[L23e_index, L4e_index] *= self.j02
         
+        self.J           = net.PSP_e           # mv; mean EPSP, used as reference PSP
+        self.J_ab   = self.J * g_all
+        self.weight_rel_sd = weight_rel_sd # Standard deviation of weight relative to mean weight
+        if neuron_model=="iaf_psc_delta":
+            self.weights    = self.J_ab     # neuron populations
+        else:
+            # PSCs calculated from PSP amplitudes
+            tau_m, tau_syn, C_m = \
+                [self.model_params[key] for key in ["tau_m", "tau_syn_ex", "C_m"]]
+            delta_tau   = tau_syn - tau_m
+            ratio_tau    = tau_m / tau_syn
+            PSC_over_PSP = C_m * delta_tau / (tau_m * tau_syn * \
+                (ratio_tau**(tau_m / delta_tau) - ratio_tau**(tau_syn / delta_tau)))
+            self.weights    = self.J_ab  * PSC_over_PSP     # neuron populations
+
+
         ###################################################
         ###          Delays and dicts                   ###        
         ###################################################
@@ -183,6 +198,10 @@ class model:
         self.delay_ext  = self.delay_e  # ms;  mean delay of external input
         self.dc_amplitude = net.dc_amplitude  # constant bg amplitude
         self.C_aext     = net.C_aext        # in-degrees for background input
+        if neuron_model=="iaf_psc_delta":
+            self.weight_ext = self.J_ext    # external poisson
+        else:
+            self.weight_ext = self.J_ext * PSC_over_PSP  # external poisson
 
         # optional additional thalamic input (Poisson)
         self.n_th           = net.n_th      # size of thalamic population
@@ -190,13 +209,17 @@ class model:
         self.th_duration    = net.th_duration   # duration of thalamic input (ms)
         self.th_rate        = net.th_rate      # rate of thalamic neurons (spikes/s)
         self.J_th           = net.PSP_th      # mean EPSP amplitude (mV) for thalamic input
+        if neuron_model=="iaf_psc_delta":
+            self.weight_th  = self.J_th     # thalamus
+        else:
+            self.weight_th  = self.J_th  * PSC_over_PSP   # thalamus
         
         # connection probabilities for thalamic input
         conn_probs_th = net.conn_probs_th
         if net.scale_C_linearly:
             if not self.n_th == 0:
                 C_th_full_scale = np.log(1. - conn_probs_th) / \
-                    np.log(1. - 1. / (self.n_th * full_scale_n_neurons))
+                    np.log(1. - 1. / (self.n_th * net.full_scale_n_neurons))
                 self.C_th_scaled     = np.int_(C_th_full_scale * self.area)
         else:
             if not self.n_th == 0:
@@ -209,20 +232,6 @@ class model:
         self.delay_th    = net.delay_th
         # standard deviation relative to mean delay of thalamic input
         self.delay_th_rel_sd = net.delay_th_rel_sd
-
-
-        ######################################################
-        # PSCs calculated from PSP amplitudes               ##
-        ######################################################
-        tau_m, tau_syn, C_m = \
-            [self.model_params[key] for key in ["tau_m", "tau_syn_ex", "C_m"]]
-        delta_tau   = tau_syn - tau_m
-        ratio_tau    = tau_m / tau_syn
-        PSC_over_PSP = C_m * delta_tau / (tau_m * tau_syn * \
-            (ratio_tau**(tau_m / delta_tau) - ratio_tau**(tau_syn / delta_tau)))
-        self.PSCs    = self.J_ab  * PSC_over_PSP     # neuron populations
-        self.PSC_ext = self.J_ext * PSC_over_PSP  # external poisson
-        self.PSC_th  = self.J_th  * PSC_over_PSP   # thalamus
 
 
         ######################################################

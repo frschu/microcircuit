@@ -43,7 +43,7 @@ area            = 1.0
 connection_rule = "fixed_indegree"
 g               = 4.0
 rate_ext        = 8.0 # Hz background rate
-PSC_rel_sd      = 0.0 # 0.1 for  Potjans' model
+weight_rel_sd      = 0.0 # 0.1 for  Potjans' model
 delay_rel_sd    = 0.5 # 0.5 for Potjans' model  
 
 # Brunel:
@@ -54,7 +54,7 @@ model_brunel    = model_class.model(area=area,
                                     n_neurons=n_neurons, C_ab=C_ab, 
                                     connection_rule=connection_rule,
                                     j02=j02, g=g, rate_ext=rate_ext,
-                                    PSC_rel_sd=PSC_rel_sd, 
+                                    weight_rel_sd=weight_rel_sd, 
                                     delay_rel_sd=delay_rel_sd) 
 
 # Microcircuit light:
@@ -66,7 +66,7 @@ model_micro     = model_class.model(area=area,
                                     n_neurons=n_neurons, C_ab=C_ab, 
                                     connection_rule=connection_rule,
                                     j02=j02, g=g, rate_ext=rate_ext,
-                                    PSC_rel_sd=PSC_rel_sd, 
+                                    weight_rel_sd=weight_rel_sd, 
                                     delay_rel_sd=delay_rel_sd) 
 
 #######################################################
@@ -101,13 +101,13 @@ for distance in dists:
     j02             = (1. - distance) * model_init.j02          + distance * model_final.j02         
     g               = (1. - distance) * model_init.g            + distance * model_final.g           
     rate_ext        = (1. - distance) * model_init.rate_ext     + distance * model_final.rate_ext    
-    PSC_rel_sd      = (1. - distance) * model_init.PSC_rel_sd   + distance * model_final.PSC_rel_sd  
+    weight_rel_sd      = (1. - distance) * model_init.weight_rel_sd   + distance * model_final.weight_rel_sd  
     delay_rel_sd    = (1. - distance) * model_init.delay_rel_sd + distance * model_final.delay_rel_sd
     model   = model_class.model(area=area, 
                                 n_neurons=n_neurons, C_ab=C_ab, 
                                 connection_rule="fixed_indegree",
                                 j02=j02, g=g, rate_ext=rate_ext,
-                                PSC_rel_sd=PSC_rel_sd, 
+                                weight_rel_sd=weight_rel_sd, 
                                 delay_rel_sd=delay_rel_sd) 
 
     ######################################################
@@ -148,7 +148,7 @@ for distance in dists:
     # Save recorded data
     ###################################################
     print("Save data")
-    group_name  = "d%.2f_j%.2f_sdJ%.2f"%(distance, j02, PSC_rel_sd)  
+    group_name  = "d%.2f_j%.2f_sdJ%.2f"%(distance, j02, weight_rel_sd)  
     print(group_name)
     now         = str(datetime.datetime.now())[:-7]
     grp         = data_file.create_group(group_name)

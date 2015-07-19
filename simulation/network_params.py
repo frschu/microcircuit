@@ -56,8 +56,8 @@ g     = 4.           # weight for inhibitory synapses
 j02 = 2.
 # Mean reference PSP (EPSP amplitude except for L4e->L2/3e)
 PSP_e   = .15           # mv
-# Standard deviation of PSC amplitudes relative to mean PSC amplitudes
-PSC_rel_sd = 0.1 
+# Standard deviation of weight  relative to mean weight
+weight_rel_sd = 0.1 
 
 
 # Connection probabilities
@@ -97,22 +97,22 @@ syn_dict = {"model": "static_synapse"}
 ###          Single-neuron parameters		###        
 ###################################################
 
-neuron_model = "iaf_psc_exp"    # neuron model. For PSP-to-PSC conversion to
-                                # be correct, synapses should be current-based
-                                # with an exponential time course
+neuron_model = "iaf_psc_delta"  # "iaf_psc_delta" or "iaf_psc_exp"
 Vm0_mean    = -58.0             # mean of initial membrane potential (mV)
 Vm0_std     = 10.0              # std of initial membrane potential (mV)
 
 # neuron model parameters
 model_params = {"tau_m": 10.,       # membrane time constant (ms)
                 "t_ref": 2.,        # absolute refractory period (ms)
-                "tau_syn_ex": 0.5,  # excitatory synaptic time constant (ms)
-                "tau_syn_in": 0.5,  # inhibitory synaptic time constant (ms)
                 "C_m": 250.,        # membrane capacitance (pF)
                 "E_L": -65.,        # resting membrane potential (mV)
                 "V_th": -50.,       # spike threshold (mV)
                 "V_reset": -65.     # reset potential (mV)
                } 
+
+if not neuron_model=="iaf_psc_delta":
+    model_params["tau_syn_ex"] = 0.5 # excitatory synaptic time constant (ms)
+    model_params["tau_syn_in"] = 0.5 # inhibitory synaptic time constant (ms)
 
 ###################################################
 ###           Stimulus parameters		###        

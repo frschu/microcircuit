@@ -94,10 +94,12 @@ backend=biber
 \allsectionsfont{ \color{gray1} \normalfont\scshape} % Make all sections centered, the default font and small caps
 
 \usepackage{fancyhdr} % Custom headers and footers
-\pagestyle{fancy} % Makes all pages in the document conform to the custom headers and footers
-
-\renewcommand{\headrulewidth}{0.0pt} % Remove header underlines
-\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\fancypagestyle{plain}{%
+\fancyhf{} % clear all header and footer fields
+\fancyfoot[C]{\sffamily\fontsize{9pt}{9pt}\selectfont\thepage} % except the center
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}}
+\pagestyle{plain}
 
 \numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
 \numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)

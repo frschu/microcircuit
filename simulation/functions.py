@@ -268,8 +268,8 @@ def connect(model, all_GIDs,
                 elif model.connection_rule == "fixed_indegree":
                     conn_dict["indegree"]  = n_synapses
     
-                mean_weight             = model.PSCs[target_index, source_index]
-                std_weight              = abs(mean_weight * model.PSC_rel_sd)
+                mean_weight             = model.weights[target_index, source_index]
+                std_weight              = abs(mean_weight * model.weight_rel_sd)
                 if mean_weight >= 0:
                     weight_dict = model.weight_dict_exc.copy()
                 else:
@@ -297,8 +297,8 @@ def connect(model, all_GIDs,
                 conn_dict_th        = model.conn_dict.copy()
                 conn_dict_th["N"]   = n_synapses_th
                 
-                mean_weight_th      = model.PSC_th
-                std_weight_th       = mean_weight_th * model.PSC_rel_sd
+                mean_weight_th      = model.weight_th
+                std_weight_th       = mean_weight_th * model.weight_rel_sd
                 weight_dict_th      = model.weight_dict_exc.copy()
                 weight_dict_th["mu"]    = mean_weight_th
                 weight_dict_th["sigma"] = std_weight_th
@@ -334,7 +334,7 @@ def connect(model, all_GIDs,
             if verbose: print("\tpoisson background")
             nest.Connect(ext_poisson[target_index], target_GIDs, 
                 conn_spec={"rule": "all_to_all"}, 
-                syn_spec={"weight": model.PSC_ext, "delay": model.delay_ext}) 
+                syn_spec={"weight": model.weight_ext, "delay": model.delay_ext}) 
         if not model.dc_amplitude == 0:
             if verbose: print("\tDC background" )
             nest.Connect(ext_dc[target_index], target_GIDs, "all_to_all")

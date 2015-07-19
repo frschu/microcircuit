@@ -54,17 +54,6 @@ up to $\pm 10 \%$ above or below the median. Thus, the highest absolute fluctuat
 for the layers $L5e, L5i$ and $L6i$.} 
 
 The CV of ISI is calculated for each neuron that fired more than twice.
-It is defined as 
-\begin{equation}
-    %c_{v, \text{ISI}} 
-    \text{CV of ISI} = \frac{\sigma_\text{ISI}}{\mu_\text{ISI}} \,,
-    \label{eq:cv_isi}
-\end{equation}
-where $\sigma_\text{ISI}$ and $\mu_\text{ISI}$ are the standard deviation and mean of 
-the interspike intervals (i.~e. the difference in times between two successive spikes of one neuron), 
-respectively. 
-It indicates the irregularity of single neuron activity.\cite{potjans2014} 
-\\\emph{Brunel2000: neurons in AI state show CV > 1 (Fig. 1, p.189)}
 Although the results of both implementations agree, there is a disagreement with the results presented 
 in the original paper, where a CV of ISI larger 0.8 for all populations is stated
 under similar simulation conditions\cite{potjans2014}. 
@@ -148,19 +137,14 @@ and thus contradicts the assumption of uncorrelated gaussian white noise
 
 \subsection{Mean field theory}
 The primary results of the mean field theory cut down to the prediction of 
-population mean of single neuron firing rates by solving equation 
-\eqref{eq:self_consistency_a} and furthers predicting the 
-distributions of membrane potential using the predicted rates and 
-equation \eqref{eq:P_V_a}. These results are directly compared to 
-the rates and membrane potentials recorded from the spiking network 
-model simulation analyzed in the previous sections. Furthermore, 
-a number of parameters that are different between the two models 
-or don't appear in the mean field model are examined more closely. 
-This is done by analyzing data from additional simulations with 
-parameters changed accordingly. 
-\emph{+ correlations...}
+population mean of single neuron firing rates and then using these rates 
+in order to predict the CV of ISI and the distribution of membrane potentials. 
+These results are directly compared to 
+the corresponding quantities recorded from the spiking network 
+model simulation analyzed in the previous sections. 
 
-The predicted firing rates are displayed in a bar plot in Figure 
+The predicted firing rates obtained by solving equation 
+\eqref{eq:self_consistency_a} are displayed in a bar plot in Figure 
 \ref{fig:compare_sim_mf_fixed_total_number}. Rates measured in 
 simulation and previously stated in Figure \ref{fig:spontaneous_activity}
 are shown for comparison. As visible, the results of the mean field model 
@@ -175,25 +159,33 @@ for six of the eight populations are smaller than the measured ones.
 The comparison can further be quantified: The difference 
 $    \Delta r_a := r_{\text{mf}, a} - r_{\text{sim}, a} $
 between the mean of simulated rates $r_{\text{sim}, a}$ and predicted rates 
-$r_{\text{mf}, a}$ for each population $a$ is shown in table \ref{tab:diff_r}. 
-%\begin{equation}
-    %\Delta r_a := 
-    %r_{\text{mf}, a} - r_{\text{sim}, a}
-    %\label{eq:diff_r}
-%\end{equation}
-For the absolute values, mean and standard 
+$r_{\text{mf}, a}$ for each population $a$ is shown in table \ref{tab:diff_fixed_total_number}. 
+For the absolute values of all populations, mean and standard 
 deviation are $(0.46 \pm  0.13)$ Hz. The relative differences 
 are much larger for populations firing at low rate.  
-\\\emph{
+The CV of ISI for each population is the result of plugging in the predicted rates 
+into equation \eqref{eq:CV_ISI_mf}. A comparison with simulation data is shown
+in Figure \ref{fig:compare_sim_mf_fixed_total_number}. Here the result turns out 
+to be quite close to the measured one. In all cases, the mean field theory predicts 
+a slightly higher variability. The larges deviation is again seen in the populations 
+$L2/3e$ and $L6e$, those firing at the lowest rates. Ignoring these two populations, 
+the theory further predicts the order of variability among the populations, although
+the differences are small. As for the rates, numerical results are subsumed in 
+Table \ref{tab:diff_fixed_total_number}, using analogous definitions. 
+Averaged over all populations, the deviation between mean field theory and simulation
+is $(0.06 \pm 0.04)$ corresponding to about $(6 \pm 5) \%$. 
+\emph{
     Discuss these results in Discussion: origin of discrepancies:
     bad agreement for j02 = 2; larger rates: origin?
+    CV of ISI: reason for deviation at low rates: bias in measurement / correlation?
 }
+
 % Table of results of comparison
 \begin{table}[htpb]
     \centering
     \caption{Difference between predicted and simulated population means for single 
     neuron firing rates; absolute and relative to simulated rates.}
-    \label{tab:diff_r}
+    \label{tab:diff_fixed_total_number}
     \begin{tabular}{p{2.4cm}| *{8}{x{1.12cm}}}
         \rowcolor{TableColor}
         Population $a$       
@@ -202,6 +194,10 @@ are much larger for populations firing at low rate.
             & -0.41 & -0.61 & -0.38 & -0.36 &  0.37 & -0.70 &  0.54 & -0.32 \tn[0.2cm]
         $\Delta r_a \:/\: r_{\text{sim}, a}$
             & -0.42 & -0.20 & -0.09 & -0.06 &  0.05 & -0.08 &  0.49 & -0.04 \tn[0.2cm]
+        $\Delta \text{CV}_a$
+            &  0.14 &  0.05 &  0.04 &  0.03 &  0.02 &  0.03 &  0.13 &  0.03 \tn[0.2cm]
+        $\Delta \text{CV}_a / \text{CV}_{\text{sim}, a}$
+            &  0.16 &  0.06 &  0.05 &  0.03 &  0.02 &  0.04 &  0.15 &  0.04 \tn[0.2cm]
     \end{tabular}
 \end{table}
 
@@ -220,9 +216,10 @@ are much larger for populations firing at low rate.
     \label{fig:compare_sim_mf_fixed_total_number}
 \end{figure}
 
-The membrane potential distributions corresponding to the predicted rates are
-shown in Figure \ref{fig:membrane_potential}. 
-These values are confronted with the normalized histograms of recorded 
+Applying equation \eqref{eq:P_V_a} on the predicted rates yields the 
+membrane potential distributions shown in 
+Figure \ref{fig:membrane_potential}. 
+The obtained distributions  are confronted with the normalized histograms of recorded 
 membrane potentials of a subpopulation of $n_\text{rec} = 100$ neurons for 
 each population. The contribution due to neurons in refractory period is removed
 (see Analysis in Methods, \ref{subsec:analysis} for details). 
@@ -291,22 +288,5 @@ Table~\ref{tab:diff_params}.
     \end{tabular}
 \end{table}
 
-Differences between modeling with "fixed indegree" and "fixed total number",
-figures \ref{fig:compare_sim_mf_fixed_indegree} and 
-\ref{fig:compare_sim_mf_fixed_total_number}.
-
-\begin{figure}[htpb]
-    \centering
-    \includegraphics[width=0.8\linewidth]{\figdir compare_sim_mf_fixed_indegree}
-    \caption{
-        Comparison between mean field theory and spiking network model.
-        Mean field rates are the same as in Figure 
-        \ref{fig:compare_sim_mf_fixed_total_number} the simulation data is 
-        taken from 20 simulations with the connection 
-        rule set to "fixed\_total\_number", all other parameters as before.
-        The measured rates of the simulation 
-        fluctuate less strongly but around the same mean. 
-    }
-    \label{fig:compare_sim_mf_fixed_indegree}
-\end{figure}
+\emph{Simulation with parameters adapted are on their way...}
 

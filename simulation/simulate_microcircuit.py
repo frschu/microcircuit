@@ -42,9 +42,9 @@ append_data = False
 T0 = time.time()
 # Unchanged parameters
 connection_rule = "fixed_total_number" # "fixed_indegree", "fixed_total_number"
-PSC_rel_sd      = 0.1 # 0.1 for  Potjans' model
+weight_rel_sd      = 0.1 # 0.1 for  Potjans' model
 model           = model_class.model(connection_rule=connection_rule,
-                                    PSC_rel_sd=PSC_rel_sd) 
+                                    weight_rel_sd=weight_rel_sd) 
 
 #######################################################
 # Create data file

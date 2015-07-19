@@ -67,9 +67,19 @@ whereas specific numerical values of the parameters are displayed in Table
 \end{table}
 
 The network consists of eight cortical populations arranged in four 
-layers. Each layer contains an excitatory as well as an inhibitory population.
-A simplified diagram of the network is given in Figure \ref{fig:diagram}. 
-
+layers. Each layer contains an excitatory as well as an inhibitory population, 
+implying what is known as Dale's principle: neurons can only be one type or the other.%
+\footnote{
+The actual principle is aimed at more detailed models, hence more specific stating that
+"at all the axonal branches of a neurone, there was liberation of the same transmitter 
+substance or substances"~\cite{eccles1976electrical}.
+} %
+A simplified diagram of the network together with an illustration of population 
+sizes is given in Figure \ref{fig:model_description}. 
+A total of 77169 leaky integrate-and-fire neurons are distributed according to the population
+sizes given in Table \ref{tab:network_params}. The total numbers of excitatory and inhibitory 
+neurons are 61843 and 15326, respectively, yielding a ratio of 4.04 of excitatory over inhibitory
+neurons. 
 
 \begin{figure} 
     \centering 
@@ -97,30 +107,10 @@ A simplified diagram of the network is given in Figure \ref{fig:diagram}.
     }
     \label{fig:model_description} 
 \end{figure}
-
-
-%\begin{figure}[htpb]
-    %\centering
-    %\includegraphics[width=0.5\linewidth]{../figures/diagram_colored}
-    %\caption{Diagram of the layered cortical network. 
-        %Layers 23, 4, 5, and 6 are composed of one excitatory
-        %(triangles) and one inhibitory population (circles) each.
-        %The connections are only shown for probabilities $>0.04$. 
-        %The external input is simulated by poissonian spike trains 
-        %and fed to all four layers containing populations. 
-        %Layer 1 does not contain neuron populations.
-    %}
-    %\label{fig:diagram}
-%\end{figure}
-
-A total of 77169 leaky integrate-and-fire neurons are distributed according to the population
-sizes given in Table \ref{tab:network_params}. The total numbers of excitatory and inhibitory 
-neurons are 61843 and 15326, respectively, yielding a ratio of 4.04 of excitatory over inhibitory
-neurons. \\
 For each combination of pre- and postsynaptic population, pairs of neurons to be connected are drawn
 randomly until a fixed number of synapses for each postsynaptic population is reached, 
 allowing for multiple synapses and self-connections. 
-Potjans' original model defines the connection probability $P_{\text{conn}, \,ab}$ 
+Potjans and Diesmann's original model defines the connection probability $P_{\text{conn}, \,ab}$ 
 of one neuron in the presynaptic population $a$ to form at least one connection with one neuron in 
 the postsynaptic population $b$. For given population sizes $N_a$ and $N_b$, the number of 
 synapses $C_{ab}$ is then calculated by
@@ -128,13 +118,13 @@ synapses $C_{ab}$ is then calculated by
     C_{ab} = \frac{\ln \left( 1 - P_{\text{conn}, \,ab} \right)}{\ln \left( 1 - \frac{1}{N_a N_b} \right)} \, ,
     \label{eq:synapse_numbers}
 \end{equation}
-the inverse of the formula for connection probabilities derived by Potjans et al~\cite{potjans2014}.
+the inverse of the formula for connection probabilities of the original paper~\cite{potjans2014}.
 
 The weight $w$ for each synapse is drawn from a normal distribution.
 For excitatory presynaptic neurons, this mean value is set to $87,8$ pA (see below for 
 a derivation). The mean for inhibitory ones is determined by multiplying 
 with a factor $-g$, where the relative inhibitory synapse strength is set to 
-$g = 4$. There is one important exception to this scheme.
+$g = 4$. There is one important exception to this scheme:
 The mean for the connection from L4e to L2/3e is increased by a factor of 
 $j_{02} = 2$ (consult the corresponding paper~\cite{potjans2014} for details). 
 The standard deviation is set to $10\%$ of the mean. 
@@ -142,7 +132,6 @@ The distributions from which weights are drawn are clipped,
 such that a neuron assigned to the excitatory 
 population will not have associated outgoing synapses with $w < 0$ 
 and vice versa for inhibitory ones. 
-
 Delays are drawn from normal distributions as well, with a mean value 
 of $1.5$ ms for excitatory presynaptic neurons and half this value for 
 inhibitory ones. The relative standard deviation is set to $0.5$. The distributions
@@ -161,7 +150,8 @@ The membrane is specified by its resting potential $E_\text{L}$,
 its time constant $\tau_\text{m}$ and the capacitance $C_\text{m}$.
 If, at time $t$, the threshold is reached, the neuron emits a spike and remains 
 in a refractory period for a fixed time $\tau_\text{rp}$, with the membrane 
-potential set to $V_\text{r}$. The total input to the neuron is represented by 
+potential set to $V_\text{r}$ and discarding any input arriving. 
+The total input to the neuron is represented by 
 the current $I_i(t)$, which is a linear superposition of the individual 
 postsynaptic currents (PSC) of the recurrent network.
 
@@ -178,7 +168,11 @@ $w$ is identical to the amplitude of the PSC
 at the time the spike arrives. 
 Since measuring currents remains a difficult task for experimentalists, 
 the model relays on measurements of the amplitude of the postsynaptic 
-potential (PSP). In order to use the experimental observations, 
+potential (PSP). In order to use the experimental observations%
+\footnote{
+Potential differences are much easier to access compared to incoming currents.
+\emph{cite something?}
+}, 
 an approximative transformation is implemented 
 by calculating the PSC induced if one spike with given PSP arrives at 
 a neuron with membrane potential at rest. 
@@ -209,7 +203,6 @@ Thus
     V(t) = C_1 \left[\exp\left(-\frac{t}{\tau_\text{m}}\right) - \exp\left(-\frac{t}{\tau_\text{syn}}\right)\right]	\,.  
     \label{eq:V(t)}
 \end{equation}
-
 In order to get the PSP, we search for the maximum. Setting $\dot{V}(t) = 0$ 
 yields
 \begin{equation}
@@ -225,7 +218,7 @@ Inserting into equation \eqref{eq:V(t)} leads to
             \left[ 
                 \left( \frac{\tau_\text{syn}}{\tau_\text{m}} \right)^\frac{\tau_\text{syn}}{\Delta\tau} 
             - \left( \frac{\tau_\text{syn}}{\tau_\text{m}} \right)^\frac{\tau_\text{m}}{\Delta\tau} 
-            \right]
+            \right] \,.
     \label{eq:PSP}
 \end{equation}
 For a given PSP, this equation is simply inverted in order to get the according 
@@ -248,15 +241,13 @@ background rate of $8$ Hz multiplied by an external indegree $C_{a, \text{ext}}$
 population $a$. This mimics a multiple number of synapses each transmitting the same input. 
 At creation, the neurons are initialized by drawing their membrane potential from a normal
 distribution with mean $-58$ mV and a standard deviation of $10$ mV. 
-
 The activity of the network is measured in terms of spike trains (measuring the spike times 
-of single neurons up to the maximal simulation resolution $dt$) and membrane potentials in mV. 
+of single neurons up to the maximal grid resolution $h$) and membrane potentials in mV. 
 The results in this thesis are based on recording only a fraction of the neurons in the network, 
 choosing the first $n_a$ neurons of each population $a$. Since no topology is applied, this is 
 equal to choosing $n_a$ neurons to record from randomly. If not specified else, spikes are recorded 
-from $10\%$ of each population, membrane potentials from $2\%$. The further analysis of the data 
+from $1000$ neurons of each population, membrane potentials from $100$. The further analysis of the data 
 is explained in following sections.
-
 The large number of free parameters of the model and their chosen values are summarized in 
 Table \ref{tab:network_params}. 
 % Network parameters
@@ -343,11 +334,10 @@ Table \ref{tab:network_params}.
 In order to verify that the model behaves as assumed, a number of basic parameters 
 is examined before stating more central results. As the implementation of the neuron model
 is part of the NEST software and thus well established, the validation starts at the level 
-of connections. Figure \ref{fig:syn_numbers} shows the connection probability as stated in
-table \ref{tab:network_params}, the number of synapses for each pair of pre- and postsynaptic 
-population and finally 
+of connections. Figure \ref{fig:syn_numbers} shows the number of synapses for each pair 
+of pre- and postsynaptic population and 
 the mean number of synapses each neuron receives from a specific population. The total number 
-of synapses int the model is almost 0.3 billion synapses.  
+of synapses in the model is almost 0.3 billion synapses.  
 \begin{figure}[htpb]
     \centering
     \includegraphics[width=1.0\linewidth]{\figdir syn_numbers}
@@ -695,7 +685,7 @@ firing rate $\nu_a$ of a single neuron in population $a$,
     \label{eq:self_consistency_a}
 \end{equation}
 These equations are coupled by the boundaries of the integrals. Note that the index $0$ 
-is ommitted to facilitate readability, as the results are only concerned with stationary
+is omitted to facilitate readability, as the results are only concerned with stationary
 solutions. Ultimately, after the rates $\nu_a$ are found, theses values can also be 
 plugged into an equation for the distribution of membrane potentials. Extending the 
 corresponding expression \eqref{eq:P_V_0} to more populations and again dropping the 
@@ -709,6 +699,34 @@ index $0$ yields
 \end{equation}
 In a reasonable regime, this function resembles a gaussian curve with discontinuity in the first 
 derivative at $V_r$.
+Finally, the model also makes a prediction about the regularity of single spike 
+trains. For neurons firing irregularly, the interspike intervals
+(ISI, i.~e. the difference in times between two successive spikes of one neuron) 
+a distributed broadly. Hence, one parameter to measure irregularity is the coefficient 
+of variation (CV) of ISI, defined as
+\begin{equation}
+    %c_{v, \text{ISI}} 
+    \text{CV of ISI} = \frac{\sigma_\text{ISI}}{\mu_\text{ISI}} \,,
+    \label{eq:cv_isi}
+\end{equation}
+where $\sigma_\text{ISI}$ and $\mu_\text{ISI}$ are the standard deviation and mean of 
+the ISI. For the mean field theory introduced above, this quantity can be calculated
+independently for each population. For the given parameters $\nu_a$, $\mu_a$ and 
+$\sigma_a$ as in equation \eqref{eq:self_consistency_a}, the corresponding 
+result~\cite{brunel2000} is
+\begin{equation}
+    (\text{CV of ISI})^2 
+        = 2 \pi \left(\frac{\nu_a}{\tau_\text{m}}\right)^2
+            \int_{\frac{V_r - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+            e^{x^2}  \,\text{d}x  \,
+            \int_{-\infty}^{x} 
+            e^{u^2} \left(1 + \text{erf}(u)\right)^2 \,\text{d}u  \,.
+    \label{eq:CV_ISI_mf}
+\end{equation}
+
+\emph{What is irregular? Are there experimental estimates for CV of ISI?}
+
+
 
  
 \subsection{Implementation, numerics and analysis}
