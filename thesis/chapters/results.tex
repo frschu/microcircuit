@@ -24,7 +24,7 @@ showing the activity of a subset of the network simulated for 400 ms
 after a transient period of 100 ms. The subset shown consists of the first 
 $2.5 \%$ of the neurons of each population created during the creation of the network. 
 Both results have a very similar structure: Common features are the observable low 
-rates of populations $L2/3e$ and $L6e$ as well some signs of synchrony within populations. 
+rates of populations L2/3e and L6e as well some signs of synchrony within populations. 
 Single neurons fire at a rate much lower than the activity of the 
 entire population, as would be expected for networks in the AI regime \cite{brunel2000}. 
 \begin{figure}[htpb]
@@ -54,17 +54,7 @@ the entire population.
 The single neuron firing rates as 
 the number of spikes measured over the time measured.
 The CV of ISI is calculated for each neuron that fired more than twice.
-\emph{
-Although the results of both implementations agree, there is a disagreement with the results presented 
-in the original paper, where a CV of ISI larger 0.8 for all populations is stated
-under similar simulation conditions\cite{potjans2014}. 
-This might be due to a difference in calculating the CV of ISI, for instance excluding neurons 
-with particularly low firing rates. }
-Especially 
-for the populations with low rates ($L2/3e, L6e$), the finite simulation time leads to an estimation bias
-of the CV of ISI as a significant ratio of the neurons in the population is either not included at all 
-($n_i < 2$) or the part of the distribution covering higher CV of ISIs is not represented well~%
-\cite{grun2010analysis}. 
+\emph{DESCRIBE RESULTS!}
 The synchrony measure explores the activity of each population as a whole. The respective population
 activity is calculated by subdividing the time of measurement into equal bins (bin width = $3$ ms) 
 and counting the number of spikes within each bin for each population. 
@@ -78,7 +68,7 @@ and well within statistical fluctuations. ---More detials once the plot is done}
 %\emph{ASSUMPTION: The box plot further shows that 
 %fluctuations relative to the mean are roughly equal for all populations, with outliers lying 
 %up to $\pm 10 \%$ above or below the median. Thus, the highest absolute fluctuations are observed 
-%for the layers $L5e, L5i$ and $L6i$.} 
+%for the layers L5e, L5i and L6i.} 
 %\\\emph{IS THERE anything to be said about fluctuations?}
 
 %\\\emph{CAN THIS be traced back to the fact that they used 
@@ -125,12 +115,6 @@ of first order quantities.
         are similar to the ones of Figure \ref{fig:spontaneous_activity} 
         (boxes: Q1-Q3, median:black line, mean: star, 
         whiskers to 1.5 of IQR, outliers: crosses). 
-        \\\emph{DISCUSSION?
-        Both quantities show very large fluctuations. One of the suspected
-        causes is the connection rule applied, yielding a binomial distribution 
-        of synapse numbers within one population
-        such that differences in input between single neurons can be 
-    considerably large.}
     }
     \label{fig:single_neuron_activity}
 \end{figure}
@@ -139,7 +123,7 @@ of first order quantities.
 Synchrony of populations in terms of population activity, 
 see Appendix, Figure \ref{fig:population_activity}. 
 The observed global oscillation indicates non-negligible correlations
-and thus contradicts the assumption of uncorrelated gaussian white noise 
+and thus contradicts the assumption of uncorrelated Gaussian white noise 
 (in the mean field model).}
 
 \subsection{Mean field theory}
@@ -159,7 +143,7 @@ match those of the simulation qualitatively: The sequence of populations
 ordered by increasing firing rates is reproduced with the exception of
 the two highest rates, i.~e. the two populations of layer $5$. 
 The most apparent difference is the seen for the populations firing at the lowest 
-rates, $L2/3e$  and $L6e$. The measured rates are almost equal while the 
+rates, L2/3e  and L6e. The measured rates are almost equal while the 
 predicted rates are very different, $r_{L6e} = 1.6$ Hz is almost three times 
 as large as $r_{L2/3e}$. Another observable feature is that the predicted rates
 for six of the eight populations are smaller than the measured ones. 
@@ -175,7 +159,7 @@ into equation \eqref{eq:CV_ISI_mf}. A comparison with simulation data is shown
 in Figure \ref{fig:compare_sim_mf_fixed_total_number}. Here the result turns out 
 to be quite close to the measured one. In all cases, the mean field theory predicts 
 a slightly higher variability. The larges deviation is again seen in the populations 
-$L2/3e$ and $L6e$, those firing at the lowest rates. Ignoring these two populations, 
+L2/3e and L6e, those firing at the lowest rates. Ignoring these two populations, 
 the theory further predicts the order of variability among the populations, although
 the differences are small. As for the rates, numerical results are subsumed in 
 Table \ref{tab:diff_fixed_total_number}, using analogous definitions. 
@@ -229,17 +213,17 @@ Figure \ref{fig:membrane_potential}.
 The obtained distributions  are confronted with the normalized histograms of recorded 
 membrane potentials of a subpopulation of $n_\text{rec} = 100$ neurons for 
 each population. The contribution due to neurons in refractory period is removed
-(see Analysis in Methods, \ref{subsec:analysis} for details). 
-Similar to the firing rates, 
+(see corresponding subsection in Methods, \ref{subsec:analysis} for details). 
+Similar to the previous results, 
 the agreement is quite good and the largest deviations are observable for  
-the populations $L2/3e$ and $L6e$, corresponding to the lowest firing rates and
+the populations L2/3e and L6e, corresponding to the lowest firing rates and
 largest relative differences as calculated before. A common feature found for all
 populations is that the predicted distributions are narrower than the recorded ones.
 Furthermore, the predicted maximum is shifted towards the threshold. The effect
 of neurons coming out of refractory period is underestimated in some cases, 
-visible for example in populations $L2/3i$ and $L4i$ where the mean distributions 
+visible for example in populations L2/3i and L4i where the mean distributions 
 show a step while the kink in the theoretical curves is hardly detectable. 
-In the case of population $L5i$ and $L6i$, however, this behavior is captured well. 
+In the case of population L5i and L6i, however, this behavior is captured well. 
 
 % Membrane potentials
 \begin{figure}[htpb]
@@ -285,8 +269,8 @@ Table~\ref{tab:diff_params}.
             "fixed\_indegree"; same synapse number per neuron 
             \tn[0.1cm] %\hline
         Synapse type & 
-            current based &
-            voltage based
+            current based, exponential shape &
+            voltage based, delta shape
             \tn[0.1cm] %\hline
         Synaptic weights & 
             clipped normal distribution & 

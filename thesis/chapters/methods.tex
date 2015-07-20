@@ -321,7 +321,7 @@ Table \ref{tab:network_params}.
         $E_\text{L}$    
             &  \multicolumn{3}{l}{$-65 \,\text{mV}$}
             &  \multicolumn{5}{l}{Leaky rest potential} \tn
-        $V_\text{reset}$    
+        $V_\text{r}$    
             &  \multicolumn{3}{l}{$-65 \,\text{mV}$}
             &  \multicolumn{5}{l}{Reset potential} \tn
         $\theta$    
@@ -367,18 +367,21 @@ permutations into account then has the probability
         \left( 1 - \frac{1}{N_b} \right)^{C_{ab} - k} \,.
     \label{eq:binomial}
 \end{equation}
-Accordingly, the expected value of $k$ is $C_{ab} / N_b$. 
+Accordingly, the expected value of $k$ is $\text{E}[k] = C_{ab} / N_b$, its variance is 
+$\text{Var}(k) = C_{ab} (1 - 1/N_b) / N_b$. 
 In Figure \ref{fig:syn_numbers_distribution}, the actual distribution of synapse numbers 
-for the connection $L4e \to L4i$ is shown in a normalized histogram. 
-The agreement between the numbers from the simulation and the theoretical expectation is quite
+for the connection L6e $\to$ L6i is shown in a normalized histogram. 
+The measured mean and standard deviation are $(975 \pm 31)$ compared to the theoretical 
+value of $(979 \pm 31)$ synapses. 
+Thus, the agreement between the numbers from the simulation and the theoretical expectation is quite
 well. 
 \begin{figure}[htpb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir syn_numbers_distribution}
     \caption{
-        Distribution of synapse numbers for the connection $L6e \to L6i$.
+        Distribution of synapse numbers for the connection L6e $\to$ L6i.
         The total number of synapses for this connection is $2888426$, 
-        the mean number for each neuron in $L6i$ is $979$.
+        the mean number for each neuron in L6i is $979$.
         The steps indicate the normalized histogram (bin width = 10) obtained 
         from a simulation, the dashed line is a binomial distribution, the 
         underlying distribution for the given connection rule. 
@@ -391,11 +394,11 @@ is taken. Figure \ref{fig:single_membrane_potential} shows the membrane
 potentials of two neurons over the first 1.2 s of simulation and further 
 the normalized histograms compared to the normalized histogram of a larger subset of the 
 respective population. The neuron of the upper plots appertains to the population
-$L6e$, the other one to population $L6i$. Potjans and Diesmann state that
+L6e, the other one to population L6i. Potjans and Diesmann state that
 these two populations have comparably low / high rates, the excitatory one firing at 
 $\sim 1$ Hz, the inhibitory one at $\sim 7$ Hz~\cite{potjans2014}.
-This is reflected in the average membrane potential which for the neuron of $L6e$
-is much closer to the threshold $\theta = -50$ mV, whereas for the $L6i$ neuron, it is
+This is reflected in the average membrane potential which for the neuron of L6e
+is much closer to the threshold $\theta = -50$ mV, whereas for the L6i neuron, it is
 closer to the resting potential $E_L = -65$ mV. Furthermore, it is observable, that a single 
 neurons' membrane potential is not necessarily distributed as the population mean. 
 This is due to the large variation in single neuron firing rates reported already in the 
@@ -409,7 +412,7 @@ data each time.
     \includegraphics[width=0.8\linewidth]{\figdir single_membrane_potential}
     \caption{
         Membrane potentials of two exemplary neurons of the populations 
-        $L6e$ (\textbf{A, C}) and $L6i$ (\textbf{B, D}). The data is taken from 
+        L6e (\textbf{A, C}) and L6i (\textbf{B, D}). The data is taken from 
         a simulation of 1.2 s, recording the membrane potential every 1 ms. 
         In all four plots, the threshold $\theta = -50$ mV is indicated by a dashed line, 
         the resting potential $E_L = -65$ mV by a line of dashes and dots. 
@@ -421,7 +424,7 @@ data each time.
         two neurons (thin steps) as well as the averaged ones for a subset of $100$ 
         neurons (thick steps). 
         Note that contributions due to neurons being in refractory 
-        period after spiking are not removed, yielding peaks at $V_r = -65$ mV. 
+        period after spiking are not removed, yielding peaks at $V_\text{r} = -65$ mV. 
     }
     \label{fig:single_membrane_potential}
 \end{figure}
@@ -484,13 +487,13 @@ this description to a probabilistic one:
         time, each being very small compared to the threshold ($J \ll \theta$).
 \end{itemize}
 If these conditions are true, the input can be modeled as a time-varying average part
-$\mu(t)$ plus a fluctuating gaussian part with amplitude $\sigma(t)\tau_\text{m}$:
+$\mu(t)$ plus a fluctuating Gaussian part with amplitude $\sigma(t)\tau_\text{m}$:
 \footnote{\emph{I have not yet understood the scaling by $\tau_m$...}}
 \begin{equation}
     \frac{\tau_\text{m}}{C_\text{m}} \, I_i(t) =  \mu(t) + \sigma(t) \sqrt{\tau_\text{m}} \eta_i(t) \, .
     \label{eq:input_random}
 \end{equation}
-The random fluctuations are described by gaussian white noise $\eta_i(t)$ with 
+The random fluctuations are described by Gaussian white noise $\eta_i(t)$ with 
 $\langle  \eta_i(t)\rangle = 0$. The model explicitly excludes correlations, 
 both in time and between different neurons, i.~e.
 \begin{equation}
@@ -571,7 +574,7 @@ time $t + \tau_\text{rp}$ at the reset potential $V_\text{r}$. This leads to
 a difference in probability current below and above $V_\text{r}$ proportional to 
 the rate of neurons firing at $t - \tau_\text{rp}$ expressed by
 \begin{equation}
-    \frac{\partial P(V_r^+, t)}{\partial V} \: -  \: \frac{\partial P(V_r^-, t)}{\partial V} 
+    \frac{\partial P(V_\text{r}^+, t)}{\partial V} \: -  \: \frac{\partial P(V_\text{r}^-, t)}{\partial V} 
         = - \frac{2 \nu(t - \tau_\text{rp}) \tau_\text{m}}{\sigma^2(t)} \,.
 \end{equation}
 Finally, $P(V, t)$ is assumed to converge sufficiently quickly to zero:
@@ -589,7 +592,7 @@ satisfying the above boundary conditions is then presented:
     P_0(V) = 2 \frac{\nu_0 \tau_\text{m}}{\sigma_0} 
         \exp{\left(- \frac{(V - \mu_0)^2}{{\sigma_0}^2} \right)}
         \int_{\frac{V - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
-            \Theta \left(u - \frac{V_r - \mu_0}{\sigma_0} \right) e^{u^2} \, \text{d}u  \,. 
+            \Theta \left(u - \frac{V_\text{r} - \mu_0}{\sigma_0} \right) e^{u^2} \, \text{d}u  \,. 
     \label{eq:P_V_0}
 \end{equation}
 Here, $\Theta(x)$ is the Heaviside step function, i.~e. 
@@ -633,10 +636,10 @@ then leads to an expression for $\nu_0$:
                 \int_{-\infty}^{\theta} \! \left[ 
                     \exp{\left(- \frac{(V - \mu_0)^2}{{\sigma_0}^2} \right)}
                     \int_{\frac{V - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
-                        \Theta \left(u - \frac{V_r - \mu_0}{\sigma_0} \right) e^{u^2} \, \text{d}u 
+                        \Theta \left(u - \frac{V_\text{r} - \mu_0}{\sigma_0} \right) e^{u^2} \, \text{d}u 
                     \right] \, \text{d}V  \\ 
             &= \tau_\text{rp} + \frac{2 \tau_\text{m}}{\sigma_0} 
-                \int_{\frac{V_r - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
+                \int_{\frac{V_\text{r} - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
                     \left[ 
                         e^{u^2}
                         \int_{-\infty}^{u \sigma_0 + \mu_0} \! 
@@ -644,13 +647,13 @@ then leads to an expression for $\nu_0$:
                         \, \text{d}V
                     \right] \, \text{d}u  \\ 
             &= \tau_\text{rp} + 2 \tau_\text{m}
-                \int_{\frac{V_r - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
+                \int_{\frac{V_\text{r} - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
                     \left[ 
                         e^{u^2}
                         \int_{-\infty}^{u} \! e^{v^2} \, \text{d}v
                     \right] \, \text{d}u  \\ 
             &= \tau_\text{rp} + \tau_\text{m} \sqrt{\pi}
-                \int_{\frac{V_r - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
+                \int_{\frac{V_\text{r} - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
                 e^{u^2} \left(1 + \text{erf}(u)\right)
                 \, \text{d}u  
         \label{eq:self_consistency}
@@ -685,7 +688,7 @@ firing rate $\nu_a$ of a single neuron in population~$a$,
 \begin{equation}
     \frac{1}{\nu_{a}} = \tau_{rp} 
         + \tau_\text{m} \sqrt{\pi}
-            \int_{\frac{V_r - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+            \int_{\frac{V_\text{r} - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
                 e^{u^2} \left(1 + \text{erf}(u)\right) \,\text{d}u  \,.
     \label{eq:self_consistency_a}
 \end{equation}
@@ -699,11 +702,11 @@ index $0$ yields
     P_a(V) = 2 \frac{\nu_a \tau_\text{m}}{\sigma_a} 
         \exp{\left(- \frac{(V - \mu_a)^2}{{\sigma_a}^2} \right)}
         \int_{\frac{V - \mu_a}{\sigma_a}}^{\frac{\theta - \mu_a}{\sigma_a}} \! 
-            \Theta \left(u - \frac{V_r - \mu_a}{\sigma_a} \right) e^{u^2} \, \text{d}u  \,.
+            \Theta \left(u - \frac{V_\text{r} - \mu_a}{\sigma_a} \right) e^{u^2} \, \text{d}u  \,.
     \label{eq:P_V_a}
 \end{equation}
 In a reasonable regime, this function resembles a gaussian curve with discontinuity in the first 
-derivative at $V_r$ (a visible "kink" or "step").
+derivative at $V_\text{r}$ (a visible "kink" or "step").
 Ultimately, the model also makes a prediction about the regularity of single spike 
 trains. For neurons firing irregularly, the interspike intervals
 (ISI, i.~e. the difference in times between two successive spikes of one neuron) 
@@ -722,7 +725,7 @@ result~\cite{brunel2000} is
 \begin{equation}
     (\text{CV of ISI})^2 
         = 2 \pi \left(\frac{\nu_a}{\tau_\text{m}}\right)^2
-            \int_{\frac{V_r - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+            \int_{\frac{V_\text{r} - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
             e^{x^2}  \,\text{d}x  \,
             \int_{-\infty}^{x} 
             e^{u^2} \left(1 + \text{erf}(u)\right)^2 \,\text{d}u  \,.
