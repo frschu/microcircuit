@@ -340,7 +340,7 @@ the mean number of synapses each neuron receives from a specific population. The
 of synapses in the model is almost 0.3 billion synapses.  
 \begin{figure}[htpb]
     \centering
-    \includegraphics[width=1.0\linewidth]{\figdir syn_numbers}
+    \includegraphics[width=0.8\linewidth]{\figdir syn_numbers}
     \caption{
         Connection between populations. (\textbf{A}) Visualization of 
         connection probability. (\textbf{B}) Calculated total synapse number between a pre- 
@@ -367,13 +367,14 @@ permutations into account then has the probability
         \left( 1 - \frac{1}{N_b} \right)^{C_{ab} - k} \,.
     \label{eq:binomial}
 \end{equation}
+Accordingly, the expected value of $k$ is $C_{ab} / N_b$. 
 In Figure \ref{fig:syn_numbers_distribution}, the actual distribution of synapse numbers 
 for the connection $L4e \to L4i$ is shown in a normalized histogram. 
 The agreement between the numbers from the simulation and the theoretical expectation is quite
 well. 
 \begin{figure}[htpb]
     \centering
-    \includegraphics[width=1.0\linewidth]{\figdir syn_numbers_distribution}
+    \includegraphics[width=0.8\linewidth]{\figdir syn_numbers_distribution}
     \caption{
         Distribution of synapse numbers for the connection $L6e \to L6i$.
         The total number of synapses for this connection is $2888426$, 
@@ -385,13 +386,14 @@ well.
     \label{fig:syn_numbers_distribution}
 \end{figure}
 
-To further validate the model on a basic level, a look at membrane potentials of 
-single neurons is taken. Figure \ref{fig:single_membrane_potential} shows the membrane 
-potentials of two neurons during the first 1.2 s of simulation and further 
+To further validate the model on a basic level, a look at single neurons' membrane potentials 
+is taken. Figure \ref{fig:single_membrane_potential} shows the membrane 
+potentials of two neurons over the first 1.2 s of simulation and further 
 the normalized histograms compared to the normalized histogram of a larger subset of the 
 respective population. The neuron of the upper plots appertains to the population
 $L6e$, the other one to population $L6i$. Potjans and Diesmann state that
-these two populations have among the highest / lowest rates of the simulation~\cite{potjans2014}.
+these two populations have comparably low / high rates, the excitatory one firing at 
+$\sim 1$ Hz, the inhibitory one at $\sim 7$ Hz~\cite{potjans2014}.
 This is reflected in the average membrane potential which for the neuron of $L6e$
 is much closer to the threshold $\theta = -50$ mV, whereas for the $L6i$ neuron, it is
 closer to the resting potential $E_L = -65$ mV. Furthermore, it is observable, that a single 
@@ -404,7 +406,7 @@ data each time.
 
 \begin{figure}[htpb]
     \centering
-    \includegraphics[width=1.0\linewidth]{\figdir single_membrane_potential}
+    \includegraphics[width=0.8\linewidth]{\figdir single_membrane_potential}
     \caption{
         Membrane potentials of two exemplary neurons of the populations 
         $L6e$ (\textbf{A, C}) and $L6i$ (\textbf{B, D}). The data is taken from 
@@ -458,7 +460,8 @@ is the transition from the deterministic description of membrane potential
 dynamics to a probabilistic formulation. 
 As in Potjans' model, the membrane potential follows
 the differential equation \eqref{eq:leaky_integrator}. The input is simplified 
-by assuming an instantaneous and fixed change in membrane potential
+by implementing voltage based synapses which
+yield an instantaneous and fixed change in membrane potential
 for each spike arriving at the neuron instead of an exponential shaped PSC.
 It can be described by a sum over Dirac delta-functions, 
 \begin{equation}
@@ -466,21 +469,23 @@ It can be described by a sum over Dirac delta-functions,
     \label{eq:input_const_volt}
 \end{equation}
 The synaptic weights $J_{ij}$ in this case are equal to the PSP and given in mV.  
+\emph{Multiple synapses between two neurons are excluded?!?}
 
 A number of conditions are necessary in order to make the transition from 
 this description to a probabilistic one:
 \begin{itemize}
     \item The sparsity implies that 
-        two neurons share only a small number of common input such that pair correlations
+        two neurons share only a small number of common input, such that pair correlations
         are negligible for $C / N \to 0$; 
     \item For the low single neuron firing rates $\nu$ compared to the 
         inverse membrane time constant $\tau_\text{a}$
         (e.~g. $\nu \sim10$ Hz and $1 / \tau_\text{m} \sim 1 / (20\,\text{ms}) = 50\, \text{Hz}$),
         a neuron receives a large number of small contributions per integration 
-        time, each being very small compared to the threshold ($J \ll \theta$);
+        time, each being very small compared to the threshold ($J \ll \theta$).
 \end{itemize}
 If these conditions are true, the input can be modeled as a time-varying average part
-$\mu(t)$ plus a fluctuating gaussian part with amplitude $\sigma(t)$:
+$\mu(t)$ plus a fluctuating gaussian part with amplitude $\sigma(t)\tau_\text{m}$:
+\footnote{\emph{I have not yet understood the scaling by $\tau_m$...}}
 \begin{equation}
     \frac{\tau_\text{m}}{C_\text{m}} \, I_i(t) =  \mu(t) + \sigma(t) \sqrt{\tau_\text{m}} \eta_i(t) \, .
     \label{eq:input_random}
@@ -492,12 +497,12 @@ both in time and between different neurons, i.~e.
     \langle \eta_i(t) \: \eta_j(t') \rangle = \delta_{ij} \: \delta(t - t')	\, . 
     \label{eq:no_correlations}
 \end{equation}
-The latter assumptions has to be tested for the spiking model
-that is to be described with this mean field approach. 
+\emph{The latter assumptions has to be tested for the spiking model
+that is to be described with this mean field approach.}
 
 The fundamental parameter calculated by the mean field model is the single neuron
 firing rate $\nu(t)$. In this basic model, it is assumed that any neuron of either 
-of the two populations is firing with the same rate which is linked to the 
+of the two populations is firing with the same rate $\nu$ which is linked to the 
 average input $\mu(t)$ by
 \begin{equation}
     \begin{split}
@@ -589,7 +594,7 @@ satisfying the above boundary conditions is then presented:
 \end{equation}
 Here, $\Theta(x)$ is the Heaviside step function, i.~e. 
 \begin{equation}
-    \Theta(x) = \begin{cases} 1 & \text{if } x \le 0 \\ 0 & \text{if } x < 0 \end{cases}  \,.
+    \Theta(x) = \begin{cases} 1 & \text{if } x \le 0 \\ 0 & \text{else } \end{cases}  \,.
     \label{eq:heaviside}
 \end{equation}
 The stationary mean input and fluctuation amplitudes are obtained by inserting 
@@ -676,7 +681,7 @@ be written as
 \end{align}
 where the sums go over all internal populations. In this specific case of eight 
 populations one thus obtains eight equations for the 
-firing rate $\nu_a$ of a single neuron in population $a$, 
+firing rate $\nu_a$ of a single neuron in population~$a$, 
 \begin{equation}
     \frac{1}{\nu_{a}} = \tau_{rp} 
         + \tau_\text{m} \sqrt{\pi}
@@ -686,7 +691,7 @@ firing rate $\nu_a$ of a single neuron in population $a$,
 \end{equation}
 These equations are coupled by the boundaries of the integrals. Note that the index $0$ 
 is omitted to facilitate readability, as the results are only concerned with stationary
-solutions. Ultimately, after the rates $\nu_a$ are found, theses values can also be 
+solutions. After the rates $\nu_a$ are found, theses values can also be 
 plugged into an equation for the distribution of membrane potentials. Extending the 
 corresponding expression \eqref{eq:P_V_0} to more populations and again dropping the 
 index $0$ yields
@@ -698,8 +703,8 @@ index $0$ yields
     \label{eq:P_V_a}
 \end{equation}
 In a reasonable regime, this function resembles a gaussian curve with discontinuity in the first 
-derivative at $V_r$.
-Finally, the model also makes a prediction about the regularity of single spike 
+derivative at $V_r$ (a visible "kink" or "step").
+Ultimately, the model also makes a prediction about the regularity of single spike 
 trains. For neurons firing irregularly, the interspike intervals
 (ISI, i.~e. the difference in times between two successive spikes of one neuron) 
 a distributed broadly. Hence, one parameter to measure irregularity is the coefficient 
@@ -742,7 +747,7 @@ The source code both for simulation and analysis can be reviewed at my
 github server~\cite{ba_github} or more conveniently with the 
 \textit{ipython notebook viewer}~\cite{notebook_viewer}.
 
-The core part of the mean field theory given by the coupled the 
+The core part of the mean field theory constituted of the 
 coupled integrals of equation \eqref{eq:self_consistency_a} relies on numerical
 solving. The implementation of $\text{erf}(u)$ has a limited domain for the applied 
 precision, such that for large values $u > 0$, the evaluation of 
@@ -771,10 +776,10 @@ A test with simulated rates from 20 independent simulations for 20 seconds each 
 after a number of $42 \pm 12$ steps (mean and standard deviation). 
 The second solution entirely independent of simulation data is solving the simplified model 
 with only two populations corresponding to equation \eqref{eq:self_consistency} first.
-Convergence is found for a much broader range of initial guesses. The model can then be split 
+Testing showed that convergence is found for a much broader range of initial guesses (data not shown).
+The model can then be split 
 into eight populations and all parameters can be iteratively transformed to the ones of the 
 model in question. 
-\\\emph{I could add a plot to the appendix...}
 
 Most of the analysis does not require any specification at this point. 
 However, the evaluation of membrane potentials of simulated neurons requires a specific treatment 

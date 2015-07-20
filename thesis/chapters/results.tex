@@ -11,23 +11,25 @@ comparison. Instead, a statistical description is chosen which furthermore sheds
 onto the differences between individual realizations with different seeds for the 
 random number generators. Certain aspects such as
 the distribution of single neuron firing rate within the population, 
-the interspike interval distributions and the global population activity 
-are then analyzed more thoroughly. Some of these  results are compared with 
+the interspike interval distributions 
+\emph{and the global population activity} 
+are then analyzed more thoroughly. 
+%Some of these  results are compared with 
 theoretical approximations, namely the resulting distributions 
 for Poisson processes.
 
 A comparison between the pyNEST implementation and the original one written in SLI
 is first supplied in form of raster plots (Figure~\ref{fig:raster_plot}), 
-showing the activity of a subset of the neurons simulated for 400 ms 
+showing the activity of a subset of the network simulated for 400 ms 
 after a transient period of 100 ms. The subset shown consists of the first 
-$2.5 \%$ of the neurons created during the creation of the network. 
+$2.5 \%$ of the neurons of each population created during the creation of the network. 
 Both results have a very similar structure: Common features are the observable low 
 rates of populations $L2/3e$ and $L6e$ as well some signs of synchrony within populations. 
 Single neurons fire at a rate much lower than the activity of the 
 entire population, as would be expected for networks in the AI regime \cite{brunel2000}. 
 \begin{figure}[htpb]
     \centering
-    \includegraphics[width=1.0\linewidth]{\figdir raster_plot}
+    \includegraphics[width=0.8\linewidth]{\figdir raster_plot}
     \caption{Raster plot showing spontaneous activity of network for 
         (A) the pyNEST implementation and (B) the SLI implementation.
         The simulation and network parameters for both simulations are 
@@ -40,32 +42,29 @@ entire population, as would be expected for networks in the AI regime \cite{brun
 
 A more thorough comparison is done on the bases of three statistical quantities: 
 Figure~\ref{fig:spontaneous_activity} shows the population means of single neurons firing rates, 
-the coefficient of variation of interspike intervals (CV of ISI) as well as a measure for synchrony for both 
-simulations. All parameters were calculated from $10$ repetitions of a simulation for 
-$60.2$ s. Spikes were recorded from $1000$ neurons of each population, with recording 
+irregularity as measured by  the CV of ISI as well as a measure for synchrony for both 
+simulations. All parameters were calculated from $20$ repetitions of a simulation for 
+$60.2$ s.%
+\footnote{\emph{which are still being simulated...}}
+Spikes were recorded from $1000$ neurons of each population, with recording 
 starting after a transient period of $0.2$ s. 
-For all three aspects, the agreement between the two implementations is very good 
-and well within statistical fluctuations. 
-The means are obtained by calculating the single neuron firing rates as 
-the number of spikes measured over the time measured and then taking the mean over the entire population. 
-\emph{ASSUMPTION: The box plot further shows that 
-fluctuations relative to the mean are roughly equal for all populations, with outliers lying 
-up to $\pm 10 \%$ above or below the median. Thus, the highest absolute fluctuations are observed 
-for the layers $L5e, L5i$ and $L6i$.} 
+The means are obtained by calculating the respective quantity for each neuron and averaging over 
+the entire population. 
 
+The single neuron firing rates as 
+the number of spikes measured over the time measured.
 The CV of ISI is calculated for each neuron that fired more than twice.
+\emph{
 Although the results of both implementations agree, there is a disagreement with the results presented 
 in the original paper, where a CV of ISI larger 0.8 for all populations is stated
 under similar simulation conditions\cite{potjans2014}. 
 This might be due to a difference in calculating the CV of ISI, for instance excluding neurons 
-with particularly low firing rates. 
+with particularly low firing rates. }
 Especially 
 for the populations with low rates ($L2/3e, L6e$), the finite simulation time leads to an estimation bias
 of the CV of ISI as a significant ratio of the neurons in the population is either not included at all 
 ($n_i < 2$) or the part of the distribution covering higher CV of ISIs is not represented well~%
 \cite{grun2010analysis}. 
-\\\emph{IS THERE anything to be said about fluctuations?}
-
 The synchrony measure explores the activity of each population as a whole. The respective population
 activity is calculated by subdividing the time of measurement into equal bins (bin width = $3$ ms) 
 and counting the number of spikes within each bin for each population. 
@@ -74,11 +73,19 @@ A population firing totally asynchronously would yield a synchrony of zero as th
 be no global oscillations i.~e. zero variance observed.
 As with the CV of ISI, the results of both implementations agree, but do not reproduce the ones stated 
 by Potjans and Diesmann \cite{potjans2014}. 
-\\\emph{CAN THIS be traced back to the fact that they used 
-only 5 s of simulation? -> methods: check synchrony for measurement time and bin width!}. 
+\emph{For all three aspects, the agreement between the two implementations is very good 
+and well within statistical fluctuations. ---More detials once the plot is done}
+%\emph{ASSUMPTION: The box plot further shows that 
+%fluctuations relative to the mean are roughly equal for all populations, with outliers lying 
+%up to $\pm 10 \%$ above or below the median. Thus, the highest absolute fluctuations are observed 
+%for the layers $L5e, L5i$ and $L6i$.} 
+%\\\emph{IS THERE anything to be said about fluctuations?}
+
+%\\\emph{CAN THIS be traced back to the fact that they used 
+%only 5 s of simulation? -> methods: check synchrony for measurement time and bin width!}. 
 \begin{figure}[htpb]
     \centering
-    \includegraphics[width=1.0\linewidth]{\figdir spontaneous_activity}
+    \includegraphics[width=0.8\linewidth]{\figdir spontaneous_activity}
     \caption{
         Derived statistical quantities for spontaneous activity of network for
         (\textbf{A - C}) the pyNEST implementation and (\textbf{D - E}) the SLI implementation, 
@@ -109,7 +116,7 @@ and less on the actual wiring, i.~e. that a mean field approach would be able to
 of first order quantities. 
 \begin{figure}[htpb]
     \centering
-    \includegraphics[width=1.0\linewidth]{\figdir single_neuron_activity}
+    \includegraphics[width=0.8\linewidth]{\figdir single_neuron_activity}
     \caption{
         Firing rates (\textbf{A}) and CV of ISI (\textbf{B}) for single neurons. 
         The data is take from one simulation of the pyNEST implementation 
