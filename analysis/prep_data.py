@@ -17,18 +17,23 @@ import time
 ######################################################
 # File and path
 ######################################################
-data_file = "brunel"
-data_sup_path = "/export/data-schuessler/data_microcircuit/"
-data_sup_path    = "/users/schuessler/uni/microcircuit/data"
-data_path = os.path.join(data_sup_path, data_file)
+#data_sup_path    = "/users/schuessler/uni/microcircuit/data"
+#data_file = "brunel"
+#sim_spec = "test_brunel_C250_exp"
+
+#data_sup_path = "/export/data-schuessler/data_microcircuit/"
+#data_file = "micro"
 #sim_spec = "a1.0_t20.4_00"
-sim_spec = "a1.0_t20.2_fixindeg_01" 
-sim_spec = "test_brunel_C250_exp"
+#sim_spec = "a1.0_t20.2_fixindeg_01" 
 #sim_spec = "spontaneous_activity_sli"
 #sim_spec = "spon_act_statistic_sli"
-#sim_spec = "simulation_at_mf"
+
+data_sup_path    = "/users/schuessler/uni/microcircuit/data"
+data_file = "micro"
+sim_spec = "simulation_at_mf"
 
 # Original data
+data_path = os.path.join(data_sup_path, data_file)
 file_name  = sim_spec + ".hdf5"  
 res_file_name = sim_spec + "_res.hdf5"
 # Attributes are not save for sli simulations

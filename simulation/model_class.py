@@ -137,9 +137,9 @@ class model:
         if not self.neuron_model=="iaf_psc_delta":
             self.model_params["tau_syn_ex"] = net.tau_syn_ex # excitatory synaptic time constant (ms)
             self.model_params["tau_syn_in"] = net.tau_syn_in # inhibitory synaptic time constant (ms)
-            self.tau_syn_ex = net.tau_syn_ex * 1e-3             # s
-            self.tau_syn_in = net.tau_syn_in * 1e-3             # s
-            self.tau_syn    = np.tile([self.tau_syn_ex, self.tau_syn_in], (self.n_populations, self.n_layers))
+        self.tau_syn_ex = net.tau_syn_ex * 1e-3             # s
+        self.tau_syn_in = net.tau_syn_in * 1e-3             # s
+        self.tau_syn    = np.tile([self.tau_syn_ex, self.tau_syn_in], (self.n_populations, self.n_layers))
         # Rescaling for model calculations: these values are not used in the simulation!
         self.tau_m  = self.model_params["tau_m"] * 1e-3          # s
         self.t_ref  = self.model_params["t_ref"] * 1e-3          # s
@@ -163,15 +163,18 @@ class model:
         self.J              = net.PSP_e           # mv; mean PSP, used as reference PSP
         self.J_ab           = self.J * g_all
         self.weight_rel_sd  = weight_rel_sd # Standard deviation of weight relative to mean weight
-        # Actual weights have to be adapted, as a postsynaptic POTENTIAL is used
-        if   self.neuron_model=="iaf_psc_delta":
-            self.weights    = self.J_ab     # neuron populations
-        elif self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
-            delta_tau       = self.tau_syn - self.tau_m
-            ratio_tau       = self.tau_m / self.tau_syn
-            PSC_over_PSP    = self.C_m * delta_tau / (self.tau_m * self.tau_syn * \
-                (ratio_tau**(self.tau_m / delta_tau) - ratio_tau**(self.tau_syn / delta_tau))) * 1e-3
+        # Transformation from peak PSP to PSC
+        delta_tau       = self.tau_syn - self.tau_m
+        ratio_tau       = self.tau_m / self.tau_syn
+        PSC_over_PSP    = self.C_m * delta_tau / (self.tau_m * self.tau_syn * \
+            (ratio_tau**(self.tau_m / delta_tau) - ratio_tau**(self.tau_syn / delta_tau))) * 1e-3
+        pA_to_mV            = 1e3 / self.C_m # Factor for conversion from pA to mV
+        # Actual weights have to be adapted: from peak PSP to PSC (and back...)
+        if self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
             self.weights    = self.J_ab  * PSC_over_PSP     # neuron populations
+        elif self.neuron_model=="iaf_psc_delta":
+            self.weights    = self.J_ab * PSC_over_PSP * self.tau_syn * pA_to_mV 
+            # This might be an overkill / doing things twice...
         elif self.neuron_model=="iaf_psc_alpha": # PSCs calculated from PSP amplitudes
             raise Exception("Neuron model: iaf_psc_alpha. CHeck units of weights before applying!")
             self.weights = self.J_ab * np.exp(1) # see Sadeh 2014
@@ -211,10 +214,10 @@ class model:
         self.dc_amplitude = net.dc_amplitude  # constant bg amplitude
         self.C_aext     = net.C_aext        # in-degrees for background input
         # Adapt weights
-        if self.neuron_model=="iaf_psc_delta":
-            self.weight_ext = self.J_ext    
-        elif self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
+        if self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
             self.weight_ext = self.J_ext * PSC_over_PSP[0, 0] 
+        elif self.neuron_model=="iaf_psc_delta":
+            self.weight_ext = self.J_ext * PSC_over_PSP[0, 0] * self.tau_syn_ex * pA_to_mV 
         elif self.neuron_model=="iaf_psc_alpha": # PSCs calculated from PSP amplitudes
             self.weight_ext = self.J_ext * np.exp(1) 
 
@@ -225,10 +228,10 @@ class model:
         self.th_rate        = net.th_rate      # rate of thalamic neurons (spikes/s)
         self.J_th           = net.PSP_th      # mean EPSP amplitude (mV) for thalamic input
         # Adapt weights
-        if self.neuron_model=="iaf_psc_delta":
-            self.weight_th = self.J_th    
-        elif self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
+        if self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
             self.weight_th = self.J_th * PSC_over_PSP[0, 0] 
+        elif self.neuron_model=="iaf_psc_delta":
+            self.weight_th = self.J_th * PSC_over_PSP[0, 0] * self.tau_syn_ex * pA_to_mV 
         elif self.neuron_model=="iaf_psc_alpha": # PSCs calculated from PSP amplitudes
             self.weight_th = self.J_th * np.exp(1) 
         
@@ -261,13 +264,11 @@ class model:
             self.J_mu_ext   = self.weight_ext   
             self.J_sd_ext   = self.weight_ext
         elif self.neuron_model=="iaf_psc_exp":
-            pA_to_mV            = 1e3 / self.C_m # Factor for conversion from pA to mV
             self.J_mu       = self.weights    * self.tau_syn    * pA_to_mV
             self.J_sd       = self.weights    * self.tau_syn    * pA_to_mV / np.sqrt(2.)
             self.J_mu_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV
             self.J_sd_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV / np.sqrt(2.)
         elif self.neuron_model=="iaf_psc_alpha":
-            pA_to_mV            = 1e3 / self.C_m # Factor for conversion from pA to mV
             self.J_mu       = self.weights    * self.tau_syn    * pA_to_mV
             self.J_sd       = self.weights    * self.tau_syn    * pA_to_mV / 2.
             self.J_mu_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV

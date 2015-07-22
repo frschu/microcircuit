@@ -32,7 +32,7 @@ import model_class; reload(model_class)
 verbose     = False                     # whether to print every connection made
 
 # ONLY PUT THIS IF YOU DONT WANT TO HAVE A FILE NAME AUTOMATICALLY ASSIGNED
-name    = "simulation_at_mf"          
+name    = "simulation_at_mf"
 # whether to append the selected data_file (if it existist, otherwise might cause error!)
 append_data = False 
 

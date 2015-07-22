@@ -8,7 +8,7 @@ Following Nordlie et al.'s suggestions on
 the network model is described in detail in the following paragraphs while a detailed 
 overview is provided in two tables: The model is summarized in Table 
 \ref{tab:model_description}, 
-whereas specific numerical values of the parameters are displayed in Table 
+whereas specific numerical values of the parameters are shown in Table 
 \ref{tab:network_params}. 
 
 %\subsubsection{Model composition and connectivity}
@@ -68,10 +68,10 @@ whereas specific numerical values of the parameters are displayed in Table
 
 The network consists of eight cortical populations arranged in four 
 layers. Each layer contains an excitatory as well as an inhibitory population, 
-implying what is known as Dale's principle: neurons can only be one type or the other.%
+implying what is known as Dale's principle: neurons can only be of one type or the other.%
 \footnote{
 The actual principle is aimed at more detailed models, hence more specific stating that
-"at all the axonal branches of a neurone, there was liberation of the same transmitter 
+"at all the axonal branches of a neuron, there was liberation of the same transmitter 
 substance or substances"~\cite{eccles1976electrical}.
 } %
 A simplified diagram of the network together with an illustration of population 
@@ -98,8 +98,8 @@ neurons.
         Layers 23, 4, 5, and 6 are composed of one excitatory
         (triangles) and one inhibitory population (circles) each.
         The connections are only shown for probabilities $>0.04$. 
-        The external input is simulated by poissonian spike trains 
-        and fed to all four layers containing populations. 
+        The external input is simulated by Poissonian spike trains
+        with adapted rates for each population. 
         Layer 1 does not contain neuron populations.
         (\textbf{B})
         Population sizes, total of 77169 neurons. The total number of inhibitory neurons is roughly
@@ -107,8 +107,10 @@ neurons.
     }
     \label{fig:model_description} 
 \end{figure}
+Synapses are created according to a set connection rule, referred to as 
+"fixed total number":
 For each combination of pre- and postsynaptic population, pairs of neurons to be connected are drawn
-randomly until a fixed number of synapses for each postsynaptic population is reached, 
+randomly until a fixed number of synapses is reached, 
 allowing for multiple synapses and self-connections. 
 Potjans and Diesmann's original model defines the connection probability $P_{\text{conn}, \,ab}$ 
 of one neuron in the presynaptic population $a$ to form at least one connection with one neuron in 
@@ -118,7 +120,7 @@ synapses $C_{ab}$ is then calculated by
     C_{ab} = \frac{\ln \left( 1 - P_{\text{conn}, \,ab} \right)}{\ln \left( 1 - \frac{1}{N_a N_b} \right)} \, ,
     \label{eq:synapse_numbers}
 \end{equation}
-the inverse of the formula for connection probabilities of the original paper~\cite{potjans2014}.
+the inverse of the formula for connection probabilities of the original study~\cite{potjans2014}.
 
 The weight $w$ for each synapse is drawn from a normal distribution.
 For excitatory presynaptic neurons, this mean value is set to $87,8$ pA (see below for 
@@ -126,7 +128,7 @@ a derivation). The mean for inhibitory ones is determined by multiplying
 with a factor $-g$, where the relative inhibitory synapse strength is set to 
 $g = 4$. There is one important exception to this scheme:
 The mean for the connection from L4e to L2/3e is increased by a factor of 
-$j_{02} = 2$ (consult the corresponding paper~\cite{potjans2014} for details). 
+$j_{02} = 2$ (consult~\cite{potjans2014} for details). 
 The standard deviation is set to $10\%$ of the mean. 
 The distributions from which weights are drawn are clipped, 
 such that a neuron assigned to the excitatory 
@@ -134,7 +136,7 @@ population will not have associated outgoing synapses with $w < 0$
 and vice versa for inhibitory ones. 
 Delays are drawn from normal distributions as well, with a mean value 
 of $1.5$ ms for excitatory presynaptic neurons and half this value for 
-inhibitory ones. The relative standard deviation is set to $0.5$. The distributions
+inhibitory ones. The relative standard deviation is set to $50 \%$. The distributions
 are again clipped such that $d \ge 0$
 
 %\subsubsection{Neuron and synapse model}
@@ -162,20 +164,16 @@ spike arriving at one neuron leads to a current
 I_{\text{syn}}(t) = w \exp{\left(\frac{-t}{\tau_\text{syn}}\right)}	
     \label{eq:synaptic_current}
 \end{equation}
-where $w$ is the weight of the synapse in the model, given in pA
-and $\tau_\text{syn}$ is the synapse time constant.
-$w$ is identical to the amplitude of the PSC
+where $w$ is the weight of the synapse in the model,
+which corresponds to the amplitude of the PSC
 at the time the spike arrives. 
+$\tau_\text{syn}$ is the synaptic time constant.
 Since measuring currents remains a difficult task for experimentalists, 
 the model relays on measurements of the amplitude of the postsynaptic 
-potential (PSP). In order to use the experimental observations%
-\footnote{
-Potential differences are much easier to access compared to incoming currents.
-\emph{cite something?}
-}, 
-an approximative transformation is implemented 
-by calculating the PSC induced if one spike with given PSP arrives at 
-a neuron with membrane potential at rest. 
+potential (PSP). In order to use the experimental observations,
+an approximative transformation is implemented.
+The PSC induced by one spike of given PSP with the membrane potential
+at rest is calculated as follows:
 For $E_\text{L} = 0$, setting $I(t) = I_\text{syn}(t)$ in equation \eqref{eq:leaky_integrator}
 yields:
 \begin{equation}
@@ -203,7 +201,7 @@ Thus
     V(t) = C_1 \left[\exp\left(-\frac{t}{\tau_\text{m}}\right) - \exp\left(-\frac{t}{\tau_\text{syn}}\right)\right]	\,.  
     \label{eq:V(t)}
 \end{equation}
-In order to get the PSP, we search for the maximum. Setting $\dot{V}(t) = 0$ 
+In order to get the peak PSP, we search for the maximum. Setting $\dot{V}(t) = 0$ 
 yields
 \begin{equation}
     t_\text{max} 
@@ -213,7 +211,7 @@ yields
 \end{equation}
 Inserting into equation \eqref{eq:V(t)} leads to 
 \begin{equation}
-    \text{PSP} := V(t_\text{max}) 
+    V(t_\text{max}) 
         = \frac{w \tau_\text{m} \tau_\text{syn}}{C_\text{m} \Delta\tau}	
             \left[ 
                 \left( \frac{\tau_\text{syn}}{\tau_\text{m}} \right)^\frac{\tau_\text{syn}}{\Delta\tau} 
@@ -221,9 +219,10 @@ Inserting into equation \eqref{eq:V(t)} leads to
             \right] \,.
     \label{eq:PSP}
 \end{equation}
-For a given PSP, this equation is simply inverted in order to get the according 
-weight $w$. In this model, the PSP for excitatory neurons is set to 0.15 mV, 
-which yields a PSC of 87.8 pA. 
+For a given PSP amplitude, this equation is simply inverted in order to get the according 
+weight $w$. The value used for the original model and also applied in this work 
+is 0.15 mV. It is suggested by experiments and yields 
+a synaptic weight of 87.8 pA. 
 Finally, the 
 input current of neuron $i$ can be described as the sum over currents induced by
 arriving spike trains, 
@@ -235,17 +234,63 @@ where $t_j^k$ is the time the $k$-th spike by neuron $j$ was emitted and the
 delay between neuron $i$ and $j$ is set to $d_{ij}$. 
 
 %\subsubsection{Model input, output and free parameters}
-The model is solely driven by poissonian spike trains. Each neuron receives independent 
-input at a rate specific to its population. This rate is determined by a global 
+The activity of the network depends both on the recurrent stimulation as well as 
+external input. The biological networks motivating the model are shown to be 
+stable under a wide range of conditions\emph{CITE}. 
+The inhibitory populations that guarantee this stability require that the network 
+is supplied with external stimuli -- without this, it converges to quiescence.\cite{brunel2000}
+In the case of the local neocortical microcircuit, the roles of different
+external input and recurrence is debated widely. While some interpret the local circuit
+as computational building blocks \cite{potjans2014}, others focus on the interplay between 
+different cortical regions (e.~g. \cite{boucsein2011beyond}) or the transmission of 
+thalamic signals (\emph{CITE}). The model implemented in this work is only driven 
+by unspecific input mimicking stimulation from close and distant cortical areas\cite{potjans2014}.%
+\footnote{
+The original publication included thalamic input in order to examine temporal transmission 
+of stimuli. This is omitted here as the focus lies on stationary states. 
+}
+
+Instead of using simulated neurons populations, the input is implemented as Poissonian 
+spike trains. The underlying Poisson process with mean rate $\nu$ is a stochastic process formally 
+defined as a continuous-time counting process ${N(t), t \le 0}$ with the properties%
+~\cite{tuckwell2005introduction}
+\begin{itemize}
+    \item $N(0) = 0$;
+    \item for any $0 = t_0 < t_1 < t_2 < \cdots < t_{n-1} < t_n$, the random variables
+        $N(t_k) - N(t_{k-1}), k = 1, 2, \dots, n$ are mutually independent; 
+    \item for any $0 \le t_1 < t_2, N(t_1) - N(t_2)$ is a Poisson random variable with 
+        probability distribution 
+        \begin{equation}
+            \text{Pr}\left\{N(t_2) - N(t_1) = k \right\} 
+                = \frac{\left( \nu(t_2 - t_1) \right)^k \exp \left( - \nu(t_2 - t_1) \right) }{k!}
+            \label{eq:poisson_process}
+        \end{equation}
+        for $k \in \mathbb{N}$.
+\end{itemize}
+For the random variable $N(t_2) - N(t_1)$, mean and variance are given by
+$\text{E}[N(t_2) - N(t_1)] = \text{Var}(N(t_2) - N(t_1)) = \nu(t_2 - t_1)$,
+such that the average number of spikes $\langle k \rangle$ 
+per time bin of width $\Delta t = t_2 - t_1$ is 
+\begin{equation}
+    \frac{\langle{N}\rangle}{\Delta t} = \nu \,.
+    \label{eq:poisson_rate}
+\end{equation}
+
+In the spiking network model, each neuron receives spikes of a defined weight with 
+the spike times implemented as such a Poisson process. All processes are mutually independent 
+and the rate of each one is determined by a global 
 background rate of $8$ Hz multiplied by an external indegree $C_{a, \text{ext}}$ for
-population $a$. This mimics a multiple number of synapses each transmitting the same input. 
+population $a$. 
+This mimics a multiple number of synapses to the respective neuron, each receiving an 
+independent Poisson process with a mean rate of $8$ Hz. 
+
 At creation, the neurons are initialized by drawing their membrane potential from a normal
 distribution with mean $-58$ mV and a standard deviation of $10$ mV. 
 The activity of the network is measured in terms of spike trains (measuring the spike times 
 of single neurons up to the maximal grid resolution $h$) and membrane potentials in mV. 
 The results in this thesis are based on recording only a fraction of the neurons in the network, 
-choosing the first $n_a$ neurons of each population $a$. Since no topology is applied, this is 
-equal to choosing $n_a$ neurons to record from randomly. If not specified else, spikes are recorded 
+choosing $n_a$ random neurons of each population $a$. 
+If not specified else, spikes are recorded 
 from $1000$ neurons of each population, membrane potentials from $100$. The further analysis of the data 
 is explained in following sections.
 The large number of free parameters of the model and their chosen values are summarized in 
@@ -331,13 +376,6 @@ Table \ref{tab:network_params}.
 \end{table}
 
 %\subsubsection{Model validation}
-In order to verify that the model behaves as assumed, a number of basic parameters 
-is examined before stating more central results. As the implementation of the neuron model
-is part of the NEST software and thus well established, the validation starts at the level 
-of connections. Figure \ref{fig:syn_numbers} shows the number of synapses for each pair 
-of pre- and postsynaptic population and 
-the mean number of synapses each neuron receives from a specific population. The total number 
-of synapses in the model is almost 0.3 billion synapses.  
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir syn_numbers}
@@ -345,23 +383,36 @@ of synapses in the model is almost 0.3 billion synapses.
         Connection between populations.
         (\textbf{A}) Calculated total synapse number between a pre- 
         and a postsynaptic population. These numbers are used for connecting the network, 
-        using the connection rule "fixed\_total\_number". (\textbf{B}) Mean number of synapses
+        using the connection rule "fixed total number". (\textbf{B}) Mean number of synapses
         a neuron in a specific postsynaptic population is receiving from all neurons of a 
         presynaptic population. These numbers are only applied when using the connection
-        rule "fixed\_indegree" (for comparison between spiking network model and mean field theory).
+        rule "fixed indegree" (\emph{see section comparison for details}).
     }
     \label{fig:syn_numbers}
 \end{figure}
-With the connection rule applied in the simulation ("fixed\_total\_number"~\cite{NEST}),
+In order to verify that the model behaves reasonably, a number of basic parameters 
+is examined before stating more central results. As the implementation of the neuron model
+is part of the NEST software and thus well established, the validation starts at the level 
+of connections. Figure \ref{fig:syn_numbers} shows the number of synapses for each pair 
+of pre- and postsynaptic population and 
+the mean number of synapses each neuron receives from a specific population. The total number 
+of synapses in the model is almost 0.3 billion synapses.  
+
+With the connection rule "fixed total number" applied in the simulation, 
 the number of synapses per postsynaptic neuron is expected to follow a binomial distribution:
-for pre- and postsynaptic populations $a$ and $b$, respectively, 
+For pre- and postsynaptic populations $a$ and $b$, respectively, 
 each time a pair is drawn, one postsynaptic neuron is chosen with a probability 
 $1 / N_b$, $N_b$ being the population size. This is repeated until $C_{ab}$ synapses are
 created. 
-Choosing this neuron exactly $k$ times and taking 
-permutations into account then has the probability
+Choosing one neuron the first $k$ times and not again has the probability 
+$\text{Pr}\left\{X = k\right\} = 
+\left( \frac{1}{N_b} \right)^{k} 
+\left( 1 - \frac{1}{N_b} \right)^{C_{ab} - k}$.
+Multiplied by the number of possibilities to choose this neuron $k$ times out of 
+$C_{ab}$, the total probabilities of receiving $k$ synapses from population $a$ is
+given by
 \begin{equation}
-    p_{\,\text{Binom}}\left(k; n=C_{ab}, p=\frac{1}{N_b}\right) = 
+    \text{Pr}_{\,\text{Binom}}\left\{X = k; n=C_{ab}, p=\frac{1}{N_b}\right\} = 
         {C_{ab}\choose{k}} 
         \left( \frac{1}{N_b} \right)^{k} 
         \left( 1 - \frac{1}{N_b} \right)^{C_{ab} - k} \,.
@@ -373,8 +424,8 @@ In Figure \ref{fig:syn_numbers_distribution}, the actual distribution of synapse
 for the connection L6e $\to$ L6i is shown in a normalized histogram. 
 The measured mean and standard deviation are $(975 \pm 31)$ compared to the theoretical 
 value of $(979 \pm 31)$ synapses. 
-Thus, the agreement between the numbers from the simulation and the theoretical expectation is quite
-well. 
+Thus, the agreement between the numbers from the simulation and the theoretical expectation is
+in full agreement. 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir syn_numbers_distribution}
@@ -389,23 +440,28 @@ well.
     \label{fig:syn_numbers_distribution}
 \end{figure}
 
-To further validate the model on a basic level, a look at single neurons' membrane potentials 
+To further validate the model on a basic level, a look at a single neurons' membrane potentials 
 is taken. Figure \ref{fig:single_membrane_potential} shows the membrane 
-potentials of two neurons over the first 1.2 s of simulation and further 
-the normalized histograms compared to the normalized histogram of a larger subset of the 
+potentials of two neurons over the first 1.2 s of simulation together with a comparison of
+the normalized histograms of a larger subset of the 
 respective population. The neuron of the upper plots appertains to the population
-L6e, the other one to population L6i. Potjans and Diesmann state that
-these two populations have comparably low / high rates, the excitatory one firing at 
-$\sim 1$ Hz, the inhibitory one at $\sim 7$ Hz~\cite{potjans2014}.
-This is reflected in the average membrane potential which for the neuron of L6e
-is much closer to the threshold $\theta = -50$ mV, whereas for the L6i neuron, it is
-closer to the resting potential $E_L = -65$ mV. Furthermore, it is observable, that a single 
-neurons' membrane potential is not necessarily distributed as the population mean. 
-This is due to the large variation in single neuron firing rates reported already in the 
-original publication~\cite{potjans2014}. Observing the first 100 ms of the membrane potential 
+L6e, the other one to population L6i. 
+Observing the first 100 ms of the membrane potential 
 indicates that the used initialization leads to a large hyperpolarization at least in these two 
 sample neurons. Thus, for the further analysis, a transient period of 0.2 seconds is cut off the
-data each time. 
+data before further analysis. For the remaining time, the membrane potentials fluctuate 
+in a reasonable range with mean between resting potential $E_L = -65$ mV and threshold $\theta = -50$ mV, 
+hitting the threshold as small number of times. 
+Potjans and Diesmann state that
+these two populations have comparably low / high rates, the excitatory one firing at 
+$\sim 1$ Hz, the inhibitory one at $\sim 7$ Hz~\cite{potjans2014}, 
+but linking this to the membrane potential distribution can be very misleading:
+Rare but large fluctuations can lead to high number of spikes without substantially 
+raising the average. 
+Furthermore, it is can be seen, that a single 
+neurons' membrane potential is not necessarily distributed as the population mean. 
+This is due to the large variation in single neuron firing rates reported already in the 
+original publication~\cite{potjans2014}. 
 
 \begin{figure}[tb]
     \centering
@@ -435,7 +491,7 @@ data each time.
 The derivation of a mean field theory goes along the 
 lines of the work by Brunel~\cite{brunel2000}.
 It starts of with a simplified model of 
-$N$ leaky integrate-and-fire neurons. 
+$N$ leaky integrate-and-fire neurons in two populations. 
 Each neuron receives input from the network by $C$ synapses, 
 $C_E$ from excitatory and $C_I$ from inhibitory ones. 
 Furthermore, each neurons receives $C_\text{ext} = C_E$ connections from 
@@ -456,7 +512,7 @@ $N_e = 0.8N$ excitatory and $N_i = 0.2N$ inhibitory neurons. Taking the definiti
 \end{equation}
 with $\gamma = 0.25$. The synaptic weights in this model are set to $J$ for 
 excitatory presynaptic neurons and to $-g\, J$ for inhibitory ones, 
-whereas the delays are fixed uniformly to $d$ for all synapses. 
+whereas the delays are fixed to $d$ for all synapses. 
 
 At the heart of the mean field model
 is the transition from the deterministic description of membrane potential 
@@ -474,39 +530,42 @@ It can be described by a sum over Dirac delta-functions,
 The synaptic weights $J_{ij}$ in this case are equal to the PSP and given in mV.  
 \emph{Multiple synapses between two neurons are excluded?!?}
 
-A number of conditions are necessary in order to make the transition from 
+Two important conditions have to be met in order to make the transition from 
 this description to a probabilistic one:
 \begin{itemize}
-    \item The sparsity implies that 
+    \item Sparsity: This implies that 
         two neurons share only a small number of common input, such that pair correlations
         are negligible for $C / N \to 0$; 
-    \item For the low single neuron firing rates $\nu$ compared to the 
-        inverse membrane time constant $\tau_\text{a}$
-        (e.~g. $\nu \sim10$ Hz and $1 / \tau_\text{m} \sim 1 / (20\,\text{ms}) = 50\, \text{Hz}$),
-        a neuron receives a large number of small contributions per integration 
-        time, each being very small compared to the threshold ($J \ll \theta$).
+    \item Uncorrelated input: The contributions a neuron receives have to stem from 
+        a wide range of the network, each being small compared to the threshold
+        (corresponding to no spatial correlations). 
+        No temporal correlations imply low single neuron firing rates $\nu$ compared 
+        to the membrane time constant $\tau_\text{m}$
+        (e.~g. $\nu \sim10$ Hz and $1 / \tau_\text{m} \sim 1 / (20\,\text{ms}) = 50\, \text{Hz}$).
 \end{itemize}
-If these conditions are true, the input can be modeled as a time-varying average part
+If these conditions are met, the input can be modeled as a time-varying average part
 $\mu(t)$ plus a fluctuating Gaussian part with amplitude $\sigma(t)\tau_\text{m}$:
-\footnote{\emph{I have not yet understood the scaling by $\tau_m$...}}
 \begin{equation}
     \frac{\tau_\text{m}}{C_\text{m}} \, I_i(t) =  \mu(t) + \sigma(t) \sqrt{\tau_\text{m}} \eta_i(t) \, .
     \label{eq:input_random}
 \end{equation}
 The random fluctuations are described by Gaussian white noise $\eta_i(t)$ with 
-$\langle  \eta_i(t)\rangle = 0$. The model explicitly excludes correlations, 
-both in time and between different neurons, i.~e.
+$\langle  \eta_i(t)\rangle = 0$. 
+The exclusion of correlations is formalized as  
 \begin{equation}
-    \langle \eta_i(t) \: \eta_j(t') \rangle = \delta_{ij} \: \delta(t - t')	\, . 
+    \langle \eta_i(t) \: \eta_j(t') \rangle = \delta_{ij} \: \delta(t - t')	\, ,
     \label{eq:no_correlations}
 \end{equation}
-\emph{The latter assumptions has to be tested for the spiking model
-that is to be described with this mean field approach.}
+$\delta_{ij}$ corresponding to correlations between neurons, 
+the Dirac delta distribution to temporal ones. 
+\emph{
+    In order to apply the mean field theory to a spiking network model, 
+the uncorrelatedness of single neurons' input has to be quantified.}
 
 The fundamental parameter calculated by the mean field model is the single neuron
 firing rate $\nu(t)$. In this basic model, it is assumed that any neuron of either 
-of the two populations is firing with the same rate $\nu$ which is linked to the 
-average input $\mu(t)$ by
+of the two populations sees the same input on average and thus fires with the same 
+rate $\nu$. This rate is linked to the average input $\mu(t)$ by
 \begin{equation}
     \begin{split}
         \mu(t)          &= \mu_l(t) + \mu_\text{ext} \\
@@ -560,7 +619,7 @@ constraints: Since the spiking resets neurons to $V_\text{rp} < \theta$,
 the membrane potential is always below this threshold:
 $P(V, t) = 0$ for $V > \theta$. Infinite probability currents are excluded 
 such that $P(V, t)$ must be continuous at any point. Specifically, 
-this continuity forbids infinity spiking probabilities at the threshold $\theta$. 
+this continuity forbids infinite spiking probabilities at the threshold $\theta$. 
 The resulting constraint is 
 \begin{equation}
     P(\theta, t) = 0 \,.
@@ -573,10 +632,10 @@ equation \eqref{eq:prob_curr} yields
     \frac{\partial P(\theta, t)}{\partial V}    
         = - \frac{2 \nu(t) \tau_\text{m}}{\sigma^2(t)}  \,.
 \end{equation}
-Neurons that fired at time $t$ come out of their refractory period at 
+Neurons that fired at time $t$ exit their refractory period at 
 time $t + \tau_\text{rp}$ at the reset potential $V_\text{r}$. This leads to
 a difference in probability current below and above $V_\text{r}$ proportional to 
-the rate of neurons firing at $t - \tau_\text{rp}$ expressed by
+the rate of neurons firing at $t - \tau_\text{rp}$, which is expressed by
 \begin{equation}
     \frac{\partial P(V_\text{r}^+, t)}{\partial V} \: -  \: \frac{\partial P(V_\text{r}^-, t)}{\partial V} 
         = - \frac{2 \nu(t - \tau_\text{rp}) \tau_\text{m}}{\sigma^2(t)} \,.
@@ -669,7 +728,7 @@ characterize the different states the system can be found in.
 In order to transfer these results to the model of the neocortical microcircuit, 
 the contributions to the input have to be adapted for each population. Instead of 
 parametrized $\mu_0$ and $\sigma_0$ in terms of the variables $C_E$, $J$, $g$ and $\gamma$, 
-a matrix notation as in equation \eqref{eq:synapse_numbers} is used: 
+a matrix notation as in equation \eqref{eq:synapse_numbers} is utilized: 
 Synapse numbers and weights are defined as $C_{ab}$ and $J_{ab}$, respectively, 
 where $a$ is the postsynaptic and $b$ the presynaptic population. 
 Finally, the external input is written in a similar notation: 
@@ -709,12 +768,12 @@ index $0$ yields
             \Theta \left(u - \frac{V_\text{r} - \mu_a}{\sigma_a} \right) e^{u^2} \, \text{d}u  \,.
     \label{eq:P_V_a}
 \end{equation}
-In a reasonable regime, this function resembles a gaussian curve with discontinuity in the first 
+In a reasonable regime, this function can be approximated by a gaussian curve with discontinuity in the first 
 derivative at $V_\text{r}$ (a visible "kink" or "step").
 Ultimately, the model also makes a prediction about the regularity of single spike 
 trains. For neurons firing irregularly, the interspike intervals
 (ISI, i.~e. the difference in times between two successive spikes of one neuron) 
-a distributed broadly. Hence, one parameter to measure irregularity is the coefficient 
+are distributed broadly. Hence, one parameter to measure irregularity is the coefficient 
 of variation (CV) of ISI, defined as
 \begin{equation}
     \text{CV}_\text{ISI} = \frac{\sigma_\text{ISI}}{\mu_\text{ISI}} \,,
@@ -726,7 +785,7 @@ independently for each population. For the given parameters $\nu_a$, $\mu_a$ and
 $\sigma_a$ as in equation \eqref{eq:self_consistency_a}, the corresponding 
 result~\cite{brunel2000} is
 \begin{equation}
-    (\text{CV}_\text{ISI})^2 
+    \text{CV}_\text{ISI}^2 
         = 2 \pi \left(\frac{\nu_a}{\tau_\text{m}}\right)^2
             \int_{\frac{V_\text{r} - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
             e^{x^2}  \,\text{d}x  \,
@@ -745,7 +804,7 @@ result~\cite{brunel2000} is
 The simulations are implemented with the NEST simulation tool using its python interface
 PyNEST~\cite{NEST}. The differential equations of the network are solved with a computational 
 step size of $h=0.1$, applying a numerical method known as "exact integration"~\cite{rotter1999exact}.
-Numerical solving as well as the analysis of the data is done in using 
+Numerical solution as well as the analysis of the data is done in using 
 python~\cite{python} and heavily relies upon the numpy-scipy framework~\cite{scipy}. 
 Plots are created using matplotlib~\cite{matplotlib}.
 The source code both for simulation and analysis can be reviewed at my

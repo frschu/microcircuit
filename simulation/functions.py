@@ -55,7 +55,8 @@ def initialize_data_file(sub_path, model, verbose=True, name=None, append=False)
             sim_spec += "_fixindeg"
     else:
         sim_spec = name
-    file_name   = sim_spec + "_00.hdf5"
+    
+    file_name   = sim_spec + ".hdf5"
     
     # don't overwrite existing files...
     if not append:
@@ -63,7 +64,9 @@ def initialize_data_file(sub_path, model, verbose=True, name=None, append=False)
             max_n = 0
             for some_file in os.listdir(data_path):
                 if some_file.startswith(sim_spec):
-                    max_n = max(max_n, int(some_file[len(sim_spec)+1: len(sim_spec) + 3])) 
+                    file_number = some_file[len(sim_spec)+1: len(sim_spec) + 3]
+                    if file_number.isdigit():
+                        max_n = max(max_n, int(file_number))
             file_name = sim_spec + "_" + str(max_n + 1).zfill(2) + ".hdf5"
     if verbose: print("Filename: micro/" + file_name)
     

@@ -18,7 +18,7 @@ log_path    = "/users/schuessler/uni/microcircuit/simulation"
 ###################################################
 
 t_trans = 0.2e3     # ms; transitional period in order to reach equilibrium
-t_measure = 1.0e3   # ms; time actually measured
+t_measure = 60.0e3   # ms; time actually measured
 t_sim = t_measure + t_trans    # ms; simulated time 
 dt = 0.1            # ms; simulation step; default is 0.1 ms. (resolution of kernel)
 allgather = True    # communication protocol

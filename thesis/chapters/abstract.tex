@@ -4,25 +4,32 @@ In the search for understanding the basic functions of the neocortex,
 linking the anatomical structure to population dynamics has been a mayor
 focus of research. Experimental data in form of local connectivity data
 and cell-type specific activity is increasing at a fast past but remains
-mainly inconclusive. Simultaneously, spiking network simulations using 
+mainly inconclusive. Simultaneously, spiking network models using 
 leaky integrate-and-fire neurons 
-have been successfully developed and used as 
-explanatory schemes. 
-A sensible analytical framework is under construction although a 
-large number of open questions persist. 
-A full-scale spiking network model of the local cortical microcircuit
+have been successfully developed and used for interpreting 
+statistical features in experimental data such as firing rates, 
+correlations or oscillations. 
+On the one hand, these models can be implemented in numerical 
+simulations such that specific hypotheses can be tested. 
+On the other hand, a deeper understanding is reached by 
+an analytical framework relying on a statistical description.
+Such a rate based mean field theory has been developed 
+for networks of two populations
+by Brunel~\cite{brunel2000} and successfully applied for a number 
+spiking network models. However, for more complicated networks
+it is not a priori clear whether this description is adequate. 
+One important case is the modeling of the local cortical 
+microcircuit, featuring a laminar structure. 
+A full-scale spiking network model incorporating this characteristic
 was established by Potjans and Diesmann~\cite{potjans2014} in 2014, 
-using a large number of the experimental data available and reproducing
-some of the main features of spiking activity. 
-On the analytical side, a rate based mean field theory for spiking neuron
-networks has been developed by Brunel~\cite{brunel2000} 
-and widely applied since then. 
-Here, the spiking network model of the microcircuit is reimplemented, 
+integrating a large number of the experimental studies available and reproducing
+some of the main features of spiking activity of the cortex.
+In this work, the spiking network model of the microcircuit is reimplemented, 
 compared with the original one and further analyzed.
 Aiming for a more thorough understanding as well as a computationally less
 expensive tool, the existing mean field theory is extended to the given network. 
-The predictions are tested against simulated data, namely predicting 
-firing rates, membrane potential distributions as well as a measure 
-for the irregularity of spikes (CV of ISI). \emph{Finally, in order to test 
-the dependence on a number of parameters, a simulation adapted to the 
+The predictions, namely single neuron firing rates, 
+membrane potential distributions as well as the irregularity of spike trains, 
+are tested against simulated data. \emph{Finally, in order to test 
+the dependence of a number of parameters, a simulation adapted to the 
 mean field theory is contrasted with the previous results.}
