@@ -13,7 +13,7 @@ whereas specific numerical values of the parameters are displayed in Table
 
 %\subsubsection{Model composition and connectivity}
 % Model description
-\begin{table}[htpb]
+\begin{table}[tb]
     \centering
     \caption{
         Model description according to Nordlie et al.~\cite{nordlie2009}. 
@@ -81,7 +81,7 @@ sizes given in Table \ref{tab:network_params}. The total numbers of excitatory a
 neurons are 61843 and 15326, respectively, yielding a ratio of 4.04 of excitatory over inhibitory
 neurons. 
 
-\begin{figure} 
+\begin{figure}[tb]
     \centering 
     \begin{subfigure}[b]{0.45\textwidth} 
         \includegraphics[width=\textwidth]{../figures/diagram_colored}
@@ -251,7 +251,7 @@ is explained in following sections.
 The large number of free parameters of the model and their chosen values are summarized in 
 Table \ref{tab:network_params}. 
 % Network parameters
-\begin{table}[htpb]
+\begin{table}[tb]
     \centering
     \caption{
         Network parameters
@@ -338,14 +338,14 @@ of connections. Figure \ref{fig:syn_numbers} shows the number of synapses for ea
 of pre- and postsynaptic population and 
 the mean number of synapses each neuron receives from a specific population. The total number 
 of synapses in the model is almost 0.3 billion synapses.  
-\begin{figure}[htpb]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir syn_numbers}
     \caption{
-        Connection between populations. (\textbf{A}) Visualization of 
-        connection probability. (\textbf{B}) Calculated total synapse number between a pre- 
+        Connection between populations.
+        (\textbf{A}) Calculated total synapse number between a pre- 
         and a postsynaptic population. These numbers are used for connecting the network, 
-        using the connection rule "fixed\_total\_number". (\textbf{C}) Mean number of synapses
+        using the connection rule "fixed\_total\_number". (\textbf{B}) Mean number of synapses
         a neuron in a specific postsynaptic population is receiving from all neurons of a 
         presynaptic population. These numbers are only applied when using the connection
         rule "fixed\_indegree" (for comparison between spiking network model and mean field theory).
@@ -375,7 +375,7 @@ The measured mean and standard deviation are $(975 \pm 31)$ compared to the theo
 value of $(979 \pm 31)$ synapses. 
 Thus, the agreement between the numbers from the simulation and the theoretical expectation is quite
 well. 
-\begin{figure}[htpb]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir syn_numbers_distribution}
     \caption{
@@ -407,7 +407,7 @@ indicates that the used initialization leads to a large hyperpolarization at lea
 sample neurons. Thus, for the further analysis, a transient period of 0.2 seconds is cut off the
 data each time. 
 
-\begin{figure}[htpb]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir single_membrane_potential}
     \caption{
@@ -526,8 +526,12 @@ Similarly, for the amplitude of fluctuations $\sigma(t)$:
     \end{split}
 \end{equation}
 
+\emph{Under cortical condition: blablabla (Amit, Brunel); 
+mu and sigma relate to measurable quantities!}
+
+
 Brunel then transforms equations \eqref{eq:input_random} and \eqref{eq:leaky_integrator}
-into a Fokker-Planck equation describing the probability distribution of the membrane 
+into a Fokker--Planck equation describing the probability distribution of the membrane 
 potential $P(V, t)$ in time: 
 \begin{equation}
     \tau_\text{m} \, \frac{\partial P(V, t)}{\partial t} 
@@ -536,7 +540,7 @@ potential $P(V, t)$ in time:
     \label{eq:fokker_planck}
 \end{equation}
 In the terminology of stochastic differential equations, the first term on the 
-r.h.s. corresponds to a diffusion term originating in the fluctuations $\sigma$ 
+right hand side corresponds to a diffusion term originating in the fluctuations $\sigma$ 
 of the input whereas the second part describes a drift due to the respective mean $\mu$ 
 and the leaky quality of the neuron model. Introducing the probability current 
 \begin{equation}
@@ -604,7 +608,7 @@ The stationary mean input and fluctuation amplitudes are obtained by inserting
 $\nu_0$ into the equations \eqref{eq:mu} and \eqref{eq:sigma}, yielding 
 \begin{align}
     \mu_0 	    &= C_E J \:\tau_\text{m} [\nu_\text{ext} + \nu_0(1 - g \gamma)]  \,, \\ 
-    \sigma_0 	&= C_E J^{\,2} \,\tau_\text{m} [\nu_\text{ext} + \nu_0(1 + g^2 \gamma)] \,.
+    {\sigma_0}^2 	&= C_E J^{\,2} \,\tau_\text{m} [\nu_\text{ext} + \nu_0(1 + g^2 \gamma)] \,.
     \label{eq:mu_sigma_0}
 \end{align}
 
@@ -713,8 +717,7 @@ trains. For neurons firing irregularly, the interspike intervals
 a distributed broadly. Hence, one parameter to measure irregularity is the coefficient 
 of variation (CV) of ISI, defined as
 \begin{equation}
-    %c_{v, \text{ISI}} 
-    \text{CV of ISI} = \frac{\sigma_\text{ISI}}{\mu_\text{ISI}} \,,
+    \text{CV}_\text{ISI} = \frac{\sigma_\text{ISI}}{\mu_\text{ISI}} \,,
     \label{eq:cv_isi}
 \end{equation}
 where $\sigma_\text{ISI}$ and $\mu_\text{ISI}$ are the standard deviation and mean of 
@@ -723,7 +726,7 @@ independently for each population. For the given parameters $\nu_a$, $\mu_a$ and
 $\sigma_a$ as in equation \eqref{eq:self_consistency_a}, the corresponding 
 result~\cite{brunel2000} is
 \begin{equation}
-    (\text{CV of ISI})^2 
+    (\text{CV}_\text{ISI})^2 
         = 2 \pi \left(\frac{\nu_a}{\tau_\text{m}}\right)^2
             \int_{\frac{V_\text{r} - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
             e^{x^2}  \,\text{d}x  \,
@@ -740,14 +743,13 @@ result~\cite{brunel2000} is
 \subsection{Implementation, numerics and analysis}
 \label{subsec:analysis}
 The simulations are implemented with the NEST simulation tool using its python interface
-pyNEST~\cite{NEST}. The differential equations of the network are solved with a computational 
+PyNEST~\cite{NEST}. The differential equations of the network are solved with a computational 
 step size of $h=0.1$, applying a numerical method known as "exact integration"~\cite{rotter1999exact}.
 Numerical solving as well as the analysis of the data is done in using 
 python~\cite{python} and heavily relies upon the numpy-scipy framework~\cite{scipy}. 
-Plots are created using matplotlib~\cite{matplotlib}, 
-colors are chosen based on ColorBrewer~\cite{brewercolor}.
+Plots are created using matplotlib~\cite{matplotlib}.
 The source code both for simulation and analysis can be reviewed at my
-github server~\cite{ba_github} or more conveniently with the 
+GitHub server~\cite{ba_github} or more conveniently with the 
 \textit{ipython notebook viewer}~\cite{notebook_viewer}.
 
 The core part of the mean field theory constituted of the 

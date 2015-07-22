@@ -18,7 +18,7 @@ are then analyzed more thoroughly.
 theoretical approximations, namely the resulting distributions 
 for Poisson processes.
 
-A comparison between the pyNEST implementation and the original one written in SLI
+A comparison between the PyNEST implementation and the original one written in SLI
 is first supplied in form of raster plots (Figure~\ref{fig:raster_plot}), 
 showing the activity of a subset of the network simulated for 400 ms 
 after a transient period of 100 ms. The subset shown consists of the first 
@@ -27,11 +27,11 @@ Both results have a very similar structure: Common features are the observable l
 rates of populations L2/3e and L6e as well some signs of synchrony within populations. 
 Single neurons fire at a rate much lower than the activity of the 
 entire population, as would be expected for networks in the AI regime \cite{brunel2000}. 
-\begin{figure}[htpb]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir raster_plot}
     \caption{Raster plot showing spontaneous activity of network for 
-        (A) the pyNEST implementation and (B) the SLI implementation.
+        (A) the PyNEST implementation and (B) the SLI implementation.
         The simulation and network parameters for both simulations are 
         the same. 
         For each layer, the excitatory population is the upper one shown 
@@ -73,12 +73,12 @@ and well within statistical fluctuations. ---More detials once the plot is done}
 
 %\\\emph{CAN THIS be traced back to the fact that they used 
 %only 5 s of simulation? -> methods: check synchrony for measurement time and bin width!}. 
-\begin{figure}[htpb]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir spontaneous_activity}
     \caption{
         Derived statistical quantities for spontaneous activity of network for
-        (\textbf{A - C}) the pyNEST implementation and (\textbf{D - E}) the SLI implementation, 
+        (\textbf{A - C}) the PyNEST implementation and (\textbf{D - E}) the SLI implementation, 
         using the same simulation and network parameters.
         Each implementation is run $20$ times independently, 
         measuring 1000 spike trains of each population in a simulation for 60 s 
@@ -104,12 +104,12 @@ to the fluctuations of the population mean for different realizations. This can 
 an indication that the population rates depend strongly on averaged input and connection numbers
 and less on the actual wiring, i.~e. that a mean field approach would be able to capture the main features 
 of first order quantities. 
-\begin{figure}[htpb]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir single_neuron_activity}
     \caption{
         Firing rates (\textbf{A}) and CV of ISI (\textbf{B}) for single neurons. 
-        The data is take from one simulation of the pyNEST implementation 
+        The data is take from one simulation of the PyNEST implementation 
         simulating $60$ s after a transient period of 0.2 s and measuring 
         $1000$ neurons of each population. The symbols of the box plot 
         are similar to the ones of Figure \ref{fig:spontaneous_activity} 
@@ -172,7 +172,7 @@ is $(0.06 \pm 0.04)$ corresponding to about $(6 \pm 5) \%$.
 }
 
 % Table of results of comparison
-\begin{table}[htpb]
+\begin{table}[tb]
     \centering
     \caption{Difference between predicted and simulated population means for single 
     neuron firing rates; absolute and relative to simulated rates.}
@@ -193,7 +193,7 @@ is $(0.06 \pm 0.04)$ corresponding to about $(6 \pm 5) \%$.
 \end{table}
 
 % Comparison mean field / simulation
-\begin{figure}[htpb]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir compare_sim_mf_fixed_total_number}
     \caption{
@@ -226,7 +226,7 @@ show a step while the kink in the theoretical curves is hardly detectable.
 In the case of population L5i and L6i, however, this behavior is captured well. 
 
 % Membrane potentials
-\begin{figure}[htpb]
+\begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir membrane_potential}
     \caption{
@@ -253,7 +253,7 @@ model and data from simulation, a number of parameters in the simulation are adj
 such that they resemble the ones chosen in the mean field theory more closely. 
 Differentiating parameters in the previous comparison are listed in the 
 Table~\ref{tab:diff_params}.
-\begin{table}[htpb]
+\begin{table}[tb]
     \centering
     \caption{Parameters chosen differently between simulation and mean field model previously.}
     \label{tab:diff_params}

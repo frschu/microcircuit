@@ -11,14 +11,16 @@ import network_params as net; reload(net)
 
 class model:
     def __init__(self, 
-                 area=net.area,                             # simulation size
-                 neuron_model=net.neuron_model,               # "iaf_psc_delta" or "iaf_psc_exp"
-                 n_neurons="micro", C_ab="micro",           # else: "brunel" or arrays
-                 connection_rule=net.connection_rule,      # "fixed_total_number" or "fixed_indegree"
-                 j02=net.j02, 
-                 weight_rel_sd=net.weight_rel_sd, 
-                 delay_rel_sd=net.delay_rel_sd,  
-                 g=net.g, rate_ext=net.rate_ext):                       # set to zero for Brunel
+                 n_neurons       = "micro",             # else: "brunel" or arrays
+                 C_ab            = "micro",             # else: "brunel" or arrays
+                 area            = net.area,            # simulation size
+                 neuron_model    = net.neuron_model,    # "iaf_psc_delta" or "iaf_psc_exp"
+                 connection_rule = net.connection_rule, # "fixed_total_number" or "fixed_indegree"
+                 j02             = net.j02, 
+                 weight_rel_sd   = net.weight_rel_sd, 
+                 delay_rel_sd    = net.delay_rel_sd,  
+                 g               = net.g, 
+                 rate_ext        = net.rate_ext):                
 
         """Class of network parameters.
 
@@ -108,7 +110,7 @@ class model:
                             "model or 'fixed_indegree' for Brunel's model!")
 
         if C_ab == "micro":
-            self.C_ab = C_ab_micro.astype(int)
+            self.C_ab = C_ab_micro # shall not be integer at this point!
         elif C_ab == "brunel":
             C_e     = np.mean(C_ab_micro) # mean for microcircuit (= 501 in full scale)
             C_i     = gamma * C_e
@@ -125,6 +127,28 @@ class model:
                                 "in {'micro', 'brunel'}")
 
 
+        ###################################################
+        ###          Single-neuron parameters		###        
+        ###################################################
+        self.neuron_model   = neuron_model
+        self.Vm0_mean       = net.Vm0_mean            # mean of initial membrane potential (mV)
+        self.Vm0_std        = net.Vm0_std            # std of initial membrane potential (mV)
+        self.model_params   = net.model_params
+        if not self.neuron_model=="iaf_psc_delta":
+            self.model_params["tau_syn_ex"] = net.tau_syn_ex # excitatory synaptic time constant (ms)
+            self.model_params["tau_syn_in"] = net.tau_syn_in # inhibitory synaptic time constant (ms)
+            self.tau_syn_ex = net.tau_syn_ex * 1e-3             # s
+            self.tau_syn_in = net.tau_syn_in * 1e-3             # s
+            self.tau_syn    = np.tile([self.tau_syn_ex, self.tau_syn_in], (self.n_populations, self.n_layers))
+        # Rescaling for model calculations: these values are not used in the simulation!
+        self.tau_m  = self.model_params["tau_m"] * 1e-3          # s
+        self.t_ref  = self.model_params["t_ref"] * 1e-3          # s
+        self.E_L    = self.model_params["E_L"]                   # mV
+        self.V_r    = self.model_params["V_reset"] - self.E_L    # mV
+        self.theta  = self.model_params["V_th"] - self.E_L       # mV
+        self.C_m    = self.model_params["C_m"]                   # pF
+
+
         ######################################################
         # Synaptic weights. Depend on neuron_model!         ##
         ######################################################
@@ -136,20 +160,23 @@ class model:
         L4e_index   = np.where(self.populations == "L4e")[0][0]
         g_all[L23e_index, L4e_index] *= self.j02
         
-        self.J           = net.PSP_e           # mv; mean EPSP, used as reference PSP
-        self.J_ab   = self.J * g_all
-        self.weight_rel_sd = weight_rel_sd # Standard deviation of weight relative to mean weight
-        if neuron_model=="iaf_psc_delta":
+        self.J              = net.PSP_e           # mv; mean PSP, used as reference PSP
+        self.J_ab           = self.J * g_all
+        self.weight_rel_sd  = weight_rel_sd # Standard deviation of weight relative to mean weight
+        # Actual weights have to be adapted, as a postsynaptic POTENTIAL is used
+        if   self.neuron_model=="iaf_psc_delta":
             self.weights    = self.J_ab     # neuron populations
-        else:
-            # PSCs calculated from PSP amplitudes
-            tau_m, tau_syn, C_m = \
-                [self.model_params[key] for key in ["tau_m", "tau_syn_ex", "C_m"]]
-            delta_tau   = tau_syn - tau_m
-            ratio_tau    = tau_m / tau_syn
-            PSC_over_PSP = C_m * delta_tau / (tau_m * tau_syn * \
-                (ratio_tau**(tau_m / delta_tau) - ratio_tau**(tau_syn / delta_tau)))
+        elif self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
+            delta_tau       = self.tau_syn - self.tau_m
+            ratio_tau       = self.tau_m / self.tau_syn
+            PSC_over_PSP    = self.C_m * delta_tau / (self.tau_m * self.tau_syn * \
+                (ratio_tau**(self.tau_m / delta_tau) - ratio_tau**(self.tau_syn / delta_tau))) * 1e-3
             self.weights    = self.J_ab  * PSC_over_PSP     # neuron populations
+        elif self.neuron_model=="iaf_psc_alpha": # PSCs calculated from PSP amplitudes
+            raise Exception("Neuron model: iaf_psc_alpha. CHeck units of weights before applying!")
+            self.weights = self.J_ab * np.exp(1) # see Sadeh 2014
+        else:
+            raise Exception("Neuron model should be iaf_psc_ - {delta, exp, alpha}!")
 
 
         ###################################################
@@ -175,21 +202,6 @@ class model:
         
         
         ###################################################
-        ###          Single-neuron parameters		###        
-        ###################################################
-        self.neuron_model   = net.neuron_model
-        self.Vm0_mean       = net.Vm0_mean            # mean of initial membrane potential (mV)
-        self.Vm0_std        = net.Vm0_std            # std of initial membrane potential (mV)
-        self.model_params   = net.model_params
-        # Rescaling for model calculations: these values are not used in the simulation!
-        self.tau_m  = self.model_params["tau_m"] * 1e-3          # s
-        self.t_ref  = self.model_params["t_ref"] * 1e-3          # s
-        self.E_L    = self.model_params["E_L"]                  # mV
-        self.V_r    = self.model_params["V_reset"] - self.E_L   # mV
-        self.theta  = self.model_params["V_th"] - self.E_L      # mV
-
-
-        ###################################################
         ###          External stimuli                    ##        
         ###################################################
         # rate of background Poisson input at each external input synapse (spikes/s) 
@@ -198,10 +210,13 @@ class model:
         self.delay_ext  = self.delay_e  # ms;  mean delay of external input
         self.dc_amplitude = net.dc_amplitude  # constant bg amplitude
         self.C_aext     = net.C_aext        # in-degrees for background input
-        if neuron_model=="iaf_psc_delta":
-            self.weight_ext = self.J_ext    # external poisson
-        else:
-            self.weight_ext = self.J_ext * PSC_over_PSP  # external poisson
+        # Adapt weights
+        if self.neuron_model=="iaf_psc_delta":
+            self.weight_ext = self.J_ext    
+        elif self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
+            self.weight_ext = self.J_ext * PSC_over_PSP[0, 0] 
+        elif self.neuron_model=="iaf_psc_alpha": # PSCs calculated from PSP amplitudes
+            self.weight_ext = self.J_ext * np.exp(1) 
 
         # optional additional thalamic input (Poisson)
         self.n_th           = net.n_th      # size of thalamic population
@@ -209,10 +224,13 @@ class model:
         self.th_duration    = net.th_duration   # duration of thalamic input (ms)
         self.th_rate        = net.th_rate      # rate of thalamic neurons (spikes/s)
         self.J_th           = net.PSP_th      # mean EPSP amplitude (mV) for thalamic input
-        if neuron_model=="iaf_psc_delta":
-            self.weight_th  = self.J_th     # thalamus
-        else:
-            self.weight_th  = self.J_th  * PSC_over_PSP   # thalamus
+        # Adapt weights
+        if self.neuron_model=="iaf_psc_delta":
+            self.weight_th = self.J_th    
+        elif self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
+            self.weight_th = self.J_th * PSC_over_PSP[0, 0] 
+        elif self.neuron_model=="iaf_psc_alpha": # PSCs calculated from PSP amplitudes
+            self.weight_th = self.J_th * np.exp(1) 
         
         # connection probabilities for thalamic input
         conn_probs_th = net.conn_probs_th
@@ -237,24 +255,38 @@ class model:
         ######################################################
         # Predefine matrices for mean field                 ##
         ######################################################
-        self.mu_ext     = self.J_ext    * self.C_aext * self.rate_ext
-        self.var_ext    = self.J_ext**2 * self.C_aext * self.rate_ext
-        self.mat1       = self.C_ab * self.J_ab
-        self.mat2       = self.C_ab * self.J_ab**2
-        self.jac_mat1   = np.pi * self.tau_m**2 * self.mat1.T
-        self.jac_mat2   = np.pi * self.tau_m**2 * 0.5 * self.mat2.T
-        
+        if self.neuron_model=="iaf_psc_delta":
+            self.J_mu       = self.weights
+            self.J_sd       = self.weights
+            self.J_mu_ext   = self.weight_ext   
+            self.J_sd_ext   = self.weight_ext
+        elif self.neuron_model=="iaf_psc_exp":
+            pA_to_mV            = 1e3 / self.C_m # Factor for conversion from pA to mV
+            self.J_mu       = self.weights    * self.tau_syn    * pA_to_mV
+            self.J_sd       = self.weights    * self.tau_syn    * pA_to_mV / np.sqrt(2.)
+            self.J_mu_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV
+            self.J_sd_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV / np.sqrt(2.)
+        elif self.neuron_model=="iaf_psc_alpha":
+            pA_to_mV            = 1e3 / self.C_m # Factor for conversion from pA to mV
+            self.J_mu       = self.weights    * self.tau_syn    * pA_to_mV
+            self.J_sd       = self.weights    * self.tau_syn    * pA_to_mV / 2.
+            self.J_mu_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV
+            self.J_sd_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV / 2.
+        self.mat_mu     = self.J_mu        * self.C_ab
+        self.mat_sigma  = self.J_sd**2     * self.C_ab
+        self.mu_ext     = self.J_mu_ext    * self.C_aext * self.rate_ext
+        self.var_ext    = self.J_sd_ext**2 * self.C_aext * self.rate_ext
 
     ######################################################
     # Methods                                           ##
     ######################################################
     def mu(self, v):
         """Mean input in Brunel's model"""
-        return self.tau_m * (np.dot(self.mat1, v) + self.mu_ext)
+        return self.tau_m * (np.dot(self.mat_mu, v) + self.mu_ext)
 
     def sd(self, v):
         """Fluctuation of input in Brunel's model"""
-        return np.sqrt(self.tau_m * (np.dot(self.mat2, v) + self.var_ext))
+        return np.sqrt(self.tau_m * (1 + self.weight_rel_sd ** 2) * (np.dot(self.mat_sigma, v) + self.var_ext))
 
     def root_v0(self, v):
         """The integral equations to be solved
@@ -334,8 +366,8 @@ class model:
         
             return quad(integrand, 0.0, upper_bound)[0] 
        
-        mus         = self.tau_m * (np.dot(self.mat1, v) + self.mu_ext)
-        sigmas      = np.sqrt(self.tau_m * (np.dot(self.mat2, v) + self.var_ext))
+        mus         = self.tau_m * (np.dot(self.mat_mu, v) + self.mu_ext)
+        sigmas      = np.sqrt(self.tau_m * (np.dot(self.mat_sigma, v) + self.var_ext))
         y_rs        = (self.V_r - mus) / sigmas
         y_thetas    = (self.theta - mus) / sigmas
         
@@ -359,6 +391,8 @@ class model:
         The calculations are done transposed to avoid unnecessary transposes (adding axes to mu and sd)
         """
         raise Exception("REVIEW FIRST")
+        jac_mat_mu     = np.pi * self.tau_m**2 * self.mat_mu.T
+        jac_mat_sigma  = np.pi * self.tau_m**2 * 0.5 * self.mat_sigma.T
         mu_v  = self.mu(v)
         sd_v  = self.sd(v)
         low = (self.V_r - mu_v) / sd_v
@@ -366,7 +400,7 @@ class model:
         f_low   = self.integrand(low)
         f_up    = self.integrand(up)
         jac_T = np.diag(v) - \
-            (self.jac_mat1 * (f_up - f_low) + self.jac_mat2 * (up * f_up - low * f_low) / sd_v**2)
+            (jac_mat_mu * (f_up - f_low) + jac_mat_sigma * (up * f_up - low * f_low) / sd_v**2)
         return jac_T.T
 
     def prob_V(self, V_array, mu, sd, v):

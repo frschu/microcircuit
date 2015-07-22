@@ -31,8 +31,8 @@ import functions; reload(functions)
 import model_class; reload(model_class)
 verbose     = False                     # whether to print every connection made
 
-# ONLY PUT THIS IF YOU DONT WANT TO HAVE A NFILE NAME AUTOMATICALLY ASSIGNED
-name    = "spon_act_statistic"          
+# ONLY PUT THIS IF YOU DONT WANT TO HAVE A FILE NAME AUTOMATICALLY ASSIGNED
+name    = "simulation_at_mf"          
 # whether to append the selected data_file (if it existist, otherwise might cause error!)
 append_data = False 
 
@@ -41,10 +41,10 @@ append_data = False
 #######################################################
 T0 = time.time()
 # Unchanged parameters
-connection_rule = "fixed_total_number" # "fixed_indegree", "fixed_total_number"
-weight_rel_sd      = 0.1 # 0.1 for  Potjans' model
-model           = model_class.model(connection_rule=connection_rule,
-                                    weight_rel_sd=weight_rel_sd) 
+neuron_model    = "iaf_psc_delta"  # "iaf_psc_delta" or "iaf_psc_exp"
+connection_rule = "fixed_indegree" # "fixed_total_number" or "fixed_indegree"
+model           = model_class.model(neuron_model=neuron_model,
+                                    connection_rule=connection_rule)
 
 #######################################################
 # Create data file
@@ -58,7 +58,7 @@ info_file                       = functions.initialize_info_file(file_name, data
 # Looping
 #######################################################
 # The steps on the way from Brunel to microcircuit
-n_runs = 20
+n_runs = 1
 
 for run_i in range(n_runs):
     ######################################################

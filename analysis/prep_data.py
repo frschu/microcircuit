@@ -8,6 +8,7 @@
 
     Writes data to ..._res.hdf5 file.
 """
+from __future__ import print_function
 import numpy as np
 import h5py
 import sys, os
@@ -16,15 +17,16 @@ import time
 ######################################################
 # File and path
 ######################################################
-data_file = "micro"
+data_file = "brunel"
 data_sup_path = "/export/data-schuessler/data_microcircuit/"
-#data_sup_path    = "/users/schuessler/uni/microcircuit/data"
+data_sup_path    = "/users/schuessler/uni/microcircuit/data"
 data_path = os.path.join(data_sup_path, data_file)
-sim_spec = "a1.0_t20.4_00"
-#sim_spec = "a1.0_t20.2_fixindeg_01" 
+#sim_spec = "a1.0_t20.4_00"
+sim_spec = "a1.0_t20.2_fixindeg_01" 
+sim_spec = "test_brunel_C250_exp"
 #sim_spec = "spontaneous_activity_sli"
-#sim_spec = "spon_act_statistic"
-
+#sim_spec = "spon_act_statistic_sli"
+#sim_spec = "simulation_at_mf"
 
 # Original data
 file_name  = sim_spec + ".hdf5"  
@@ -86,6 +88,7 @@ V_min = -100
 V_max = -50
 bin_edges_volt = np.linspace(V_min, V_max, n_bins_volt + 1)
 n_hist_max  = 10 # maximum number of single histogram to be shown
+print_volt_length_warning = False
 
 for k, sim_spec2 in enumerate(data_file.keys()):
     print(sim_spec2)
@@ -98,6 +101,7 @@ for k, sim_spec2 in enumerate(data_file.keys()):
     ######################################################
     if "spikes" in data_file[sim_spec2]:
         print("spikes")
+        print("n neurons fired    0 |    1 spikes:")
         # Data
         grp = data_file[sim_spec2 + "/spikes"]
         dt = grp.attrs["dt"]
@@ -113,12 +117,31 @@ for k, sim_spec2 in enumerate(data_file.keys()):
         hist_spikes = np.zeros((n_populations, n_bins_spikes))
         
         for i, population in enumerate(populations):
-            print(population)
+            print(population, end="")
             # Get data
             subgrp = grp[str(population)]
             raw_times_all   = subgrp["times"][:] * dt * 1e-3 # in seconds
-            indices         = subgrp["rec_neuron_i"][:]
-            
+            try:
+                indices        = subgrp["rec_neuron_i"][:]
+                print("")
+            except:
+                #print("No rec_neuron_i save -- change this in ../simulation/functions.py!!!")
+                # What is about to come is ambiguous! What if neuron i fired its last spike k 
+                # at t_i^k and neuron j = i+1 its first spike at t_j_1 > t_i_k???
+                # This is very improbable for the given condition: 
+                # Of 1000 neurons, 996 fired (using this technique), thus at maximum 4 neurons have been 
+                # falsely identified.   
+                indices                 = np.zeros(n_neurons_rec_spike[i] + 1) 
+                indices_fired_only      = np.where(np.diff(raw_times_all) < 0)[0] + 1
+                max_index               = len(indices_fired_only)  # number of neurons that fired >= 1 spike
+                indices[1:max_index+1]  = indices_fired_only     # the rest remains zero
+                indices[max_index+1:]   = indices_fired_only[-1] # at last the neurons that didn't fire
+                if max_index < n_neurons_rec_spike[i]:
+                    n_neurons_didnt_fire    = n_neurons_rec_spike[i] - max_index
+                    sorted_indices          = np.sort(np.diff(indices_fired_only))
+                    n_neurons_fired_once    = int(np.sum(sorted_indices == 1))
+                    print("\t\t{0:4d} | {1:4d}".format(n_neurons_didnt_fire, n_neurons_fired_once))
+
             rates           = []
             cv_isi_all      = []
             no_isi          = 0
@@ -156,7 +179,7 @@ for k, sim_spec2 in enumerate(data_file.keys()):
             if k ==0:
                 res_grp.create_dataset("single_rates/" + str(population), data=rates)
                 res_grp.create_dataset("single_cv_isi/" + str(population), data=cv_isi_all)
-            
+
         res_grp.create_dataset("rates_mean", data=rates_mean)
         res_grp.create_dataset("rates_std", data=rates_std)
         res_grp.create_dataset("cv_isi_mean", data=cv_isi_mean)
@@ -181,9 +204,12 @@ for k, sim_spec2 in enumerate(data_file.keys()):
         dt_volt = volt_grp.attrs["dt_volt"]
         t_min_volt  = volt_grp.attrs["t_min"]
         t_max_volt  = volt_grp.attrs["t_max"]
-        times_volt  = np.arange(t_min_volt, t_max_volt, dt_volt) *1e-3 # s
+        times_volt  = (np.arange(t_min_volt, t_max_volt, dt_volt) + dt_volt) *1e-3 # s
+        if len(volt_grp[populations[0]][0]) < len(times_volt):
+            print_volt_length_warning = True
+            times_volt = times_volt[:-1]
         
-        volt_plot         = np.zeros((n_populations, n_hist_max, len(times_volt)))    
+        volt_plot            = np.zeros((n_populations, n_hist_max, len(times_volt)))    
         volt_histo_means     = np.zeros((n_populations, n_bins_volt))
         volt_histo_single    = np.zeros((n_populations, n_hist_max, n_bins_volt))    
         for i, population in enumerate(populations):
@@ -224,4 +250,7 @@ print("sim_spec = " + sim_spec)
 # Free memory from its chains
 raw_times_all = None
 times = None
+
+if print_volt_length_warning:
+    print("Warning: Length of volt array too short. Where ever that error comes from...")
 

@@ -22,21 +22,17 @@ import numpy as np
 ###     	Network parameters		###        
 ###################################################
 
-# area of network in mm^2; scales numbers of neurons
-# use 1 for the full-size network (77,169 neurons)
-area    = 1.0
-
 layers  = np.array(["Lb"])
 types = np.array(["e", "i"]) 
 
-full_scale_n_neurons = np.array( \
+n_neurons = np.array( \
   [40000,   # e
    10000])    # i
 
 # Synaptic weights
-g     = 6.           # weight for inhibitory synapses
+g     = 5.           # weight for inhibitory synapses
 # Mean reference PSP (EPSP amplitude except for L4e->L2/3e)
-PSP_e   = .2           # mv
+PSP_e   = .1          # mv
 # Standard deviation of weight  relative to mean weight
 weight_rel_sd = 0.0
 
@@ -46,7 +42,7 @@ epsilon = 0.1
 	     
 # mean dendritic delays for excitatory and inhibitory transmission (ms)
 delay_e = 1.5   # ms, excitatory synapses
-delay_i = 0.75  # ms, inhibitory synapses
+delay_i = 1.5  # ms, inhibitory synapses
 # standard deviation relative to mean delays
 delay_rel_sd = 0.5 
 
@@ -67,30 +63,31 @@ syn_dict = {"model": "static_synapse"}
 ###################################################
 
 neuron_model = "iaf_psc_delta"  # "iaf_psc_delta" or "iaf_psc_exp"
-Vm0_mean    = -58.0             # mean of initial membrane potential (mV)
-Vm0_std     = 10.0              # std of initial membrane potential (mV)
+Vm0_mean    =  0.0             # mean of initial membrane potential (mV)
+Vm0_std     = 0.1              # std of initial membrane potential (mV)
 
 # neuron model parameters
 model_params = {"tau_m": 20.,       # membrane time constant (ms)
                 "t_ref": 2.,        # absolute refractory period (ms)
-                "C_m": 250.,        # membrane capacitance (pF)
-                "E_L": 0.,        # resting membrane potential (mV)
-                "V_th": 20.,       # spike threshold (mV)
-                "V_reset": 10.     # reset potential (mV)
+                "C_m":  1.,          # specific membrane capacitance (pF/ mum^2)
+                "E_L": 0.,          # resting membrane potential (mV)
+                "V_th": 20.,        # spike threshold (mV)
+                "V_reset": 10.,      # reset potential (mV)
+                "V_m":        0.0,
                } 
 
-if not neuron_model=="iaf_psc_delta":
-    model_params["tau_syn_ex"] = 0.5 # excitatory synaptic time constant (ms)
-    model_params["tau_syn_in"] = 0.5 # inhibitory synaptic time constant (ms)
+# Synaptic time constants are only applied if the neuron model is not iaf_psc_delta
+tau_syn_ex = 0.5 # excitatory synaptic time constant (ms)
+tau_syn_in = 0.5 # inhibitory synaptic time constant (ms)
 
 ###################################################
 ###           Stimulus parameters		###        
 ###################################################
  
 # rate of background Poisson input at each external input synapse (spikes/s) 
-rate_ext_factor    = 1.0        # in units of rate_theta = theta / (J * C_E * tau_m)
+rate_ext_factor    = 2.0        # in units of rate_theta = theta / (J * C_E * tau_m)
 PSP_ext     = PSP_e             # mean EPSP amplitude (mV) for external input
-C_aext = epsilon * np.tile(full_scale_n_neurons[0] * area, 2) # in-degrees for background input
+C_aext = epsilon * np.tile(n_neurons[0], 2) # in-degrees for background input
 
 # PREVIOUSLY USED, NOT IMPLEMENTED AT THIS POINT!
 # DC amplitude at each external input synapse (pA)

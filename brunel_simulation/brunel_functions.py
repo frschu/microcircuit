@@ -1,9 +1,8 @@
-"""functions.py
+"""brunel_functions.py
 
 Functions for simulating, 
 applied in: 
-simulate_microcircuit.py
-simulate_transition.py
+simulate_brunel.py
 
 Contains:
 # Pre-loop
@@ -24,7 +23,7 @@ import os
 import h5py
 # Import specific moduls
 from imp import reload
-import sim_params as sim; reload(sim)
+import brunel_sim_params as sim; reload(sim)
 
 #######################################################
 # Pre-loop functions
@@ -55,16 +54,11 @@ def initialize_data_file(sub_path, model, verbose=True, name=None, append=False)
             sim_spec += "_fixindeg"
     else:
         sim_spec = name
-    file_name   = sim_spec + "_00.hdf5"
+    file_name   = sim_spec + ".hdf5"
     
     # don't overwrite existing files...
-    if not append:
-        if file_name in os.listdir(data_path):
-            max_n = 0
-            for some_file in os.listdir(data_path):
-                if some_file.startswith(sim_spec):
-                    max_n = max(max_n, int(some_file[len(sim_spec)+1: len(sim_spec) + 3])) 
-            file_name = sim_spec + "_" + str(max_n + 1).zfill(2) + ".hdf5"
+    if file_name in os.listdir(data_path):
+        raise Exception("File exists, delete or rename first!")
     if verbose: print("Filename: micro/" + file_name)
     
     if append:
@@ -130,11 +124,9 @@ def prepare_simulation(master_seed, n_populations):
     nest.SetKernelStatus(
         {"communicate_allgather": sim.allgather,
         "print_time": True, 
-        "overwrite_files": sim.overwrite_existing_files,
+        "overwrite_files": False,
         "resolution": sim.dt,
         "total_num_virtual_procs": sim.n_vp})
-    if sim.to_text_file:
-        nest.SetKernelStatus({"data_path": os.path.join(sim.data_dir, "text")})
    
     # Set random seeds
     nest.sli_run('0 << /rngs [%i %i] Range { rngdict/gsl_mt19937 :: exch CreateRNG } Map >> SetStatus'%(
@@ -195,13 +187,13 @@ def create_nodes(model, pyrngs):
 
         # Devices
         if sim.record_cortical_spikes:
-            spike_detector_dict = {"label": sim.spike_detector_label + population + "_", 
-                                    "to_file": sim.to_text_file}
+            spike_detector_dict = {"label": "spikes" + population + "_", 
+                                    "to_file": False}
             spike_detectors.append(nest.Create("spike_detector", 1, params=spike_detector_dict))
 
         if sim.record_voltage:
-            multimeter_dict = {"label": sim.multimeter_label + population + "_", 
-                                "to_file": sim.to_text_file, 
+            multimeter_dict = {"label": "voltage" + population + "_", 
+                                "to_file": False, 
                                 "start": sim.t_rec_volt_start,   
                                 "stop": sim.t_rec_volt_stop, 
                                 "interval": 1.0, # ms
@@ -228,7 +220,7 @@ def create_nodes(model, pyrngs):
                 "stop": model.th_start + model.th_duration})
         if sim.record_thalamic_spikes:
             th_spike_detector_dict = {"label": sim.th_spike_detector_label, 
-                                    "to_file": sim.to_text_file}
+                                    "to_file": False}
             th_spike_detector  = nest.Create("spike_detector", 1, params=th_spike_detector_dict)
         else:
             th_spike_detector = None

@@ -78,6 +78,7 @@ backend=biber
 \usepackage{hyperref}
 \usepackage{array}
 \usepackage{diagbox, pict2e}
+\usepackage{datetime}
 
 
 %\usepackage[pass,showframe]{geometry} % just to show the margins
@@ -115,13 +116,15 @@ backend=biber
 \normalfont \normalsize 
 \textsc{Albert-Ludwigs-University Freiburg} \\ [25pt] % Your university, school and/or department name(s)
 \horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
-\huge \textsc{A network model of the neocortex} \\ % The assignment title
+\huge \textsc{A network model of the neocortex accounting for its laminar structure} \\ % The assignment title
 \horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
 }
 
 \author{Friedrich Schüßler} % Your name
 
-\date{\normalsize\today} % Today's date or a custom date
+%\date{\normalsize\today} % Today's date or a custom date
+\newdate{date}{30}{07}{2015}
+\date{\normalsize July 30, 2015}
 \DeclareGraphicsExtensions{.png,.pdf,.jpg,.eps}
 
 %--------------------------------------------------------------------------------------------

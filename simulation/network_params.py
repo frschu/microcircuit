@@ -97,7 +97,7 @@ syn_dict = {"model": "static_synapse"}
 ###          Single-neuron parameters		###        
 ###################################################
 
-neuron_model = "iaf_psc_delta"  # "iaf_psc_delta" or "iaf_psc_exp"
+neuron_model = "iaf_psc_exp"    # "iaf_psc_delta" or "iaf_psc_exp"
 Vm0_mean    = -58.0             # mean of initial membrane potential (mV)
 Vm0_std     = 10.0              # std of initial membrane potential (mV)
 
@@ -110,9 +110,9 @@ model_params = {"tau_m": 10.,       # membrane time constant (ms)
                 "V_reset": -65.     # reset potential (mV)
                } 
 
-if not neuron_model=="iaf_psc_delta":
-    model_params["tau_syn_ex"] = 0.5 # excitatory synaptic time constant (ms)
-    model_params["tau_syn_in"] = 0.5 # inhibitory synaptic time constant (ms)
+# Synaptic time constants are only applied if the neuron model is not iaf_psc_delta
+tau_syn_ex = 0.5 # excitatory synaptic time constant (ms)
+tau_syn_in = 0.5 # inhibitory synaptic time constant (ms)
 
 ###################################################
 ###           Stimulus parameters		###        
