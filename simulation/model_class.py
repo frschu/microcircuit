@@ -72,8 +72,9 @@ class model:
             gamma       = 0.25
             inh_factor  = 1. / (gamma + 1.)
             exc_factor  = 1. - inh_factor 
-            N_exc       = self.n_total/self.n_populations * exc_factor
-            N_inh       = self.n_total/self.n_populations * inh_factor
+            n_total_micro = np.sum(net.full_scale_n_neurons * self.area)
+            N_exc       = n_total_micro/self.n_populations * exc_factor
+            N_inh       = n_total_micro/self.n_populations * inh_factor
             self.n_neurons  = np.tile([N_exc, N_inh], self.n_layers).astype(int)
         else:
             if type(n_neurons) == np.ndarray:
