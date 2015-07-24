@@ -9,24 +9,23 @@ differences arise solely due to internal differences in assigning the random
 number generators. It is therefor not feasible to do a direct (spike per spike) 
 comparison. Instead, a statistical description is chosen which furthermore sheds light
 onto the differences between individual realizations with different seeds for the 
-random number generators. Certain aspects such as
-the distribution of single neuron firing rate within the population, 
-the interspike interval distributions 
-\emph{and the global population activity} 
+random number generators.
+The distribution of single neuron firing rate within the population
+and the interspike interval distributions.
 are then analyzed more thoroughly. 
-%Some of these  results are compared with 
-%theoretical approximations, namely the resulting distributions 
-%for Poisson processes.
 
 A comparison between the PyNEST implementation and the original one written in SLI
-is first supplied in form of raster plots (Figure~\ref{fig:raster_plot}), 
+is supplied in form of raster plots (Fig.~\ref{fig:raster_plot}), 
 showing the activity of a subset of the network simulated for 400 ms 
 after a transient period of 100 ms. The subset shown consists of the first 
-$2.5 \%$ of the neurons of each population created during the creation of the network. 
-Both results have a very similar structure: Common features are the observable low 
-rates of populations L2/3e and L6e as well some signs of synchrony within populations. 
-Single neurons fire at a rate much lower than the activity of the 
-entire population, as would be expected for networks in the AI regime \cite{brunel2000}. 
+$2.5 \%$ of the neurons of each population created during the initialization of the network. 
+Both results have a very similar structure: 
+The corresponding subsets show about the same number of events per time. This 
+number varies strongly between different populations. Specifically, populations L2/3e and L6e 
+fire at much lower frequencies compared to the remaining populations. 
+Furthermore, both simulations show some signs of synchrony within populations, indicated by spikes 
+of different neurons aligned in vertical lines. This apparent for the populations L2/3e, L2/3i, L4e and 
+L5e.
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir raster_plot}
@@ -41,38 +40,20 @@ entire population, as would be expected for networks in the AI regime \cite{brun
 \end{figure}
 
 A more thorough comparison is done on the bases of three statistical quantities: 
-Figure~\ref{fig:spontaneous_activity} shows the population means of single neurons firing rates, 
-irregularity as measured by  the CV of ISI as well as a measure for synchrony for both 
-simulations. All parameters were calculated from $20$ repetitions of a simulation for 
-$60.2$ s.%
-\footnote{\emph{which are still being simulated...}}
+Fig.~\ref{fig:spontaneous_activity} shows the population means of single neurons firing rates, 
+irregularity as measured by the CV of ISI as well as a measure for synchrony (the Fano factor of the 
+PSTH) for both simulations (see Methods, section~\ref{subsec:analysis} for details). 
+All parameters were calculated from $20$ repetitions of a simulation for 
+$60$ s.
 Spikes were recorded from $1000$ neurons of each population, with recording 
 starting after a transient period of $0.2$ s. 
-The means are obtained by calculating the respective quantity for each neuron and averaging over 
-the entire population. 
-
-The single neuron firing rates as 
-the number of spikes measured over the time measured.
-The CV of ISI is calculated for each neuron that fired more than twice.
-\emph{DESCRIBE RESULTS!}
-The synchrony measure explores the activity of each population as a whole. The respective population
-activity is calculated by subdividing the time of measurement into equal bins (bin width = $3$ ms) 
-and counting the number of spikes within each bin for each population. 
-Dividing the variance by the squared mean yields the synchrony measure. 
-A population firing totally asynchronously would yield a synchrony of zero as there would 
-be no global oscillations i.~e. zero variance observed.
-As with the CV of ISI, the results of both implementations agree, but do not reproduce the ones stated 
-by Potjans and Diesmann \cite{potjans2014}. 
-\emph{For all three aspects, the agreement between the two implementations is very good 
-and well within statistical fluctuations. ---More details once the plot is done}
-%\emph{ASSUMPTION: The box plot further shows that 
-%fluctuations relative to the mean are roughly equal for all populations, with outliers lying 
-%up to $\pm 10 \%$ above or below the median. Thus, the highest absolute fluctuations are observed 
-%for the layers L5e, L5i and L6i.} 
-%\\\emph{IS THERE anything to be said about fluctuations?}
-
-%\\\emph{CAN THIS be traced back to the fact that they used 
-%only 5 s of simulation? -> methods: check synchrony for measurement time and bin width!}. 
+For all three quantities, both implementations are in full agreement for the statistical fluctuations
+observed. Fluctuations between different initializations differ for each quantities: For the firing rates, 
+the largest variance is observed for L5e. For the irregularity, fluctuations are much smaller with the 
+highest ones seen in populations L2/3e and L6e. Finally, the variation for synchrony is largest for 
+L2/3e and L5e. For synchrony and firing rates, there is a tendency for the fluctuations to be larger for larger
+values of the respective quantity -- note however the exception of L5i firing rate, which shows very little
+fluctuation.
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir spontaneous_activity}
@@ -80,115 +61,105 @@ and well within statistical fluctuations. ---More details once the plot is done}
         Derived statistical quantities for spontaneous activity of network for
         (\textbf{A - C}) the PyNEST implementation and (\textbf{D - E}) the SLI implementation, 
         using the same simulation and network parameters.
-        Each implementation is run $20$ times independently, 
-        measuring 1000 spike trains of each population in a simulation for 60 s 
-        after a transient period of 0.2 s. 
-        Statistical fluctuations 
-        are indicated by the interquartile ranges (boxes extend to Q1 and Q3). 
-        The median is indicated by a black line, the population mean by a star and 
-        whiskers extend to 1.5 IQR (outliers indicated by crosses). 
-        \quad (\textbf{A, D}) 
-        \quad (\textbf{B, E}) Population mean of Coefficient of variation (CV) of interspike intervals (ISI) indicating 
-        the irregularity of single neuron spiking. 
-        \quad (\textbf{C, F}) Synchrony of the recorded subset of each population quantified by the 
-        variance of the summed spike count histograms (bin width 3 ms) divided by
-        its mean. 
+        Both implementations are run $20$ times independently,
+        measuring 1000 spike trains of each population in a simulation for 60 s.
+        Results for one simulation are represented by one marker per population. In case of small 
+        fluctuations, individual marker may not be identified due to overlap. 
+        \quad (\textbf{A, D}) Population mean of single neuron firing rates.
+        \quad (\textbf{B, E}) Irregularity of spike trains measured by the 
+        population mean of coefficient of variation (CV) of interspike intervals (ISI).
+        \quad (\textbf{C, F}) Synchrony of the recorded subset of each population quantified 
+        by the Fano factor of the PSTH (bin width 3 ms).
     }
     \label{fig:spontaneous_activity}
 \end{figure}
 
 In order to get a deeper insight into the dynamics of the simulated network, the single neuron firing 
-rates and the CV of ISI of single neurons are examined in Figure \ref{fig:single_neuron_activity}.
-The observed fluctuations around the population mean are remarkably large especially when compared 
-to the fluctuations of the population mean for different realizations. This can be interpreted as 
-an indication that the population rates depend strongly on averaged input and connection numbers
-and less on the actual wiring, i.~e. that a mean field approach would be able to capture the main features 
-of first order quantities. 
+rates and the CV of ISI of single neurons are examined in Fig.~\ref{fig:single_neuron_activity}.
+The observed fluctuations around the population mean are remarkably large and can 
+be tracked back to the specific connection rule applied.
+Note, however, that despite being large within a population, the 
+fluctuations of the population means for different realizations remains small -- an observation 
+important for the application of a mean field model. Both aspects will be reviewed in the 
+Discussion, section~\ref{sec:discussion}. 
+
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.8\linewidth]{\figdir single_neuron_activity}
     \caption{
         Firing rates (\textbf{A}) and CV of ISI (\textbf{B}) for single neurons. 
-        The data is take from one simulation of the PyNEST implementation 
-        simulating $60$ s after a transient period of 0.2 s and measuring 
-        $1000$ neurons of each population. The symbols of the box plot 
-        are similar to the ones of Figure \ref{fig:spontaneous_activity} 
-        (boxes: Q1-Q3, median:black line, mean: star, 
-        whiskers to 1.5 of IQR, outliers: crosses). 
+        The data is take from one simulation of the PyNEST implementation, 
+        corresponding to a single initialization in Fig.~\ref{fig:spontaneous_activity}
+        Statistical fluctuations 
+        are indicated by the interquartile ranges (IQR) (boxes extend to 
+        the first and third quartile). 
+        The median is indicated by a black line, the population mean by a star and 
+        whiskers extend to 1.5 IQR (outliers indicated by crosses). 
     }
     \label{fig:single_neuron_activity}
 \end{figure}
 
-\emph{MORE DETAILED view on results:
-Synchrony of populations in terms of population activity, 
-see Appendix, Figure \ref{fig:population_activity}. 
-The observed global oscillation indicates non-negligible correlations
-and thus contradicts the assumption of uncorrelated Gaussian white noise 
-(in the mean field model).}
-
 \subsection{Mean field theory}
-The primary results of the mean field theory cut down to the prediction of 
+In the following section, The results of the mean field theory are presented 
+by showing the results of the prediction of 
 population mean of single neuron firing rates and then using these rates 
-in order to predict the CV of ISI and the distribution of membrane potentials. 
+in order to predict the previously introduced measure of irregularity
+as well as the distribution of membrane potentials. 
 These results are directly compared to 
 the corresponding quantities recorded from the spiking network 
-model simulation analyzed in the previous sections. 
+model simulation analyzed in the previous section. 
 
-The predicted firing rates obtained by solving equation 
-\eqref{eq:self_consistency_a} are displayed in a bar plot in Figure 
-\ref{fig:compare_sim_mf_fixed_total_number}. Rates measured in 
-simulation and previously stated in Figure \ref{fig:spontaneous_activity}
+The firing rates obtained by solving equation 
+\eqref{eq:self_consistency_a} are displayed in a bar plot in Fig.%
+~\ref{fig:compare_sim_mf_fixed_total_number}. Rates measured in 
+simulation and previously shown in Fig.~\ref{fig:spontaneous_activity}
 are shown for comparison. As visible, the results of the mean field model 
-match those of the simulation qualitatively: The sequence of populations 
-ordered by increasing firing rates is reproduced with the exception of
-the two highest rates, i.~e. the two populations of layer $5$. 
-The most apparent difference is the seen for the populations firing at the lowest 
-rates, L2/3e  and L6e. The measured rates are almost equal while the 
-predicted rates are very different, $r_{L6e} = 1.6$ Hz is almost three times 
-as large as $r_{L2/3e}$. Another observable feature is that the predicted rates
-for six of the eight populations are smaller than the measured ones. 
+match those of the simulation to a high degree:
+The predicted rates either cover those observed in simulation (in case of population
+L4e) or underestimate them to a small degree relative to the measured rate. 
+The sequence of populations ordered by increasing firing rates is reproduced.
 The comparison can further be quantified: The difference 
-$    \Delta r_a := r_{\text{mf}, a} - r_{\text{sim}, a} $
-between the mean of simulated rates $r_{\text{sim}, a}$ and predicted rates 
-$r_{\text{mf}, a}$ for each population $a$ is shown in table \ref{tab:diff_fixed_total_number}. 
-For the absolute values of all populations, mean and standard 
-deviation are $(0.46 \pm  0.13)$ Hz. The relative differences 
-are much larger for populations firing at low rate.  
-The CV of ISI for each population is the result of plugging in the predicted rates 
-into equation \eqref{eq:CV_ISI_mf}. A comparison with simulation data is shown
-in Figure \ref{fig:compare_sim_mf_fixed_total_number}. Here the result turns out 
-to be quite close to the measured one. In all cases, the mean field theory predicts 
-a slightly higher variability. The larges deviation is again seen in the populations 
-L2/3e and L6e, those firing at the lowest rates. Ignoring these two populations, 
-the theory further predicts the order of variability among the populations, although
-the differences are small. As for the rates, numerical results are subsumed in 
-Table \ref{tab:diff_fixed_total_number}, using analogous definitions. 
-Averaged over all populations, the deviation between mean field theory and simulation
-is $(0.06 \pm 0.04)$ corresponding to about $(6 \pm 5) \%$. 
-\emph{
-    Discuss these results in Discussion: origin of discrepancies:
-    bad agreement for j02 = 2; larger rates: origin?
-    CV of ISI: reason for deviation at low rates: bias in measurement / correlation?
-}
+$    \Delta \nu_a := \nu_{\text{mf}, a} - \nu_{\text{sim}, a} $
+between the mean of simulated rates $\nu_{\text{sim}, a}$ and predicted rates 
+$r_{\text{mf}, a}$ for each population $a$ is shown in Table~\ref{tab:diff_fixed_total_number}. 
+The mean and standard 
+deviation of the absolute values of $\Delta \nu_a$ 
+are $(0.31 \pm  0.13)$ Hz. The relative difference
+is largest for L2/3e with over $30 \%$, while for the populations 
+of layer 4 and 5 as well as for L6e the relative difference is smaller 
+than $6 \%$. 
+The irregularity measured by the mean CV of ISI for each population is the result of 
+plugging in the predicted rates into equation \eqref{eq:CV_ISI_mf}. 
+As for the rates, a comparison with simulation data is shown
+in Fig.~\ref{fig:compare_sim_mf_fixed_total_number}, 
+while numerical results are subsumed in 
+Table~\ref{tab:diff_fixed_total_number}, using definitions analogous to those for the rates.
+The theoretical results agree well with the measured ones. 
+For all populations but L2/3e and L6e, the 
+deviation between simulation and mean field theory are of the same order as the fluctuations
+between different simulations with deviations of less than $2 \%$ of the measured CV of ISI. 
+For L2/3e and L6e, the predicted irregularity is $7 \%$ larger then the values obtained from simulation. 
+The theory further predicts the order for sorting the populations according to their
+mean CV of ISI. 
 
 % Table of results of comparison
-\begin{table}[tb]
+\begin{table}[htb]
     \centering
-    \caption{Difference between predicted and simulated population means for single 
-    neuron firing rates; absolute and relative to simulated rates.}
+    \caption{Difference between predicted and simulated population means for 
+    firing rates and CV of ISI; absolute and relative to simulated quantities.}
     \label{tab:diff_fixed_total_number}
     \begin{tabular}{p{2.4cm}| *{8}{x{1.12cm}}}
         \rowcolor{TableColor}
         Population $a$       
         & L2/3e & L2/3i & L4e & L4i & L5e & L5i & L6e & L6i  \tn[0.2cm]
-        $\Delta r_a$ / Hz
-            & -0.41 & -0.61 & -0.38 & -0.36 &  0.37 & -0.70 &  0.54 & -0.32 \tn[0.2cm]
-        $\Delta r_a \:/\: r_{\text{sim}, a}$
-            & -0.42 & -0.20 & -0.09 & -0.06 &  0.05 & -0.08 &  0.49 & -0.04 \tn[0.2cm]
+        $\Delta \nu_a$ / Hz
+            & -0.28 & -0.44 &  0.15 & -0.30 & -0.26 & -0.43 & -0.12 & -0.51 \tn[0.2cm]
+        $\Delta \nu_a / \nu_{\text{sim}, a}$
+            & -0.31 & -0.15 &  0.03 & -0.05 & -0.03 & -0.05 & -0.11 & -0.06 \tn[0.2cm]
         $\Delta \text{CV}_a$
-            &  0.14 &  0.05 &  0.04 &  0.03 &  0.02 &  0.03 &  0.13 &  0.03 \tn[0.2cm]
+            &   0.063 &   0.016 & -4e-4&   0.002 & 6e-4&   0.002 &   0.067 &   0.007 \tn[0.2cm]
         $\Delta \text{CV}_a / \text{CV}_{\text{sim}, a}$
-            &  0.16 &  0.06 &  0.05 &  0.03 &  0.02 &  0.04 &  0.15 &  0.04 \tn[0.2cm]
+            &   0.069 &   0.017 & -5e-4&   0.002 & 7e-4&   0.002 &   0.073 &   0.009 \tn[0.2cm]
     \end{tabular}
 \end{table}
 
@@ -200,30 +171,40 @@ is $(0.06 \pm 0.04)$ corresponding to about $(6 \pm 5) \%$.
         Comparison between mean field theory and spiking network model. 
         Bars indicate the single neuron firing rates predicted by the mean field 
         theory, crosses the calculated ones of 20 simulation (as previously shown in
-        Figure \ref{fig:simulation_activity}). The connection
-        rule was set to "fixed\_total\_number".
-        Comparison between mean field theory and spiking network model.
+        Fig.~\ref{fig:spontaneous_activity}). The connection
+        rule was set to "fixed total number".
     }
     \label{fig:compare_sim_mf_fixed_total_number}
 \end{figure}
 
 Applying equation \eqref{eq:P_V_a} on the predicted rates yields the 
 membrane potential distributions shown in 
-Figure \ref{fig:membrane_potential}. 
-The obtained distributions  are confronted with the normalized histograms of recorded 
+Fig.~\ref{fig:membrane_potential}. 
+The obtained distributions are compared with the normalized histograms of recorded 
 membrane potentials of a subpopulation of $n_\text{rec} = 100$ neurons for 
 each population. The contribution due to neurons in refractory period is removed
-(see corresponding subsection in Methods, \ref{subsec:analysis} for details). 
-Similar to the previous results, 
-the agreement is quite good and the largest deviations are observable for  
-the populations L2/3e and L6e, corresponding to the lowest firing rates and
-largest relative differences as calculated before. A common feature found for all
-populations is that the predicted distributions are narrower than the recorded ones.
-Furthermore, the predicted maximum is shifted towards the threshold. The effect
+(see Methods, section~\ref{subsec:analysis} for details). 
+In contrast to the previous results, the theory and measurements are not in strong agreement. 
+For all populations, the predicted distributions are narrower than the recorded ones.
+Furthermore, the predicted maximum is shifted towards the threshold (but note that
+this does not imply higher firing rates -- in fact, the predicted rates are lower). 
+The effect
 of neurons coming out of refractory period is underestimated in some cases, 
-visible for example in populations L2/3i and L4i where the mean distributions 
+visible for example both populations of layer 2/3. Here, the mean distributions 
 show a step while the kink in the theoretical curves is hardly detectable. 
 In the case of population L5i and L6i, however, this behavior is captured well. 
+%Similar to the previous results, 
+%the agreement is good and the largest deviations are observable for  
+%the populations L2/3e and L6e, corresponding to the lowest firing rates and
+%largest relative differences as calculated before. A common feature found for all
+%populations is that the predicted distributions are narrower than the recorded ones.
+%Furthermore, the predicted maximum is shifted towards the threshold (but note that
+%this does not imply higher firing rates -- in fact, the predicted rates are lower). 
+%The effect
+%of neurons coming out of refractory period is underestimated in some cases, 
+%visible for example in populations L2/3i and L4i where the mean distributions 
+%show a step while the kink in the theoretical curves is hardly detectable. 
+%In the case of population L5i and L6i, however, this behavior is captured well. 
 
 % Membrane potentials
 \begin{figure}[tb]
@@ -238,7 +219,7 @@ In the case of population L5i and L6i, however, this behavior is captured well.
         of 100 neurons, recorded every 1.0 ms for a simulation time of 1.0 s 
         (after a transitional period of 0.2 s), 
         adjusted for neurons in refractory period (see text). 
-        The binning in voltage is the same as applied in Figure 
+        The binning in voltage is the same as applied in Fig.~%
         \ref{fig:single_membrane_potential}. 
         The voltage for neurons in refractory period $V_\text{r} = -65$ mV 
         is indicated by the dashed and dotted line. The threshold is at 
@@ -247,37 +228,36 @@ In the case of population L5i and L6i, however, this behavior is captured well.
     \label{fig:membrane_potential}
 \end{figure}
 
-\subsection{Simulation closer to mean field theory }
-In order to assess some of the discrepancies between the predictions of the mean field 
-model and data from simulation, a number of parameters in the simulation are adjusted 
-such that they resemble the ones chosen in the mean field theory more closely. 
-Differentiating parameters in the previous comparison are listed in the 
-Table~\ref{tab:diff_params}.
-\begin{table}[tb]
-    \centering
-    \caption{Parameters chosen differently between simulation and mean field model previously.}
-    \label{tab:diff_params}
-    \begin{tabular}{p{3.0cm} *{2}{|p{5.3cm}}}
-        \rowcolor{TableColor}
-        Parameter & Simulation & Mean field theory   \tn[0.2cm] 
-        Network size &
-            finite; $N_a$ & 
-            none (neglecting finite size effects)
-            \tn[0.1cm] %\hline
-        Connection rule & 
-        "fixed\_total\_number"; binomial distribution of synapse numbers & 
-            "fixed\_indegree"; same synapse number per neuron 
-            \tn[0.1cm] %\hline
-        Synapse type & 
-            current based, exponential shape &
-            voltage based, delta shape
-            \tn[0.1cm] %\hline
-        Synaptic weights & 
-            clipped normal distribution & 
-            Dirac delta distribution 
-            \tn[0.1cm]
-    \end{tabular}
-\end{table}
+%\subsection{Simulation closer to mean field theory }
+%In order to assess some of the discrepancies between the predictions of the mean field 
+%model and data from simulation, a number of parameters in the simulation are adjusted 
+%such that they resemble the ones chosen in the mean field theory more closely. 
+%Differentiating parameters in the previous comparison are listed in the 
+%Table~\ref{tab:diff_params}.
+%\begin{table}[tb]
+    %\centering
+    %\caption{Parameters chosen differently between simulation and mean field model previously.}
+    %\label{tab:diff_params}
+    %\begin{tabular}{p{3.0cm} *{2}{|p{5.3cm}}}
+        %\rowcolor{TableColor}
+        %Parameter & Simulation & Mean field theory   \tn[0.2cm] 
+        %Network size &
+            %finite; $N_a$ & 
+            %none (neglecting finite size effects)
+            %\tn[0.1cm] %\hline
+        %Connection rule & 
+        %"fixed\_total\_number"; binomial distribution of synapse numbers & 
+            %"fixed\_indegree"; same synapse number per neuron 
+            %\tn[0.1cm] %\hline
+        %Synapse type & 
+            %current based, exponential shape &
+            %voltage based, delta shape
+            %\tn[0.1cm] %\hline
+        %Synaptic weights & 
+            %clipped normal distribution & 
+            %Dirac delta distribution 
+            %\tn[0.1cm]
+    %\end{tabular}
+%\end{table}
 
-\emph{Simulation with parameters adapted are on their way...}
 

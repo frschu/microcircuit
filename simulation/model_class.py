@@ -274,21 +274,31 @@ class model:
             self.J_sd       = self.weights    * self.tau_syn    * pA_to_mV / 2.
             self.J_mu_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV
             self.J_sd_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV / 2.
-        self.mat_mu     = self.J_mu        * self.C_ab
-        self.mat_sigma  = self.J_sd**2     * self.C_ab
-        self.mu_ext     = self.J_mu_ext    * self.C_aext * self.rate_ext
-        self.var_ext    = self.J_sd_ext**2 * self.C_aext * self.rate_ext
+        self.mat_mu     = self.tau_m * self.J_mu        * self.C_ab
+        self.mu_ext     = self.tau_m * self.J_mu_ext    * self.C_aext * self.rate_ext
+        self.mat_var    = self.tau_m * (1 + self.weight_rel_sd ** 2) * self.J_sd**2     * self.C_ab
+        self.var_ext    = self.tau_m * (1 + self.weight_rel_sd ** 2) * self.J_sd_ext**2 * self.C_aext * self.rate_ext
 
     ######################################################
     # Methods                                           ##
     ######################################################
     def mu(self, v):
         """Mean input in Brunel's model"""
-        return self.tau_m * (np.dot(self.mat_mu, v) + self.mu_ext)
+        return (np.dot(self.mat_mu, v) + self.mu_ext)
 
     def sd(self, v):
         """Fluctuation of input in Brunel's model"""
-        return np.sqrt(self.tau_m * (1 + self.weight_rel_sd ** 2) * (np.dot(self.mat_sigma, v) + self.var_ext))
+        return np.sqrt(np.dot(self.mat_var, v) + self.var_ext)
+
+    def integrand(u):
+        """Integrand of self-consistency equation"""
+        if u < -4.0:
+            return -1. / np.sqrt(np.pi) * (1.0 / u - 1.0 / (2.0 * u**3) + 
+                                        3.0 / (4.0 * u**5) - 
+                                        15.0 / (8.0 * u**7))
+        else:
+            return np.exp(u**2) * (1. + erf(u))
+
 
     def root_v0(self, v):
         """The integral equations to be solved
@@ -297,22 +307,60 @@ class model:
         """
         from scipy.integrate import quad
         from scipy.special import erf
-        mu_v  = self.mu(v)
-        sd_v  = self.sd(v)
-        low = (self.V_r - mu_v) / sd_v
-        up  = (self.theta - mu_v) / sd_v
-        bounds      = np.array([low, up]).T
-
         def integrand(u):
+            """Integrand of self-consistency equation"""
             if u < -4.0:
                 return -1. / np.sqrt(np.pi) * (1.0 / u - 1.0 / (2.0 * u**3) + 
                                             3.0 / (4.0 * u**5) - 
                                             15.0 / (8.0 * u**7))
             else:
                 return np.exp(u**2) * (1. + erf(u))
+
+
+        mu_v  = self.mu(v)
+        sd_v  = self.sd(v)
+        low = (self.V_r - mu_v) / sd_v
+        up  = (self.theta - mu_v) / sd_v
+        bounds      = np.array([low, up]).T
+
         integral    = np.array([quad(integrand, lower, upper)[0] for lower, upper in bounds])
         root        = - 1. / v + self.t_ref + np.sqrt(np.pi) * self.tau_m * integral
         return root
+
+
+    def jacobian(self, v):
+        """The Jacobian of root_v0.
+
+        Used to ease the process of solving.
+        The calculations are done transposed to avoid unnecessary transposes (adding axes to mu and sd)
+        """
+        from scipy.special import erf
+        def integrand(u_arr):
+            """Integrand of self-consistency equation"""
+            integrand_all = np.zeros(u_arr.shape)
+            u_mask = u_arr < -4.0
+            u = u_arr[u_mask]
+            integrand_all[u_mask] = -1. / np.sqrt(np.pi) * (1.0 / u - 1.0 / (2.0 * u**3) + 
+                                            3.0 / (4.0 * u**5) - 
+                                            15.0 / (8.0 * u**7))
+            integrand_all[~u_mask] = np.exp(u_arr[~u_mask]**2) * (1. + erf(u_arr[~u_mask]))
+            return integrand_all
+
+
+        mu_v  = self.mu(v)
+        sd_v  = self.sd(v)
+        low = (self.V_r - mu_v) / sd_v      # reduced resting potential
+        up  = (self.theta - mu_v) / sd_v    # reduced threshold
+        f_low   = integrand(low)
+        f_up    = integrand(up)
+        jac_mat_1   = self.tau_m * np.sqrt(np.pi) * self.mat_mu
+        jac_mat_2   = self.tau_m * np.sqrt(np.pi) * self.mat_var / (2. * sd_v**2)
+
+        jac_T =  np.diag(1. / v**2) - \
+                 jac_mat_1.T * (f_up - f_low) + \
+                 jac_mat_2.T * (f_up * up - f_low * low)
+        return jac_T.T
+
 
     def root_v0_siegert(self, v):
         """The integral equations to be solved
@@ -369,7 +417,7 @@ class model:
             return quad(integrand, 0.0, upper_bound)[0] 
        
         mus         = self.tau_m * (np.dot(self.mat_mu, v) + self.mu_ext)
-        sigmas      = np.sqrt(self.tau_m * (np.dot(self.mat_sigma, v) + self.var_ext))
+        sigmas      = np.sqrt(self.tau_m * (np.dot(self.mat_var, v) + self.var_ext))
         y_rs        = (self.V_r - mus) / sigmas
         y_thetas    = (self.theta - mus) / sigmas
         
@@ -382,28 +430,6 @@ class model:
 
         root        = - 1. / v + self.t_ref + self.tau_m * integrals
         return root
-
-
-    def jacobian(self, v):
-        """The Jacobian of root_v0.
-
-        NEEDS TO BE REVIEWED FIRST            
-
-        Used to ease the process of solving.
-        The calculations are done transposed to avoid unnecessary transposes (adding axes to mu and sd)
-        """
-        raise Exception("REVIEW FIRST")
-        jac_mat_mu     = np.pi * self.tau_m**2 * self.mat_mu.T
-        jac_mat_sigma  = np.pi * self.tau_m**2 * 0.5 * self.mat_sigma.T
-        mu_v  = self.mu(v)
-        sd_v  = self.sd(v)
-        low = (self.V_r - mu_v) / sd_v
-        up  = (self.theta - mu_v) / sd_v
-        f_low   = self.integrand(low)
-        f_up    = self.integrand(up)
-        jac_T = np.diag(v) - \
-            (jac_mat_mu * (f_up - f_low) + jac_mat_sigma * (up * f_up - low * f_low) / sd_v**2)
-        return jac_T.T
 
     def prob_V(self, V_array, mu, sd, v):
         """Membrane potential probability distribution P(V_m) according to Brunel"""

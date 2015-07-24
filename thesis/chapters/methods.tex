@@ -2,7 +2,7 @@
 \label{sec:methods}
 
 \subsection{Spiking network simulation}
-\label{sub:methods_simulation}
+\label{subsec:methods_simulation}
 Following Nordlie et al.'s suggestions on 
 "good model description practice"~\cite{nordlie2009},
 the network model is described in detail in the following paragraphs while a detailed 
@@ -439,7 +439,7 @@ in full agreement.
     \includegraphics[width=0.8\linewidth]{\figdir syn_numbers_distribution}
     \caption{
         Distribution of synapse numbers for the connection L6e $\to$ L6i.
-        The total number of synapses for this connection is $2888426$, 
+        The total number of synapses for this connection is $2,888,426$, 
         the mean number for each neuron in L6i is $979$.
         The steps indicate the normalized histogram (bin width = 10) obtained 
         from a simulation, the dashed line is a binomial distribution, the 
@@ -477,12 +477,14 @@ original publication~\cite{potjans2014}.
     \caption{
         Membrane potentials of two exemplary neurons of the populations 
         L6e (\textbf{A, C}) and L6i (\textbf{B, D}). The data is taken from 
-        a simulation of 1.2 s, recording the membrane potential every 1 ms. 
+        a simulation of 1.2 s, recording the membrane potential every 1 ms.
+        For the histograms, the first 0.2 s are discarded. 
         In all four plots, the threshold $\theta = -50$ mV is indicated by a dashed line, 
         the resting potential $E_L = -65$ mV by a line of dashes and dots. 
         \quad (\textbf{A, B}) Membrane potential over the time of simulation. 
-        The upper membrane potential reaches $\theta$ much more often than the lower one 
-        (leading to a spike each time). The initial membrane potential 
+        The upper membrane potential reaches $\theta$ once at $t = 0.06$ s, 
+        the lower one does not spike over the time recorded. 
+        The initial membrane potential 
         is drawn from a normal distribution.
         \quad (\textbf{C, D}) Normalized histograms of membrane potentials of the
         two neurons (thin steps) as well as the averaged ones for a subset of $100$ 
@@ -536,7 +538,6 @@ It can be described by a sum over Dirac delta-functions,
     \label{eq:input_const_volt}
 \end{equation}
 The synaptic weights $J_{ij}$ in this case are equal to the PSP and given in mV.  
-\emph{Multiple synapses between two neurons are excluded?!?}
 
 Two important conditions have to be met in order to make the transition from 
 this description to a probabilistic one:
@@ -566,9 +567,9 @@ The exclusion of correlations is formalized as
 \end{equation}
 $\delta_{ij}$ corresponding to correlations between neurons, 
 the Dirac delta distribution to temporal ones. 
-\emph{
-    In order to apply the mean field theory to a spiking network model, 
-the uncorrelatedness of single neurons' input has to be quantified.}
+%\emph{
+    %In order to apply the mean field theory to a spiking network model, 
+%the uncorrelatedness of single neurons' input has to be quantified.}
 
 The fundamental parameter calculated by the mean field model is the single neuron
 firing rate $\nu(t)$. In this basic model, it is assumed that any neuron of either 
@@ -593,8 +594,8 @@ Similarly, for the amplitude of fluctuations $\sigma(t)$:
     \end{split}
 \end{equation}
 
-\emph{Under cortical condition: blablabla (Amit, Brunel); 
-mu and sigma relate to measurable quantities!}
+%\emph{Under cortical condition: (Amit, Brunel); 
+%mu and sigma relate to measurable quantities!}
 
 
 Brunel then transforms equations \eqref{eq:input_random} and \eqref{eq:leaky_integrator}
@@ -803,7 +804,7 @@ result~\cite{brunel2000} is
     \label{eq:CV_ISI_mf}
 \end{equation}
 
-\emph{What is irregular? Are there experimental estimates for CV of ISI?}
+\emph{What is irregular? Add experimental results for CV of ISI}
 
 \subsection{Implementation, numerics and analysis}
 \label{subsec:analysis}
@@ -816,6 +817,48 @@ Plots are created using matplotlib~\cite{matplotlib}.
 The source code both for simulation and analysis can be reviewed at my
 GitHub server~\cite{ba_github} or more conveniently with the 
 \textit{ipython notebook viewer}~\cite{notebook_viewer}.
+
+The analysis of the data obtained from simulations contains a number of 
+statistical measures. The data is taken from randomly chosen subsets of each population, 
+containing 1000 neurons for spikes, 100 in the case of membrane potentials. 
+The single neuron firing rate $\nu_\text{sim}$ is 
+obtained dividing the number of spikes by the time simulated. 
+For a measure of irregularity of spike trains, the times difference
+between two successive spikes (the ISI) for all neurons that fired more than two times 
+are taken. Diving the standard deviation of ISI by its mean
+yields the corresponding quantity, the CV of ISI. Both firing rate and CV of ISI 
+are then averaged over the recorded subpopulation. 
+Measuring the synchrony of neurons within a population is achieved by 
+calculating a histogram of the spike times of the entire subpopulation
+with fixed bin width of $3$ ms (referred to as peristimulus time histogram, PSTH).
+The synchrony is then defined by calculating the Fano factor (equation
+\eqref{eq:Fano}) of the PSTH.
+A theoretical prediction in the framework of the mean field theory is not calculated. 
+However, to get a reference point, one can calculated the synchrony of an ensemble 
+of uncorrelated Poisson processes, corresponding to the case of asynchrony. 
+Since the individual processes are uncorrelated, mean and variance of the sum of 
+spike trains are equal to the sum of the single processes' means and variances. 
+Since for each process, mean and variance are equal, the resulting synchrony measure is 1. 
+\emph{Can the synchrony of the mean field solution be calculated? (under the assumptions
+that spiking is a renewal process and that we know mean and variance of the ISI distribution?)}
+
+The evaluation of membrane potentials of simulated neurons requires a specific treatment 
+for neurons residing in refractory period at the $V_\text{r} = -65$ mV. 
+Each neuron $i$ of population $a$ with firing rate $\nu_{a, i}$ measured over 
+a recording time $T$ spends a time of \:$T \tau_\text{rp} \,\nu_{a, i}$\: in refractory 
+period. If $T$ is divided into $n_T$ time bins, this corresponds to 
+$n_T \, \tau_\text{rp} \,\nu_{a, i}$ time bins. The total number of entries 
+corresponding to neurons in refractory period $n_{tot, \,\text{rp}, \,a}$ is then 
+calculated by summing over all neurons, i.~e.
+\begin{equation}
+    n_{tot, \,\text{rp}, \,a}
+        = n_T \, \tau_\text{rp} \,\sum_{i = 1}^{n_\text{rec}}\nu_{a, i} \, .
+    \label{eq:n_tot_rp}
+\end{equation}
+This number is subtracted from the bin at $V_\text{m} = E_L$. Normalization 
+of the histogram less neurons in refractory period is then
+achieved dividing the frequencies by the factor $n_T \, n_\text{rec} \, \Delta V_\text{m}$, 
+with the bin widths $\Delta V_\text{m}$ of the voltage histogram.
 
 The resulting integrals of the mean field theory, appearing in the equations 
 \eqref{eq:self_consistency_a}, \eqref{eq:P_V_a} and \eqref{eq:CV_ISI_mf}, 
@@ -868,54 +911,10 @@ A test with simulated rates from 20 independent simulations for 20 seconds each 
 after a number of $42 \pm 12$ steps (mean and standard deviation). 
 The second solution entirely independent of simulation data is solving the simplified model 
 with only two populations corresponding to equation \eqref{eq:self_consistency} first.
-Testing showed that convergence is found for a much broader range of initial guesses (data not shown).
+%Testing showed that convergence is found for 
+%\emph{a much broader range} 
+%of initial guesses (data not shown).
 The model can then be split 
 into eight populations and all parameters can be iteratively transformed to the ones of the 
 model in question. 
-
-The analysis of the data obtained from simulations contains a number of 
-statistical measures. The data is taken from randomly chosen subsets of each population, 
-containing 1000 neurons for spikes, 100 in the case of membrane potentials. 
-The single neuron firing rate $\nu_\text{sim}$ is 
-obtained dividing the number of spikes by the time simulated. 
-For a measure of irregularity of spike trains, the times difference
-between two successive spikes (the ISI) for all neurons that fired more than two times 
-are taken. Diving the standard deviation of ISI by its mean
-yields the corresponding quantity, the CV of ISI. Both firing rate and CV of ISI 
-are then averaged over the recorded subpopulation. 
-Measuring the synchrony of neurons within a population is achieved by 
-calculating a histogram of the spike times of the entire subpopulation
-with fixed bin width of $3$ ms (referred to as peristimulus time histogram, PSTH).
-The synchrony is then defined by calculating the Fano factor (equation
-\eqref{eq:Fano}) of the PSTH.
-A theoretical prediction in the framework of the mean field theory is not calculated. 
-However, to get a reference point, one can calculated the synchrony of an ensemble 
-of uncorrelated Poisson processes, corresponding to the case of asynchrony. 
-Since the individual processes are uncorrelated, mean and variance of the sum of 
-spike trains are equal to the sum of the single processes' means and variances. 
-Since for each process, mean and variance are equal, the resulting synchrony measure is 1. 
-
-
-
-
-
-
-
-Most of the analysis does not require any specification at this point. 
-However, the evaluation of membrane potentials of simulated neurons requires a specific treatment 
-for neurons residing in refractory period at the $V_\text{r} = -65$ mV. 
-Each neuron $i$ of population $a$ with firing rate $\nu_{a, i}$ measured over 
-a recording time $T$ spends a time of \:$T \tau_\text{rp} \,\nu_{a, i}$\: in refractory 
-period. If $T$ is divided into $n_T$ time bins, this corresponds to 
-$n_T \, \tau_\text{rp} \,\nu_{a, i}$ time bins. The total number of entries 
-corresponding to neurons in refractory period $n_{tot, \,\text{rp}, \,a}$ is then 
-calculated by summing over all neurons, i.~e.
-\begin{equation}
-    n_{tot, \,\text{rp}, \,a}
-        = n_T \, \tau_\text{rp} \,\sum_{i = 1}^{n_\text{rec}}\nu_{a, i} \, .
-    \label{eq:n_tot_rp}
-\end{equation}
-This number is subtracted from the bin at $V_\text{m} = E_L$. Normalization is then
-achieved by dividing each entry by the factor $n_T \, n_\text{rec} \, \Delta V_\text{m}$, 
-with the bin widths $\Delta V_\text{m}$ of the voltage histogram.
 

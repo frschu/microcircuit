@@ -21,16 +21,16 @@ import time
 #data_file = "brunel"
 #sim_spec = "test_brunel_C250_exp"
 
-#data_sup_path = "/export/data-schuessler/data_microcircuit/"
-#data_file = "micro"
+data_sup_path = "/export/data-schuessler/data_microcircuit/"
+data_file = "micro"
 #sim_spec = "a1.0_t20.4_00"
 #sim_spec = "a1.0_t20.2_fixindeg_01" 
 #sim_spec = "spontaneous_activity_sli"
-#sim_spec = "spon_act_statistic_sli"
+sim_spec = "spon_act_statistic"
 
-data_sup_path    = "/users/schuessler/uni/microcircuit/data"
-data_file = "micro"
-sim_spec = "simulation_at_mf"
+#data_sup_path    = "/users/schuessler/uni/microcircuit/data"
+#data_file = "micro"
+#sim_spec = "simulation_at_mf"
 
 # Original data
 data_path = os.path.join(data_sup_path, data_file)
@@ -83,7 +83,7 @@ with h5py.File(os.path.join(data_path, attrs_file_name), "r") as attrs_file:
 # Spikes and membrane potentials
 ######################################################
 # Spike histogram
-bin_width_spikes = dt * 1e-3  # s
+bin_width_spikes = 3 * 1e-3  # s
 n_bins_spikes    = int(t_measure / bin_width_spikes) 
 bin_edges_spikes = np.arange(t_trans, t_sim, bin_width_spikes)
 
