@@ -1,0 +1,90 @@
+% **************************************************************************************************************
+% Bachelor Thesis
+% ""
+% Copyright (C) 2015 Friedrich Schuessler
+%
+%
+% **************************************************************************************************************
+% Using: A Classic Thesis Style
+% Copyright (C) 2012 Andr\'e Miede http://www.miede.de
+%
+% Note:
+%    * You must not use "u etc. in strings/commands that will be spaced out (use \"u or real umlauts instead)
+%    * New enumeration (small caps): \begin{aenumerate} \end{aenumerate}
+%    * For margin notes: \marginpar or \graffito{}
+%    * Do not use bold fonts in this style, it is designed around them
+%    * Use tables as in the examples
+% **************************************************************************************************************
+
+\documentclass[ twoside,openright,titlepage,numbers=noenddot,headinclude,%1headlines,% letterpaper a4paper
+                footinclude=true,cleardoublepage=empty,abstractoff, % <--- obsolete, remove (todo)
+                BCOR=5mm,paper=a4,fontsize=12pt,%11pt,a4paper,%
+                ngerman,american,%
+                ]{scrreprt}
+
+%********************************************************************
+% Note: Make all your adjustments in here
+%*******************************************************
+\input{ba_thesis_config}
+
+%********************************************************************
+% Hyphenation
+%*******************************************************
+%\hyphenation{put special hyphenation here}
+
+% ********************************************************************
+% GO!GO!GO! MOVE IT!
+%*******************************************************
+\color{gray1}
+\begin{document}
+\frenchspacing
+\raggedbottom
+\selectlanguage{american} % american ngerman
+%\renewcommand*{\bibname}{new name}
+%\setbibpreamble{}
+\pagenumbering{roman}
+\pagestyle{plain}
+
+%********************************************************************
+% Frontmatter
+%*******************************************************
+%\include{FrontBackmatter/DirtyTitlepage}
+%\include{FrontBackmatter/Titlepage}
+%\include{FrontBackmatter/Titleback}
+%\cleardoublepage\include{FrontBackmatter/Dedication}
+%\cleardoublepage\include{FrontBackmatter/Foreword}
+\cleardoublepage\include{frontbackmatter/abstract}
+%%\cleardoublepage\include{FrontBackmatter/Publication}
+%%\cleardoublepage\include{FrontBackmatter/Acknowledgments}
+\pagestyle{scrheadings}
+\cleardoublepage\include{frontbackmatter/contents}
+
+%********************************************************************
+% Mainmatter
+%*******************************************************
+\pagenumbering{arabic}
+%\setcounter{page}{90}
+% use \cleardoublepage here to avoid problems with pdfbookmark
+\cleardoublepage
+\include{chapters/intro}
+\include{chapters/methods}
+\include{chapters/results}
+\include{chapters/discussion}
+\include{frontbackmatter/endnotes}
+
+% ********************************************************************
+% Backmatter
+%*******************************************************
+%\appendix
+%\clearpage
+%\include{chapter/appendix}
+
+%********************************************************************
+% Other Stuff in the Back
+%*******************************************************
+\clearpage\include{frontbackmatter/bibliography}
+%\cleardoublepage\include{frontbackmatter/colophon}
+%\cleardoublepage\include{frontbackmatter/declaration}
+
+\end{document}
+% ********************************************************************

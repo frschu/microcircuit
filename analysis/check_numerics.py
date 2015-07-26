@@ -95,15 +95,15 @@ model_names = ["Brunel", "Micro"]
 
 n = model_micro.n_populations # Dimension
 r_max = 2.0       # Radius around which solutions are sampled
+r_rel = np.linspace(0., 1., n_rs + 1)
 
 root_method='hybr'
 options= {"xtol": 1e-13, "maxfev": 10**4}
 jacobian = False
 
-n_rs = 200
-n_sims = 500
+n_rs = 10
+n_sims = 10
 
-r_max_all = np.linspace(0., 1., n_rs + 1)
 tints_mean = np.zeros((2, n_rs))
 nfevs_mean = np.zeros((2, n_rs))
 success_rate = np.zeros((2, n_rs))
@@ -120,7 +120,7 @@ for k, model in enumerate([model_micro, model_brunel]):
         for i in range(n_sims):
             # Sample initial conditions        
             x = np.random.normal(0, 1, n)
-            r = np.random.uniform(r_max_all[j], r_max_all[j+1])
+            r = np.random.uniform(r_rel[j], r_rel[j+1]) # THIS IS NOT EQUIVALENT TO THE RADIUS!
             offset = r_max * r**(1 / n) / np.linalg.norm(x) * x
             v_guess_0 = v_sol + offset   
 

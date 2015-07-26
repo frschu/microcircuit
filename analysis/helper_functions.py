@@ -45,8 +45,10 @@ def saving_fig(fig, figure_path, fig_name, verbose=True):
     if verbose:
         print("save figure to " + fig_name) 
     fig.savefig(os.path.join(figure_path, fig_name + ".pdf"), 
+            dpi=1000, # This is simple recommendation for publication plots
             bbox_inches='tight', format="pdf")
     fig.savefig(os.path.join(figure_path, fig_name + ".png"), 
+            dpi=1000, # This is simple recommendation for publication plots
             bbox_inches='tight', format="png")      
 
 def rlbl(str_or_array):
@@ -76,3 +78,18 @@ def adjust_steps(data):
     """
     data_out = np.append(data[0], data[:-1])
     return data_out
+
+
+def resadjust(ax, xres=None, yres=None):
+    """
+    Send in an axis and I fix the resolution as desired.
+    """
+
+    if xres:
+        start, stop = ax.get_xlim()
+        ticks = np.arange(start, stop + xres, xres)
+        ax.set_xticks(ticks)
+    if yres:
+        start, stop = ax.get_ylim()
+        ticks = np.arange(start, stop + yres, yres)
+        ax.set_yticks(ticks)

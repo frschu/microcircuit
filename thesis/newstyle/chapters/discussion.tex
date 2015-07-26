@@ -1,0 +1,161 @@
+\chapter{Discussion}
+\label{sec:discussion}
+
+% Spiking network
+The reimplementation of Potjans and Diesmann's spiking network simulation  
+confirmed the expectation: The original model's results where reproduced 
+well within the statistical fluctuations. The fluctuations of the calculated population 
+means between different instantiations of the model are 
+relatively small, a characteristic that can be interpreted as an indication that a mean 
+field approach is suited well for describing the corresponding network:
+The parameters describing the main features of the network activity
+depend strongly on average input and connection numbers,
+and much less on the actual wiring.
+However, this assertion has to be restricted to 
+random networks as more detailed structure, for example induce by learning, 
+can lead to stronger effects of correlation (see for example \citeb{staude2010higher}).
+The fluctuations along neurons within one population and a single instantiation
+of the network were shown to be large both for the firing rate and the 
+CV of ISI. This can be tracked back to the large deviations of input between 
+different neurons: Due to randomly choosing the synapses and adding further 
+variability by distributing the synapse number (as shown for model validation, 
+Methods, section \ref{subsec:methods_simulation}), 
+some neurons will receive more excitatory or inhibitory input than others 
+and fire accordingly. 
+The measurement of the synchrony indicates that there is a significant 
+amount of correlation among spike trains of different neurons. This has to be taken 
+into account when interpreting the results of the mean field model. 
+
+% Mean field theory
+Introducing the mean field theory for the simulated spiking network 
+turned out to be remarkably successful. 
+The formal extension 
+from the original model of two populations has been a rather small step, while
+the numerical implementation revealed a number of obstacles. The resulting
+algorithm, nonetheless, is a convenient and computationally inexpensive tool for 
+predictions. It has been shown to predict central quantities 
+of the network activity to a high degree of accuracy.  
+
+% MF: Rates
+The predicted population means of single neuron firing rates differ by 
+$\sim 0.3$ Hz when compared to simulation data. For the populations firing at 
+higher rates, i.~e. those of layers 4 and 5 as well as L6i, this corresponds 
+to $<6 \%$ of the respective rates. Yet, for the more quiescent population L2/3e, 
+the relative disagreement is much more drastic ($\sim 30 \%$). 
+For all populations but L4e, the predicted rates are lower than the measured ones.  
+One reason for this underestimation could be the negligence of correlation: 
+Larger correlations among excitatory input can lead to higher fluctuations 
+and thus higher spiking rates~\cite{staude2010higher}. This 
+assertion has to be taken with care, though, as correlation in inhibitory 
+populations can cancel the effect \emph{(citation!! Sadra emphasized that)}. 
+
+% MF: CV of ISI
+The prognosis for the irregularity of spike trains, measured by the coefficient of
+variation of interspike intervals (CV of ISI) turns out to be more exact.:
+Excluding the populations L2/3e and L6e, the deviation between theory and simulation 
+is $<2 \%$. The two remaining 
+populations are predicted to have the highest irregularity (as observed in simulation), 
+and the deviation to measured values is about $7 \%$. 
+One explanation for the remaining differences can be an estimation bias of the CV of ISI 
+using spike trains of finite lengths arising as a significant ratio of the neurons in the 
+population is either not included at all (if the number of spikes is $ < 2$) or the part of the distribution 
+covering higher CV of ISI is not represented well (see \citeb{nawrot2010analysis} for details). 
+This is especially critical for the populations with low rates (L2/3e, L6e).
+What cannot be accounted for by this bias would indicate a lower irregularity than that 
+of the respective stationary Gaussian process, pointing towards temporal correlations
+introduced for example by the synapse model 
+(see e.\,g. \citeb{brunel1999fast} for the case of $\alpha$ synapses in a simpler context). 
+
+% MF: Membrane potentials
+The third and last measure predicted by the mean field model, the distribution of 
+membrane potentials, shows more visible disagreement with the obtained simulation 
+data than the previous ones. Although the general shape of the distributions is reproduced, the predicted
+ones are narrower than the measured histograms. The maximum is further shifted 
+towards the threshold. 
+The kink at the resting potential $V_\text{r}$ due to neurons exiting the 
+refractory period is reproduced but less pronounced than the measured one, indicating that the diffusion
+away from this point is slower than assumed. The largest deviations are observed for 
+the populations L2/3e and L6e, where the measured membrane potentials have a considerably 
+high density below $V_\text{r}$.
+Again, the fact that predicted rates are lower than the measured ones 
+despite the distributions' means being closer to the threshold
+would again point towards the impact of correlations:
+Even if the membrane potential spends most time close to the resting potential, 
+a large number of excitatory spikes arriving in a short time would lead to a quick rise and
+firing without affecting the distribution significantly.  
+This interpretation is in agreement with the measured degree of synchrony. 
+Ultimately, the wide distribution of single neuron firing rates within each population
+can be expected to widen the distribution. 
+
+%The third and last measure predicted by the mean field model, the distribution of 
+%membrane potentials, agrees well with the obtained simulation data, too. 
+%Both the shape and position of the distribution are reproduced despite being slightly 
+%narrower than the measured histograms. The kink at $V_\text{r}$ due to neurons exiting the 
+%refractory period is reproduced but smaller than the measured one, indicating that the diffusion
+%from this point is slower than assumed. The largest deviations are again observed for 
+%the populations L2/3e and L6e, where the measured distributions are shifted towards 
+%the resting potentials. For L4i, this is counterintuitive as the predicted rate is 
+%lower than the measured one and would again point towards the impact of correlations:
+%Even if the membrane potential spends most time close to the resting potential, 
+%a large number of excitatory spikes arriving in a short time would lead to a quick rise and
+%firing without deforming the distribution significantly.  
+
+% Summary of results, explanations and shortcomings
+In summary, the hypothesis for the analytical ansatz is confirmed: 
+The considered activity measures of the simulated spiking network model of the neocortex 
+can be predicted by a mean field theory assuming uncorrelated Gaussian input.
+Possible explanations for the remaining deviations are (i) correlations between neurons, 
+yielding an input to single neurons different from the assumed white Gaussian noise;
+(ii) temporal correlations induced by the synapse type different from the 
+delta synapses of the mean field model; and finally (iii) fluctuations in the 
+input of single neurons. 
+%\emph{Comparison with simulations where the according parameters are adapted 
+    %have show the individual effects}.
+
+% Use of the theory, limits
+The value of the analytical framework developed is twofold: On the one hand, 
+it provides a useful tool for predicting the activity of a spiking network model
+over a large range of parameters 
+%\emph{as observed for external frequency $\nu_{ext}$ 
+%and relative inhibitory synapse strength $g$}. 
+On the other hand, it represents an
+essential means for identifying relevant measures and understanding the emergent 
+dynamics of the complex systems under consideration. This is a hard and one of the 
+most important tasks in this field. 
+The long lasting
+debate over whether neural coding is rate based or exploits precise timing and correlations
+may at some point be solved by
+excluding one or the other option using a sensible framework
+of biological data, spiking network simulation and analytical arguments. 
+On a less ambitious scale, the presented models can at least indicate by how much 
+correlations effect the observed rates. 
+
+% Outlook
+The presented combination of the spiking network model and the mean field approach
+could serve as a framework to tackle further questions. 
+The implementation in PyNEST could work as a convenient basis for extensions 
+such as the inclusion of newly available experimental data.
+Furthermore, different neuron populations, 
+especially concerning different interneuron classes, may be included, 
+making the simulation a viable means for testing hypothesis about their 
+role. 
+Another possible extension already introduced in the 
+original model \cite{potjans2014} is unspecific input from a thalamic population. 
+When applying this input for for short bursts (e.\,g. 10 ms), 
+this can by used in order to examine a possibility for propagation of information
+along the different layers in time and thus assessing the 
+path of signal processing within the neocortex.
+(\emph{see ??? for an overview of 
+the presumed way of information processing over the layers})
+The mean field approach, however, would have to be extended to a non-equilibrium 
+regime since it lacks temporal resolution at the present state. 
+When focusing on neural computation, one might also include specific input.
+An interesting context is orientation selectivity, using 
+oriented input resulting in neuronal tuning curves.
+To this end, the mean field approach can be extended to single neurons 
+as shown for example by ~\citeb{sadeh2015orientation} 
+for the case of one excitatory and one inhibitory population.
+
+
+
+

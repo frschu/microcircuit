@@ -169,16 +169,14 @@ class model:
         ratio_tau       = self.tau_m / self.tau_syn
         PSC_over_PSP    = self.C_m * delta_tau / (self.tau_m * self.tau_syn * \
             (ratio_tau**(self.tau_m / delta_tau) - ratio_tau**(self.tau_syn / delta_tau))) * 1e-3
-        pA_to_mV            = 1e3 / self.C_m # Factor for conversion from pA to mV
         # Actual weights have to be adapted: from peak PSP to PSC (and back...)
         if self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
             self.weights    = self.J_ab  * PSC_over_PSP     # neuron populations
         elif self.neuron_model=="iaf_psc_delta":
-            self.weights    = self.J_ab * PSC_over_PSP * self.tau_syn * pA_to_mV 
+            self.weights    = self.J_ab * PSC_over_PSP * (self.tau_syn_ex * 1e3) / self.C_m
             # This might be an overkill / doing things twice...
         elif self.neuron_model=="iaf_psc_alpha": # PSCs calculated from PSP amplitudes
-            raise Exception("Neuron model: iaf_psc_alpha. CHeck units of weights before applying!")
-            self.weights = self.J_ab * np.exp(1) # see Sadeh 2014
+            self.weights = self.J_ab * np.exp(1) / (self.tau_syn_ex * 1e3) / self.C_m
         else:
             raise Exception("Neuron model should be iaf_psc_ - {delta, exp, alpha}!")
 
@@ -218,9 +216,9 @@ class model:
         if self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
             self.weight_ext = self.J_ext * PSC_over_PSP[0, 0] 
         elif self.neuron_model=="iaf_psc_delta":
-            self.weight_ext = self.J_ext * PSC_over_PSP[0, 0] * self.tau_syn_ex * pA_to_mV 
+            self.weight_ext = self.J_ext * PSC_over_PSP[0, 0] * (self.tau_syn_ex * 1e3) / self.C_m
         elif self.neuron_model=="iaf_psc_alpha": # PSCs calculated from PSP amplitudes
-            self.weight_ext = self.J_ext * np.exp(1) 
+            self.weight_ext = self.J_ext * np.exp(1) / (self.tau_syn_ex * 1e3) / self.C_m
 
         # optional additional thalamic input (Poisson)
         self.n_th           = net.n_th      # size of thalamic population
@@ -232,9 +230,10 @@ class model:
         if self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
             self.weight_th = self.J_th * PSC_over_PSP[0, 0] 
         elif self.neuron_model=="iaf_psc_delta":
-            self.weight_th = self.J_th * PSC_over_PSP[0, 0] * self.tau_syn_ex * pA_to_mV 
+            self.weight_th = self.J_th * PSC_over_PSP[0, 0] * (self.tau_syn_ex * 1e3) / self.C_m
         elif self.neuron_model=="iaf_psc_alpha": # PSCs calculated from PSP amplitudes
-            self.weight_th = self.J_th * np.exp(1) 
+            self.weight_th = self.J_th * np.exp(1) / (self.tau_syn_ex * 1e3) / self.C_m
+
         
         # connection probabilities for thalamic input
         conn_probs_th = net.conn_probs_th
@@ -265,15 +264,15 @@ class model:
             self.J_mu_ext   = self.weight_ext   
             self.J_sd_ext   = self.weight_ext
         elif self.neuron_model=="iaf_psc_exp":
-            self.J_mu       = self.weights    * self.tau_syn    * pA_to_mV
-            self.J_sd       = self.weights    * self.tau_syn    * pA_to_mV / np.sqrt(2.)
-            self.J_mu_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV
-            self.J_sd_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV / np.sqrt(2.)
+            self.J_mu       = self.weights    * self.tau_syn * 1e3   / self.C_m
+            self.J_sd       = self.weights    * np.sqrt(self.tau_syn * 1e3 / 2.) / self.C_m
+            self.J_mu_ext   = self.weight_ext * self.tau_syn_ex * 1e3 / self.C_m
+            self.J_sd_ext   = self.weight_ext * np.sqrt(self.tau_syn_ex * 1e3 / 2.) / self.C_m
         elif self.neuron_model=="iaf_psc_alpha":
-            self.J_mu       = self.weights    * self.tau_syn    * pA_to_mV
-            self.J_sd       = self.weights    * self.tau_syn    * pA_to_mV / 2.
-            self.J_mu_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV
-            self.J_sd_ext   = self.weight_ext * self.tau_syn_ex * pA_to_mV / 2.
+            self.J_mu       = self.weights    * (self.tau_syn * 1e3)**2          / self.C_m
+            self.J_sd       = self.weights    * (self.tau_syn * 1e3)**(3./2.)    / (self.C_m * 2.)
+            self.J_mu_ext   = self.weight_ext * (self.tau_syn_ex * 1e3)**2       / self.C_m
+            self.J_sd_ext   = self.weight_ext * (self.tau_syn_ex * 1e3)**(3./2.) / (self.C_m * 2.)
         self.mat_mu     = self.tau_m * self.J_mu        * self.C_ab
         self.mu_ext     = self.tau_m * self.J_mu_ext    * self.C_aext * self.rate_ext
         self.mat_var    = self.tau_m * (1 + self.weight_rel_sd ** 2) * self.J_sd**2     * self.C_ab

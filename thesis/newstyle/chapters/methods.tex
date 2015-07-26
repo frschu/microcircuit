@@ -1,44 +1,46 @@
-\section{Methods}
+\chapter{Methods}
 \label{sec:methods}
 
-\subsection{Spiking network simulation}
+\section{Spiking network simulation}
 \label{subsec:methods_simulation}
-Following Nordlie et al.'s suggestions on 
-"good model description practice"~\cite{nordlie2009},
+Following \citeauthor{nordlie2009}'s.~\cite{nordlie2009} suggestions on 
+"good model description practice",
 the network model is described in detail in the following paragraphs while a detailed 
 overview is provided in two tables: The model is summarized in Table 
 \ref{tab:model_description}, 
 whereas specific numerical values of the parameters are shown in Table 
 \ref{tab:network_params}. 
 
-%\subsubsection{Model composition and connectivity}
+%\subsection{Model composition and connectivity}
 % Model description
+
 \begin{table}[tb]
-    \centering
-    \caption{
-        Model description according to Nordlie et al.~\cite{nordlie2009}. 
+    \myfloatalign
+    \caption[Model description, overview]{
+        Model description according to \citeb{nordlie2009}. 
         Specific parameters are shown in Table \ref{tab:network_params}.
         }
     \label{tab:model_description}
-    \begin{tabular}{b{3.1cm} p{10cm}}
-        \rowcolor{TableColor}\multicolumn{2}{l}{Model summary} \\
+    \small
+    \begin{tabular}{b{3.1cm} p{8.5cm}} \toprule
+        \modelheadline{Model summary} \\
         Populations     &   8 cortical populations\\
         Topology        &   --\\
         Connectivity    &   Random connections with fixed number of synapses for 
                             each combination of pre- and postsynaptic population\\
         Neuron model    &   Leaky integrate-and-fire, fixed voltage threshold, fixed 
                             absolute refractory period\\
-        Synapse model   &   exponential-shaped postsynaptic current\\
+        Synapse model   &   Exponential-shaped postsynaptic current\\
         Plasticity      &   --\\
         Input           &   Independent fixed-rate Poisson spike trains to iaf neurons\\
         Measurements    &   Spike activity, membrane potentials \tnn
 
-        \rowcolor{TableColor} Populations & \\
+        \modelheadline{Populations} \\
         Layers          &   L2/3, L4, L5, L6 \\
-        Cortical network&   one excitatory (e) and one inhibitory (i) population per layer\\
-        Size            &   population specific size \tnn
+        Composed of     &   One excitatory (e) and one inhibitory (i) population per layer\\
+        Size            &   Population specific size \tnn
 
-        \rowcolor{TableColor} Connectivity & \\
+        \modelheadline{Connectivity} \\
         Type            &   Random connectivity with independently chosen pre- and postsynaptic
                             neurons; fixed total number of connections between two populations \\
         Weights         &   Fixed; drawn from clipped Gaussian distributions 
@@ -46,7 +48,7 @@ whereas specific numerical values of the parameters are shown in Table
         Delays          &   Fixed; drawn from clipped Gaussian distributions ($d~>~0$);
                             multiples of computation step size \tnn
 
-        \rowcolor{TableColor}\multicolumn{2}{l}{ Neuron and synapse model} \\
+        \modelheadline{Neurons and synapse model} \\
         Name            &   iaf neuron\\
         Type            &   Leaky integrate-and-fire, exponential-shaped current inputs\\
         Subthreshold dynamics of neuron~$i$
@@ -61,8 +63,8 @@ whereas specific numerical values of the parameters are shown in Table
                             \end{aligned}$}  \\
         Spiking         &   If $\,\,V_i(t_-) < \theta \quad \land \quad V_i(t_+) \ge \theta$: \\
                         &   \quad 1. set $t^* = t$    \\
-                        &   \quad 2. emit spike with time stamp $t^*$ \tnn
-
+                        &   \quad 2. emit spike with time stamp $t^*$ \\
+        \bottomrule
     \end{tabular}
 \end{table}
 
@@ -83,15 +85,15 @@ neurons.
 
 \begin{figure}[tb]
     \centering 
-    \begin{subfigure}[b]{0.45\textwidth} 
-        \includegraphics[width=\textwidth]{../figures/diagram_colored}
+    \begin{subfigure}[b]{0.6\textwidth} 
+        \includegraphics{../figures/diagram_colored_print}
         \label{fig:diagram}
     \end{subfigure}
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{\figdir population_size}
+    \begin{subfigure}[b]{0.35\textwidth}
+        \includegraphics{\figdir population_size}
         \label{fig:population_size}
     \end{subfigure} ~
-    \caption{
+    \caption[Diagram of model and population sizes]{
         Description of the network model. 
         (\textbf{A})~% 
         Diagram of the layered cortical network. 
@@ -128,7 +130,7 @@ a derivation). The mean for inhibitory ones is determined by multiplying
 with a factor $-g$, where the relative inhibitory synapse strength is set to 
 $g = 4$. There is one important exception to this scheme:
 The mean for the connection from L4e to L2/3e is increased by a factor of 
-$j_{02} = 2$ (consult~\cite{potjans2014} for details). 
+$j_{02} = 2$ (consult \cite{potjans2014} for details). 
 The standard deviation is set to $10\%$ of the mean. 
 The distributions from which weights are drawn are clipped, 
 such that a neuron assigned to the excitatory 
@@ -139,7 +141,7 @@ of $1.5$ ms for excitatory presynaptic neurons and half this value for
 inhibitory ones. The relative standard deviation is set to $50 \%$. The distributions
 are again clipped such that $d \ge 0$
 
-%\subsubsection{Neuron and synapse model}
+%\subsection{Neuron and synapse model}
 The neurons are leaky integrate-and-fire neurons with a fixed voltage threshold. 
 Below the threshold $\theta$, the dynamics of the membrane potential $V_i(t)$ 
 for neuron $i$ are governed by the differential equation 
@@ -233,7 +235,7 @@ arriving spike trains,
 where $t_j^k$ is the time the $k$-th spike by neuron $j$ was emitted and the 
 delay between neuron $i$ and $j$ is set to $d_{ij}$. 
 
-%\subsubsection{Model input, output and free parameters}
+%\subsection{Model input, output and free parameters}
 The activity of the network depends both on the recurrent stimulation as well as 
 external input. The biological networks motivating the model are shown to be 
 stable under a wide range of conditions\emph{CITE}. 
@@ -242,7 +244,7 @@ is supplied with external stimuli -- without this, it converges to quiescence.\c
 In the case of the local neocortical microcircuit, the roles of different
 external input and recurrence is debated widely. While some interpret the local circuit
 as computational building blocks \cite{potjans2014}, others focus on the interplay between 
-different cortical regions (e.~g. \cite{boucsein2011beyond}) or the transmission of 
+different cortical regions (e.\,g. \citeb{boucsein2011beyond}) or the transmission of 
 thalamic signals (\emph{CITE}). The model implemented in this work is only driven 
 by unspecific input mimicking stimulation from close and distant cortical areas\cite{potjans2014}.%
 \footnote{
@@ -306,42 +308,47 @@ Table \ref{tab:network_params}.
 % Network parameters
 \begin{table}[tb]
     \centering
-    \caption{
+    \caption[Network parameters]{
         Network parameters
         }
     \label{tab:network_params}
-    \begin{tabular}{p{3.5cm}| *{8}{x{1.2cm}}}
-        \rowcolor{TableColor}\multicolumn{9}{l}{Populations and input} \tn 
-        Name $a$       
-            & L2/3e & L2/3i & L4e & L4i & L5e & L5i & L6e & L6i  \tn \hline
-        Population size, $N_a$   
+    \small
+    \begin{tabular}{p{2.2cm}| *{8}{x{0.9cm}}} \toprule
+        \paramsheadline{Populations and input} \tn 
+        Layer 
+        & \mc2c{L2/3} & \mc2c{L4} & \mc2c{L5} & \mc2c{L6}  \tn
+        Population& \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} \tn \hline
+        %& L2/3e & L2/3i & L4e & L4i & L5e & L5i & L6e & L6i  \tn \hline
+        Pop. size, $N_a$   
             & 20683 & 5834 & 21915 & 5479 & 4850 & 1065 & 14395 & 2948 \tn
-        Ext. inputs, $(C_\text{ext})_a$ 
+        $(C_\text{ext})_a$ 
             & 1600 & 1500 & 2100 & 1900 & 2000 & 1900 & 2900 & 2100 \tn[0.1cm]
-        Background rate     
+        Backgr. rate     
         &&&& 8 Hz \tnn
 
-        \rowcolor{TableColor}\multicolumn{9}{l}{Connection probabilities between pre- and postsynaptic populations} \tn
-        \diagbox[width=3.9cm]{post~~~~}{pre~~~}&
-              L2/3e & L2/3i & L4e & L4i & L5e & L5i & L6e & L6i  \tn \hline
+        \paramsheadline{Connection probabilities for pre- and postsynaptic populations} \tn
+        \multirow{2}{*}{\diagbox[width=2.65cm]{post~~~~}{pre~~~}}
+        & \mc2c{L2/3} & \mc2c{L4} & \mc2c{L5} & \mc2c{L6}  \tn
+        & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} \tn \hline
+          %    &L2/3e & L2/3i & L4e & L4i & L5e & L5i & L6e & L6i  \tn \hline
         L2/3e
-            & 0.101 & 0.169 & 0.044 & 0.082 & 0.032 & 0.000 & 0.008 & 0.000 \tn 
+            & 0.101 & 0.169 & 0.044 & 0.082 & 0.032 & 0 & 0.008 & 0 \tn 
         L2/3i
-            & 0.135 & 0.137 & 0.032 & 0.051 & 0.075 & 0.000 & 0.004 & 0.000 \tn 
+            & 0.135 & 0.137 & 0.032 & 0.051 & 0.075 & 0 & 0.004 & 0 \tn 
         L4e
-            & 0.008 & 0.006 & 0.050 & 0.135 & 0.007 & 0.000 & 0.045 & 0.000 \tn 
+            & 0.008 & 0.006 & 0.050 & 0.135 & 0.007 & 0 & 0.045 & 0 \tn 
         L4i
-            & 0.069 & 0.003 & 0.079 & 0.160 & 0.003 & 0.000 & 0.106 & 0.000 \tn 
+            & 0.069 & 0.003 & 0.079 & 0.160 & 0.003 & 0 & 0.106 & 0 \tn 
         L5e
-            & 0.100 & 0.062 & 0.051 & 0.006 & 0.083 & 0.373 & 0.020 & 0.000 \tn 
+            & 0.100 & 0.062 & 0.051 & 0.006 & 0.083 & 0.373 & 0.020 & 0 \tn 
         L5i
-            & 0.055 & 0.027 & 0.026 & 0.002 & 0.060 & 0.316 & 0.009 & 0.000 \tn 
+            & 0.055 & 0.027 & 0.026 & 0.002 & 0.060 & 0.316 & 0.009 & 0 \tn 
         L6e
             & 0.016 & 0.007 & 0.021 & 0.017 & 0.057 & 0.020 & 0.040 & 0.225 \tn 
         L6i
             & 0.036 & 0.001 & 0.003 & 0.001 & 0.028 & 0.008 & 0.066 & 0.144 \tnn
 
-        \rowcolor{TableColor}\multicolumn{9}{l}{Further connectivity} \tn
+        \paramsheadline{Further connectivity} \tn
         $w \pm \delta w$    
             &  \multicolumn{3}{l}{$87.8 \pm 8.8 \,\text{pA}$}
             &  \multicolumn{5}{l}{Excitatory synaptic strengths} \tn
@@ -358,7 +365,7 @@ Table \ref{tab:network_params}.
             &  \multicolumn{3}{l}{$0.8 \pm 0.4 \,\text{ms}$}
             &  \multicolumn{5}{l}{Inhibitory synaptic transmission delays} \tnn
 
-        \rowcolor{TableColor}\multicolumn{9}{l}{Neuron model} \tn
+        \paramsheadline{Neuron model} \tn
         $\tau_\text{m}$    
             &  \multicolumn{3}{l}{$10 \,\text{ms}$}
             &  \multicolumn{5}{l}{Membrane time constant} \tn
@@ -379,15 +386,15 @@ Table \ref{tab:network_params}.
             &  \multicolumn{5}{l}{Reset potential} \tn
         $\theta$    
             &  \multicolumn{3}{l}{$-50 \,\text{mV}$}
-            &  \multicolumn{5}{l}{Fixed firing threshold} \tn
+            &  \multicolumn{5}{l}{Fixed firing threshold} \tn \bottomrule
     \end{tabular}
 \end{table}
 
-%\subsubsection{Model validation}
+%\subsection{Model validation}
 \begin{figure}[tb]
     \centering
     \includegraphics{\figdir syn_numbers}
-    \caption{
+    \caption[Connection between populations]{
         Connection between populations.
         (\textbf{A}) Calculated total synapse number between a pre- 
         and a postsynaptic population. These numbers are used for connecting the network, 
@@ -437,7 +444,7 @@ in full agreement.
 \begin{figure}[tb]
     \centering
     \includegraphics{\figdir syn_numbers_distribution}
-    \caption{
+    \caption[Distribution of synapse numbers]{
         Distribution of synapse numbers for the connection L6e $\to$ L6i.
         The total number of synapses for this connection is $2,888,426$, 
         the mean number for each neuron in L6i is $979$.
@@ -474,7 +481,7 @@ original publication~\cite{potjans2014}.
 \begin{figure}[tb]
     \centering
     \includegraphics{\figdir single_membrane_potential}
-    \caption{
+    \caption[Exemplary membrane potentials]{
         Membrane potentials of two exemplary neurons of the populations 
         L6e (\textbf{A, C}) and L6i (\textbf{B, D}). The data is taken from 
         a simulation of 1.2 s, recording the membrane potential every 1 ms.
@@ -498,9 +505,9 @@ original publication~\cite{potjans2014}.
 
 
 \FloatBarrier
-\subsection{Mean field model}
+\section{Mean field model}
 The derivation of a mean field theory goes along the 
-lines of the work by Brunel~\cite{brunel2000}.
+lines of the work by \citeb{brunel2000}.
 It starts of with a simplified model of 
 $N$ leaky integrate-and-fire neurons in two populations. 
 Each neuron receives input from the network by $C$ synapses, 
@@ -551,7 +558,7 @@ this description to a probabilistic one:
         (corresponding to no spatial correlations). 
         No temporal correlations imply low single neuron firing rates $\nu$ compared 
         to the membrane time constant $\tau_\text{m}$
-        (e.~g. $\nu \sim10$ Hz and $1 / \tau_\text{m} \sim 1 / (20\,\text{ms}) = 50\, \text{Hz}$).
+        (e.\,g. $\nu \sim10$ Hz and $1 / \tau_\text{m} \sim 1 / (20\,\text{ms}) = 50\, \text{Hz}$).
 \end{itemize}
 If these conditions are met, the input can be modeled as a time-varying average part
 $\mu(t)$ plus a fluctuating Gaussian part with amplitude $\sigma(t)\tau_\text{m}$:
@@ -777,8 +784,8 @@ assessable peak PSP (as described in Methods, section~\ref{subsec:methods_simula
 the effective change in membrane potential in the mean field model is not equal to the peak PSP. 
 Instead, an effective synapse strength for the mean field model can be obtained by 
 matching the two synapse types.
-The procedure is based one pursued by 
-Sadeh for the case of $\alpha$-synapses~\cite{sadeh2014mean}, and adopted here for the applied 
+The procedure is based one pursued by \citeb{sadeh2014mean}
+for the case of $\alpha$-synapses, and adopted here for the applied 
 exponential synapses. 
 The incoming current due to a spike entering the synapse at time $t = 0$ is defined 
 by the model of neuron and synapse. For the spiking network model, the equations 
@@ -946,7 +953,7 @@ result~\cite{brunel2000} is
 \emph{What is irregular? Add experimental results for CV of ISI}
 
 \FloatBarrier
-\subsection{Implementation, numerics and analysis}
+\section{Implementation, numerics and analysis}
 \label{subsec:analysis}
 The simulations are implemented with the NEST simulation tool using its python interface
 PyNEST~\cite{NEST}. The differential equations of the network are solved with a computational 

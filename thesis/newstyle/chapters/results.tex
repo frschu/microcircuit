@@ -1,7 +1,7 @@
-\section{Results}
+\chapter{Results}
 \label{sec:results}
 
-\subsection{Spiking network model}
+\section{Spiking network model}
 The simulation of the spiking network model will be analyzed in the following manner. 
 At first, the results are directly compared to those obtained by the original 
 model of Potjans and Diesmann. Both simulations are run for the same parameters, 
@@ -29,7 +29,8 @@ L5e.
 \begin{figure}[tb]
     \centering
     \includegraphics{\figdir raster_plot}
-    \caption{Raster plot showing spontaneous activity of network for 
+    \caption[Raster plot: PyNEST and SLI]{
+        Raster plot showing spontaneous activity of network for 
         (A) the PyNEST implementation and (B) the SLI implementation.
         The simulation and network parameters for both simulations are 
         the same. 
@@ -57,18 +58,18 @@ fluctuation.
 \begin{figure}[tb]
     \centering
     \includegraphics{\figdir spontaneous_activity}
-    \caption{
-        Derived statistical quantities for spontaneous activity of network for
+    \caption[Spontaneous activity: PyNEST and SLI]{
+        Measures of spontaneous activity for
         (\textbf{A - C}) the PyNEST implementation and (\textbf{D - E}) the SLI implementation, 
         using the same simulation and network parameters.
-        Both implementations are run $20$ times independently,
+        Both implementations are run $20$ times independently (one marker per simulation),
         measuring 1000 spike trains of each population in a simulation for 60 s.
-        Results for one simulation are represented by one marker per population. In case of small 
-        fluctuations, individual marker may not be identified due to overlap. 
+        In case of small 
+        fluctuations, individual markers may not be identified due to overlap. 
         \quad (\textbf{A, D}) Population mean of single neuron firing rates.
         \quad (\textbf{B, E}) Irregularity of spike trains measured by the 
-        population mean of coefficient of variation (CV) of interspike intervals (ISI).
-        \quad (\textbf{C, F}) Synchrony of the recorded subset of each population quantified 
+        population mean of CV of ISI.
+        \quad (\textbf{C, F}) Synchrony of populations quantified 
         by the Fano factor of the PSTH (bin width 3 ms).
     }
     \label{fig:spontaneous_activity}
@@ -86,7 +87,7 @@ Discussion, section~\ref{sec:discussion}.
 \begin{figure}[tb]
     \centering
     \includegraphics{\figdir single_neuron_activity}
-    \caption{
+    \caption[Single neuron firing rates and CV of ISI]{
         Firing rates (\textbf{A}) and CV of ISI (\textbf{B}) for single neurons. 
         The data is take from one simulation of the PyNEST implementation, 
         corresponding to a single initialization in Fig.~\ref{fig:spontaneous_activity}
@@ -100,7 +101,7 @@ Discussion, section~\ref{sec:discussion}.
 \end{figure}
 
 \FloatBarrier
-\subsection{Mean field theory}
+\section{Mean field theory}
 In the following section, The results of the mean field theory are presented 
 by showing the results of the prediction of 
 population mean of single neuron firing rates and then using these rates 
@@ -146,13 +147,19 @@ mean CV of ISI.
 % Table of results of comparison
 \begin{table}[htb]
     \centering
-    \caption{Difference between predicted and simulated population means for 
-    firing rates and CV of ISI; absolute and relative to simulated quantities.}
+    \caption[Differences between prediction and simulation]{
+        Difference between predicted and simulated population means for 
+        firing rates and CV of ISI; absolute and relative to simulated quantities.}
     \label{tab:diff_fixed_total_number}
-    \begin{tabular}{p{2.4cm}| *{8}{x{1.12cm}}}
+    \small
+    \begin{tabular}{p{2.4cm}| *{8}{x{0.87cm}}} \toprule
+    \rowcolor{TableColor}
+    \spacedlowsmallcaps{Population}
+        & \mc2c{L2/3} & \mc2c{L4} & \mc2c{L5} & \mc2c{L6}  \tn
         \rowcolor{TableColor}
-        Population $a$       
-        & L2/3e & L2/3i & L4e & L4i & L5e & L5i & L6e & L6i  \tn[0.2cm]
+        & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} \tn \hline
+        %Population $a$       
+        %& L2/3e & L2/3i & L4e & L4i & L5e & L5i & L6e & L6i  \tn[0.2cm]
         $\Delta \nu_a$ / Hz
             & -0.28 & -0.44 &  0.15 & -0.30 & -0.26 & -0.43 & -0.12 & -0.51 \tn[0.2cm]
         $\Delta \nu_a / \nu_{\text{sim}, a}$
@@ -161,6 +168,7 @@ mean CV of ISI.
             &   0.063 &   0.016 & -4e-4&   0.002 & 6e-4&   0.002 &   0.067 &   0.007 \tn[0.2cm]
         $\Delta \text{CV}_a / \text{CV}_{\text{sim}, a}$
             &   0.069 &   0.017 & -5e-4&   0.002 & 7e-4&   0.002 &   0.073 &   0.009 \tn[0.2cm]
+        \bottomrule
     \end{tabular}
 \end{table}
 
@@ -168,7 +176,7 @@ mean CV of ISI.
 \begin{figure}[tb]
     \centering
     \includegraphics{\figdir compare_sim_mf_fixed_total_number}
-    \caption{
+    \caption[Comparing mean field model to simulation]{
         Comparison between mean field theory and spiking network model. 
         Bars indicate the single neuron firing rates predicted by the mean field 
         theory, crosses the calculated ones of 20 simulation (as previously shown in
@@ -211,7 +219,7 @@ In the case of population L5i and L6i, however, this behavior is captured well.
 \begin{figure}[tb]
     \centering
     \includegraphics{\figdir membrane_potential}
-    \caption{
+    \caption[Distribution of membrane potentials]{
         Distribution of membrane potentials for each population. 
         Shown are both the results of simulation (histogram) and 
         the predictions of the mean field theory (continuous line). 
@@ -229,7 +237,7 @@ In the case of population L5i and L6i, however, this behavior is captured well.
     \label{fig:membrane_potential}
 \end{figure}
 
-%\subsection{Simulation closer to mean field theory }
+%\section{Simulation closer to mean field theory }
 %In order to assess some of the discrepancies between the predictions of the mean field 
 %model and data from simulation, a number of parameters in the simulation are adjusted 
 %such that they resemble the ones chosen in the mean field theory more closely. 
