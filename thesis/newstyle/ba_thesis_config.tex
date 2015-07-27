@@ -9,7 +9,8 @@
 				pdfspacing,%floatperchapter,%linedheaders,%
 				%subfig,
                 beramono,
-                %eulermath,
+                %nochapters
+                eulermath,
                 %parts
                 }{classicthesis}										
 % ********************************************************************
@@ -37,7 +38,7 @@
 \newcommand{\myTitle}{A network model of the neocortex accounting for its laminar structure\xspace}
 \newcommand{\mySubtitle}{Subtitle\xspace}
 \newcommand{\myDegree}{Degree\xspace}
-\newcommand{\myName}{Friedrich Schüßler\xspace}
+\newcommand{\myName}{Friedrich Schuessler\xspace}
 \newcommand{\myProf}{Jens Timmer\xspace}
 \newcommand{\myOtherProf}{Stefan Rotter\xspace}
 \newcommand{\mySupervisor}{Benjamin Merkt\xspace}
@@ -302,9 +303,5 @@
 %\usepackage{lmodern} % <-- no osf support :-(
 %\usepackage[urw-garamond]{mathdesign} <-- no osf support :-(
 % ****************************************************************************************************
-
-
-% ****************************************************************************************************
-% 9. Specific commands
-% ****************************************************************************************************
-% ****************************************************************************************************
+\let\cleardoublepage\clearpage
+%\usepackage[document]{ragged2e}    % No justification ("Blocksatz")

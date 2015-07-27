@@ -66,7 +66,7 @@ def rlbl(str_or_array):
         return_obj = []
         for pop_or_layer in str_or_array:
             return_obj.append(single_rlbl(pop_or_layer))
-        return_obj = np.array(return_obj).astype("<U5")
+        return_obj = np.array(return_obj).astype("<U8")
     else:                                   # is single string (layer or population)
         return_obj = single_rlbl(str_or_array) 
     return return_obj

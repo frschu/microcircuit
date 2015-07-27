@@ -48,7 +48,7 @@ fontsize_labels         = 11    # pt, size used in latex document
 fontsize_labels_axes    = fontsize_labels
 fontsize_labels_title   = fontsize_labels
 fontsize_plotlabel      = fontsize_labels       # for labeling plots with 'A', 'B', etc.
-cross_size = 12 # pt, size of cross markers
+cross_size = 9 # pt, size of cross markers
 legend_ms  = 4  # scale of markers in legend
 
 # Adapt the matplotlib.rc

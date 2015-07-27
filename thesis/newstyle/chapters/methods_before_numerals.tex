@@ -1,15 +1,15 @@
 \chapter{Methods}
 \label{sec:methods}
 
-\section{Spiking network model}
+\section{Spiking network simulation}
 \label{subsec:methods_simulation}
 Following \citeauthor{nordlie2009}'s.~\cite{nordlie2009} suggestions on 
 "good model description practice",
 the network model is described in detail in the following paragraphs while a detailed 
-overview is provided in two tables: The model is summarized in 
-\autoref{tab:model_description}, 
-whereas specific numerical values of the parameters are shown in 
-\autoref{tab:network_params}. 
+overview is provided in two tables: The model is summarized in Table 
+\ref{tab:model_description}, 
+whereas specific numerical values of the parameters are shown in Table 
+\ref{tab:network_params}. 
 
 %\subsection{Model composition and connectivity}
 % Model description
@@ -18,7 +18,7 @@ whereas specific numerical values of the parameters are shown in
     \myfloatalign
     \caption[Model description, overview]{
         Model description according to \citeb{nordlie2009}. 
-        Specific parameters are shown in \autoref{tab:network_params}.
+        Specific parameters are shown in Table \ref{tab:network_params}.
         }
     \label{tab:model_description}
     \small
@@ -77,9 +77,9 @@ The actual principle is aimed at more detailed models, hence more specific stati
 substance or substances"~\cite{eccles1976electrical}.
 } %
 A simplified diagram of the network together with an illustration of population 
-sizes is given in \autoref{fig:model_description}. 
+sizes is given in Figure \ref{fig:model_description}. 
 A total of 77169 leaky integrate-and-fire neurons are distributed according to the population
-sizes given in \autoref{tab:network_params}. The total numbers of excitatory and inhibitory 
+sizes given in Table \ref{tab:network_params}. The total numbers of excitatory and inhibitory 
 neurons are 61843 and 15326, respectively, yielding a ratio of 4.04 of excitatory over inhibitory
 neurons. 
 
@@ -138,7 +138,7 @@ population will not have associated outgoing synapses with $w < 0$
 and vice versa for inhibitory ones. 
 Delays are drawn from normal distributions as well, with a mean value 
 of $1.5$ ms for excitatory presynaptic neurons and half this value for 
-inhibitory ones. The relative standard deviation is set to $50\,\%$. The distributions
+inhibitory ones. The relative standard deviation is set to $50 \%$. The distributions
 are again clipped such that $d \ge 0$
 
 %\subsection{Neuron and synapse model}
@@ -176,7 +176,7 @@ potential (PSP). In order to use the experimental observations,
 an approximative transformation is implemented.
 The PSC induced by one spike of given PSP with the membrane potential
 at rest is calculated as follows:
-For $E_\text{L} = 0$, setting $I(t) = I_\text{syn}(t)$ in \autoref{eq:leaky_integrator}
+For $E_\text{L} = 0$, setting $I(t) = I_\text{syn}(t)$ in equation \eqref{eq:leaky_integrator}
 yields:
 \begin{equation}
     \dot{V}(t)
@@ -211,7 +211,7 @@ yields
             \left(\frac{1}{\tau_\text{m}} - \frac{1}{\tau_\text{syn}}\right)^{-1} \,.
     \label{eq:t_max}
 \end{equation}
-Inserting into \autoref{eq:V(t)} leads to 
+Inserting into equation \eqref{eq:V(t)} leads to 
 \begin{equation}
     V(t_\text{max}) 
         = \frac{w \tau_\text{m} \tau_\text{syn}}{C_\text{m} \Delta\tau}	
@@ -238,14 +238,14 @@ delay between neuron $i$ and $j$ is set to $d_{ij}$.
 %\subsection{Model input, output and free parameters}
 The activity of the network depends both on the recurrent stimulation as well as 
 external input. The biological networks motivating the model are shown to be 
-stable under a wide range of conditions (\marginpar{CITE}). 
+stable under a wide range of conditions (\emph{CITE}). 
 The inhibitory populations that guarantee this stability require that the network 
 is supplied with external stimuli -- without this, it converges to quiescence~\cite{brunel2000}.
 In the case of the local neocortical microcircuit, the roles of different
 external input and recurrence is debated widely. While some interpret the local circuit
 as computational building blocks \cite{potjans2014}, others focus on the interplay between 
 different cortical regions (e.\,g. \citeb{boucsein2011beyond}) or the transmission of 
-thalamic signals (\marginpar{CITE}). The model implemented in this work is only driven 
+thalamic signals (\emph{CITE}). The model implemented in this work is only driven 
 by unspecific input mimicking stimulation from close and distant cortical areas~\cite{potjans2014}.%
 \footnote{
 The original publication included thalamic input in order to examine temporal transmission 
@@ -304,7 +304,7 @@ If not specified else, spikes are recorded
 from $1000$ neurons of each population, membrane potentials from $100$. The further analysis of the data 
 is explained in following sections.
 The large number of free parameters of the model and their chosen values are summarized in 
-\autoref{tab:network_params}. 
+Table \ref{tab:network_params}. 
 % Network parameters
 \begin{table}[tb]
     \centering
@@ -313,7 +313,7 @@ The large number of free parameters of the model and their chosen values are sum
         }
     \label{tab:network_params}
     \small
-    \begin{tabular}{p{2.25cm}| *{8}{x{1.0cm}}} \toprule
+    \begin{tabular}{p{2.2cm}| *{8}{x{0.9cm}}} \toprule
         \paramsheadline{Populations and input} \tn 
         Layer 
         & \mc2c{L2/3} & \mc2c{L4} & \mc2c{L5} & \mc2c{L6}  \tn
@@ -401,14 +401,14 @@ The large number of free parameters of the model and their chosen values are sum
         using the connection rule "fixed total number". (\textbf{B}) Mean number of synapses
         a neuron in a specific postsynaptic population is receiving from all neurons of a 
         presynaptic population. These numbers are only applied when using the connection
-        rule "fixed indegree". %(\marginpar{see section comparison for details}).
+        rule "fixed indegree". %(\emph{see section comparison for details}).
     }
     \label{fig:syn_numbers}
 \end{figure}
 In order to verify that the model behaves reasonably, a number of basic parameters 
 is examined before stating more central results. As the implementation of the neuron model
 is part of the NEST software and thus well established, the validation starts at the level 
-of connections. \autoref{fig:syn_numbers} shows the number of synapses for each pair 
+of connections. Figure \ref{fig:syn_numbers} shows the number of synapses for each pair 
 of pre- and postsynaptic population and 
 the mean number of synapses each neuron receives from a specific population. The total number 
 of synapses in the model is almost 0.3 billion synapses.  
@@ -435,7 +435,7 @@ given by
 \end{equation}
 Accordingly, the expected value of $k$ is $\text{E}[k] = C_{ab} / N_b$, its variance is 
 $\text{Var}(k) = C_{ab} (1 - 1/N_b) / N_b$. 
-In \autoref{fig:syn_numbers_distribution}, the actual distribution of synapse numbers 
+In Figure \ref{fig:syn_numbers_distribution}, the actual distribution of synapse numbers 
 for the connection L6e $\to$ L6i is shown in a normalized histogram. 
 The measured mean and standard deviation are $(975 \pm 31)$ compared to the theoretical 
 value of $(979 \pm 31)$ synapses. 
@@ -448,14 +448,15 @@ in full agreement.
         Distribution of synapse numbers for the connection L6e $\to$ L6i.
         The total number of synapses for this connection is $2,888,426$, 
         the mean number for each neuron in L6i is $979$.
-        The normalized histogram (bin width = 10) obtained 
-        from a simulation, the full line is a binomial distribution.
+        The steps indicate the normalized histogram (bin width = 10) obtained 
+        from a simulation, the dashed line is a binomial distribution, the 
+        underlying distribution for the given connection rule. 
     }
     \label{fig:syn_numbers_distribution}
 \end{figure}
 
 To further validate the model on a basic level, a look at a single neurons' membrane potentials 
-is taken. \autoref{fig:single_membrane_potential} shows the membrane 
+is taken. Figure \ref{fig:single_membrane_potential} shows the membrane 
 potentials of two neurons over the first 1.2 s of simulation together with a comparison of
 the normalized histograms of a larger subset of the 
 respective population. The neuron of the upper plots appertains to the population
@@ -481,7 +482,7 @@ original publication~\cite{potjans2014}.
     \centering
     \includegraphics{\figdir single_membrane_potential}
     \caption[Exemplary membrane potentials]{
-        Membrane potentials $V_\text{m}$ of two exemplary neurons of the populations 
+        Membrane potentials of two exemplary neurons of the populations 
         L6e (\textbf{A, C}) and L6i (\textbf{B, D}). The data is taken from 
         a simulation of 1.2 s, recording the membrane potential every 1 ms.
         For the histograms, the first 0.2 s are discarded. 
@@ -521,8 +522,8 @@ are determined by the relative size of the two populations through the factor
 \end{equation}
 A central assumption is the sparsity of the network, expressed by $\epsilon \ll 1$.
 Guided by anatomical estimates for the neocortex, the population sizes are set to
-$N_e = 0.8N$ excitatory and $N_i = 0.2N$ inhibitory neurons. Taking \autoref{eq:epsilon}, 
-this implies 
+$N_e = 0.8N$ excitatory and $N_i = 0.2N$ inhibitory neurons. Taking the definition
+\eqref{eq:epsilon}, this implies 
 \begin{equation}
     C_I = \gamma C_E 	
  \label{eq:C_I}
@@ -534,21 +535,17 @@ whereas the delays are fixed to $d$ for all synapses.
 At the heart of the mean field model
 is the transition from the deterministic description of membrane potential 
 dynamics to a probabilistic formulation. 
-As in the spiking network model of the last section, the membrane potential follows
-the differential equation of the leaky integrate-and-fire neuron, 
-\autoref{eq:leaky_integrator}. The input is simplified 
+As in Potjans' model, the membrane potential follows
+the differential equation \eqref{eq:leaky_integrator}. The input is simplified 
 by implementing voltage based synapses which
-yield an instantaneous and fixed voltage change
-for each spike arriving at the neuron, so-called $\delta$-synapses:
-The change in membrane potential of a neuron $i$ due to all incoming spikes 
-fired by neurons $j$ at time $t_j^k$ 
-can be described by a sum over Dirac delta-functions, 
+yield an instantaneous and fixed change in membrane potential
+for each spike arriving at the neuron instead of an exponential shaped PSC.
+It can be described by a sum over Dirac delta-functions, 
 \begin{equation}
-    R\,I_i(t) = \tau_\text{m} \sum_j J_{ij} \sum_k \delta(t - t_j^k - d_{ij}) \,.
+    I_i(t) = \tau_\text{m} \sum_j J_{ij} \sum_k \delta(t - t_j^k - d_{ij}) \,.
     \label{eq:input_const_volt}
 \end{equation}
-The synaptic weights $J_{ij}$ is in this case given in mV; $d_{ij}$ is the delay 
-between neuron $i$ and $j$.
+The synaptic weights $J_{ij}$ in this case are equal to the PSP and given in mV.  
 
 Two important conditions have to be met in order to make the transition from 
 this description to a probabilistic one:
@@ -558,19 +555,19 @@ this description to a probabilistic one:
         are negligible for $C / N \to 0$; 
     \item Uncorrelated input: The contributions a neuron receives have to stem from 
         a wide range of the network, each being small compared to the threshold
-        (corresponding to negligible spatial correlations). 
+        (corresponding to no spatial correlations). 
         No temporal correlations imply low single neuron firing rates $\nu$ compared 
         to the membrane time constant $\tau_\text{m}$
         (e.\,g. $\nu \sim10$ Hz and $1 / \tau_\text{m} \sim 1 / (20\,\text{ms}) = 50\, \text{Hz}$).
 \end{itemize}
 If these conditions are met, the input can be modeled as a time-varying average part
-$\mu(t)$ plus a fluctuating Gaussian part with variance $\sigma(t)\tau_\text{m}$:
+$\mu(t)$ plus a fluctuating Gaussian part with amplitude $\sigma(t)\tau_\text{m}$:
 \begin{equation}
     \frac{\tau_\text{m}}{C_\text{m}} \, I_i(t) =  \mu(t) + \sigma(t) \sqrt{\tau_\text{m}} \eta_i(t) \, .
     \label{eq:input_random}
 \end{equation}
 The random fluctuations are described by Gaussian white noise $\eta_i(t)$ with 
-$\langle  \eta_i(t)\rangle = 0$ and unit variance. 
+$\langle  \eta_i(t)\rangle = 0$. 
 The exclusion of correlations is formalized as  
 \begin{equation}
     \langle \eta_i(t) \: \eta_j(t') \rangle = \delta_{ij} \: \delta(t - t')	\, ,
@@ -578,7 +575,7 @@ The exclusion of correlations is formalized as
 \end{equation}
 $\delta_{ij}$ corresponding to correlations between neurons, 
 the Dirac delta distribution to temporal ones. 
-%\marginpar{
+%\emph{
     %In order to apply the mean field theory to a spiking network model, 
 %the uncorrelatedness of single neurons' input has to be quantified.}
 
@@ -590,7 +587,7 @@ rate $\nu$. This rate is linked to the average input $\mu(t)$ by
     \begin{split}
         \mu(t)          &= \mu_l(t) + \mu_\text{ext} \\
         \text{with} \qquad \mu_l(t)        &= C_E \, J (1 - \gamma g) \nu(t - d) \tau_\text{m} \\
-        \text{and~~\,} \qquad \mu_\text{ext}  &= C_E J \nu_\text{ext} \tau_\text{m} \,.
+        \mu_\text{ext}  &= C_E J \nu_\text{ext} \tau_\text{m} \,.
         \label{eq:mu}
     \end{split}
 \end{equation}
@@ -598,15 +595,14 @@ Similarly, for the amplitude of fluctuations $\sigma(t)$:
 \begin{equation}
     \begin{split}
         \sigma^2(t)     &= {\sigma_l}^2(t) + {\sigma_\text{ext}}^2 \\
-        \text{with} \qquad      {\sigma_l}^2(t)       
+        \text{with} \qquad {\sigma_l}^2(t)       
                         &= C_E \, J^2 (1 + \gamma g^2) \nu(t - d) \tau_\text{m} \\
-            \text{and~~\,}  \qquad    
         {\sigma_\text{ext}}^2  &= C_E J^2 \nu_\text{ext} \tau_\text{m} \,.
         \label{eq:sigma}
     \end{split}
 \end{equation}
 
-%\marginpar{Under cortical condition: (Amit, Brunel); 
+%\emph{Under cortical condition: (Amit, Brunel); 
 %mu and sigma relate to measurable quantities!}
 
 
@@ -648,7 +644,7 @@ The resulting constraint is
 \end{equation}
 The probability current at the threshold is equal to the firing rate
 $\nu(t)$. Inserting both $S(\theta, t) = \nu(t)$ and the above constraint into 
-\autoref{eq:prob_curr} yields
+equation \eqref{eq:prob_curr} yields
 \begin{equation}
     \frac{\partial P(\theta, t)}{\partial V}    
         = - \frac{2 \nu(t) \tau_\text{m}}{\sigma^2(t)}  \,.
@@ -671,7 +667,7 @@ Finally, $P(V, t)$ is assumed to converge sufficiently quickly to zero:
 
 A stationary solution $P(V, t) = P_0(V)$ with constant 
 single neuron firing rate $\nu_0$ 
-satisfying the above boundary conditions is then given by:
+satisfying the above boundary conditions is then presented:
 \begin{equation}
     P_0(V) = 2 \frac{\nu_0 \tau_\text{m}}{\sigma_0} 
         \exp{\left(- \frac{(V - \mu_0)^2}{{\sigma_0}^2} \right)}
@@ -692,7 +688,7 @@ $\nu_0$ into the equations \eqref{eq:mu} and \eqref{eq:sigma}, yielding
     \label{eq:mu_sigma_0}
 \end{align}
 
-To interpret $P(V, t)$ as a probability distribution, it is required to
+In order to interpret $P(V, t)$ as a probability distribution, it is required to
 satisfy the normalization condition
 \begin{equation}
     \int_{-\infty}^{\theta} \! P(V, t) \diff V  + p_r(t) = 1 \, ,
@@ -710,7 +706,7 @@ In the constant case, this is simply
     \label{eq:p_r_0}
 \end{equation}
 
-Inserting both $P_0(V)$ and $p_{r, 0}$ into the self-consistent condition, \autoref{eq:P_V_prob}
+Inserting both $P_0(V)$ and $p_{r, 0}$ into the self-consistent condition \eqref{eq:P_V_prob}
 then leads to an expression for $\nu_0$:
 \begin{equation}
     \begin{split}
@@ -747,15 +743,10 @@ where $\text{erf}$ is the error function.
 This equation can be solved numerically for varying parameters as done by Brunel in order to 
 characterize the different states the system can be found in. 
 
-\marginpar{
-    This is where my own work starts. 
-    Should I use "I"? 
-    And/or should I make this clearer by using another subsection?
-}
 In order to transfer these results to the model of the neocortical microcircuit, 
-I adapt the contributions to the input have to be adapted for each population. Instead of 
+the contributions to the input have to be adapted for each population. Instead of 
 parametrized $\mu_0$ and $\sigma_0$ in terms of the variables $C_E$, $J$, $g$ and $\gamma$, 
-a matrix notation as in \autoref{eq:synapse_numbers} is utilized: 
+a matrix notation as in equation \eqref{eq:synapse_numbers} is utilized: 
 Synapse numbers and weights are defined as $C_{ab}$ and $J_{ab}$, respectively, 
 where $a$ is the postsynaptic and $b$ the presynaptic population. 
 Finally, the external input is written in a similar notation: 
@@ -778,18 +769,18 @@ be written as
 where the sums go over all internal populations. 
 $\mu_a$ and $\sigma_a$ can be further adjusted to match the parameters of the spiking network 
 model. One such adaption is to include the variance of the synaptic weight distribution 
-following the early work of \citeb{amit1997model}. 
+following the early work of Amit and Brunel~\cite{amit1997model}. 
 If the synaptic weights between pre- and postsynaptic population $a$ and $b$ are drawn
 from a normal distribution with mean $J_{ab}$ and relative standard deviation $\Delta_{J, ab}$, 
 then the additional variance of the input is independent of the structural and temporal one
-of \autoref{eq:sigma_a} and can simply be added. Using the same relative standard deviation 
+of equation \eqref{eq:sigma_a} and can simply be added. Using the same relative standard deviation 
 $\Delta_J$ for all recurrent and external synapses, this amounts to multiplying the right 
-hand side of \autoref{eq:sigma_a} by the factor $(1 + {\Delta_J}^2)$.
+hand side of equation \eqref{eq:sigma_a} by the factor $(1 + {\Delta_J}^2)$.
 
 A further adjustment takes into account that the synapse type used in simulation does not
 deliver the applied voltage immediately. Although the synaptic weight $w_{ab}$ of the 
 current based synapses in the spiking network model is obtained using the experimentally 
-accessible peak PSP (as described in Methods, \autoref{subsec:methods_simulation}), 
+assessable peak PSP (as described in Methods, section~\ref{subsec:methods_simulation}), 
 the effective change in membrane potential in the mean field model is not equal to the peak PSP. 
 Instead, an effective synapse strength for the mean field model can be obtained by 
 matching the two synapse types.
@@ -808,7 +799,7 @@ while for the mean field model a single spike corresponds to one Dirac delta-fun
     RI_\delta(t) = \tau_\text{m} \, J \,\delta(t)\,,
     \label{eq:input_exp}
 \end{equation}
-compare to \autoref{eq:input_const_volt}. Note that both are written in voltage for 
+compare to equation \eqref{eq:input_const_volt}. Note that both are written in voltage for 
 comparability. The kernels of the two synapse models are $k_e(t) = e^{\frac{t}{\tau_\text{m}}}$
 and $\delta(t)$, respectively. 
 The idea is now to normalize the exponential kernel by matching its 
@@ -823,7 +814,7 @@ integral to the one of the $\delta$-kernel:
 introducing the normalization factor $a_\mu = 1 / \tau_\text{s} $. 
 In a second step, the normalized kernel is inserted
 in place of the $\delta$-kernel and this combination matched with the actual 
-exponential syn\-apse, integrating over the entire domain:
+exponential synapse, integrating over the entire domain:
 \begin{equation}
     \int_{0}^{\infty} \tau_\text{m} \,J \,a_\mu\, k_e(t) \diff t 
         = \int_{0}^{\infty} \frac{\tau_\text{m} }{C_\text{m}} \,w\, k_e(t)\diff t  \,,
@@ -834,13 +825,11 @@ which yields
     J = \frac{w \, \tau_\text{s}}{C_\text{m}} \,.
     \label{eq:J_eff}
 \end{equation}
-This is the synapse weight factor applied in the model.
-For the variance ${\sigma_a}^2$, the effect of the synapse model is not captured by $J^2$. 
-Hence, the effective factor ${J_\text{eff}}^2$ is introduced and obtained by an analogue procedure.
-In this case, the square of the kernel $k_e(t)$ is normalized:%
-\marginpar{
-I'm not sure how well defined taking the integral of $\delta^2$ actually is...
-}
+The effective factor ${J_\text{eff}}^2 $ for the variance ${\sigma_a}^2$ is different 
+from $J^2$ and can be 
+obtained by an analogue procedure. Here, the square of the kernel $k_e(t)$ is normalized:%
+\footnote{
+\emph{I'm not sure how well defined taking the integral of $\delta^2$ actually is...}}
 \begin{equation}
     \begin{split}
         1   &= {a_\sigma}^2 \int_{0}^{\infty}(k_e(t))^2\diff t  \\
@@ -856,7 +845,7 @@ Inserting as before but squaring both sides under the integral yields
         = \int_{0}^{\infty} \left(\frac{\tau_\text{m} }{C_\text{m}} \,w\, k_e(t)\right)^2\diff t \,,
     \label{eq:match_syns}
 \end{equation}
-which results in 
+which by pulling out the constants results in 
 \begin{equation}
     {J_\text{eff}}^2 =  \frac{w^2}{{C_\text{m}}^2} \,\frac{\tau_\text{s} }{2}  \, .
     \label{eq:J_eff}
@@ -873,7 +862,7 @@ Note that this is in agreement with the units chosen: We have
     \label{eq:units}
 \end{align}
 using the relationship between voltage, current and capacitance, $[V] = [R\cdot I] = [t / C]\cdot[I]$.
-This finally agrees with $[\mu^2] = [\sigma^2 \cdot t\,]$ (cf.~\autoref{eq:input_random}) since
+This finally agrees with $[\mu] = [\sigma \cdot \sqrt{t}\,]$ (cf.~equation~\eqref{eq:input_random}) since
 \begin{align}   
     [\mu] &= [\tau_\text{m} J \nu] = [V] \\
     \text{and}\quad 
@@ -895,8 +884,8 @@ can be conveniently written introducing the quantities
     (S_\text{ext})_{a} 
         &:= \tau_\text{m} \,(1 + {\Delta_J}^2) \,(C_\text{ext})_a \,{J_\text{eff}}^2 
 \end{align}
-for local and external input. $({J_\text{eff}}^2)_{ab}$ is obtained by inserting 
-the mean weights for populations $a$ and $b$ in \autoref{eq:J_eff}. 
+for local and external input, where $({J_\text{eff}}^2)_{ab}$ is obtained by inserting 
+the mean weights for populations $a$ and $b$ in equation \eqref{eq:J_eff}. 
 The extended equations \eqref{eq:mu_a} and \eqref{eq:sigma_a} then read
 \begin{align}
     \label{eq:mu_a_plus}
@@ -913,7 +902,7 @@ The extended equations \eqref{eq:mu_a} and \eqref{eq:sigma_a} then read
 
 
 With these parameters, one can now turn back to the self-consistency condition 
-of \autoref{eq:self_consistency}. Extending the model yields eight equations for the 
+of equation~\eqref{eq:self_consistency}. Extending the model yields eight equations for the 
 firing rate $\nu_a$ of neurons in population~$a$, 
 \begin{equation}
     \frac{1}{\nu_{a}} = \tau_{rp} 
@@ -924,9 +913,9 @@ firing rate $\nu_a$ of neurons in population~$a$,
 \end{equation}
 These equations are coupled by the boundaries of the integrals. Note that the index $0$ 
 is omitted to facilitate readability, as the results are only concerned with stationary
-solutions. After the rates $\nu_a$ are found, these values can be 
+solutions. After the rates $\nu_a$ are found, theses values can be 
 plugged into an equation for the distribution of membrane potentials. Extending the 
-corresponding expression, \autoref{eq:P_V_0} to more populations and again dropping the 
+corresponding expression \eqref{eq:P_V_0} to more populations and again dropping the 
 index $0$ yields
 \begin{equation}
     P_a(V) = 2 \frac{\nu_a \tau_\text{m}}{\sigma_a} 
@@ -935,8 +924,7 @@ index $0$ yields
             \Theta \left(u - \frac{V_\text{r} - \mu_a}{\sigma_a} \right) e^{u^2} \diff u  \,.
     \label{eq:P_V_a}
 \end{equation}
-In a reasonable regime, this function can be approximated by a Gaussian curve and an 
-additional discontinuity in the first 
+In a reasonable regime, this function can be approximated by a gaussian curve with discontinuity in the first 
 derivative at $V_\text{r}$ (a visible "kink" or "step").
 Ultimately, the model also makes a prediction about the regularity of single spike 
 trains. For neurons firing irregularly, the interspike intervals
@@ -950,8 +938,8 @@ of variation (CV) of ISI, defined as
 where $\sigma_\text{ISI}$ and $\mu_\text{ISI}$ are the standard deviation and mean of 
 the ISI. For the mean field theory introduced above, this quantity can be calculated
 independently for each population. For the given parameters $\nu_a$, $\mu_a$ and 
-$\sigma_a$ as in \autoref{eq:self_consistency_a}, the corresponding 
-result of \citeb{brunel2000} is
+$\sigma_a$ as in equation \eqref{eq:self_consistency_a}, the corresponding 
+result~\cite{brunel2000} is
 \begin{equation}
     \text{CV}_\text{ISI}^2 
         = 2 \pi \left(\frac{\nu_a}{\tau_\text{m}}\right)^2
@@ -962,22 +950,22 @@ result of \citeb{brunel2000} is
     \label{eq:CV_ISI_mf}
 \end{equation}
 The CV of ISI is also an experimentally accessable quantity. An example for observed 
-values in neocortical neurons is given by \citeb{nawrot2008measurement}, who report values
-of $CV_{ISI} \sim 0.4 - 0.6$ in a task-related monkey experiment recording from 
+values in neocortical neurons is given by \citeb{nawrot2010measurement}, who report values
+of $CV_{ISI} \sim 0.4 -- 0.6$ in an task-related monkey experiment recording from 
 single neurons of the primary visual cortex.
 
 \FloatBarrier
-\section{Implementation and analysis}
+\section{Implementation, numerics and analysis}
 \label{subsec:analysis}
-The simulations are implemented with the NEST simulation tool using its Python interface
+The simulations are implemented with the NEST simulation tool using its python interface
 PyNEST~\cite{NEST}. The differential equations of the network are solved with a computational 
 step size of $h=0.1$, applying a numerical method known as "exact integration"~\cite{rotter1999exact}.
 Numerical solution as well as the analysis of the data is done in using 
-python~\cite{python} and heavily relies upon the NumPy--SciPy framework~\cite{scipy}. 
-Plots are created using Matplotlib~\cite{matplotlib}.
+python~\cite{python} and heavily relies upon the numpy-scipy framework~\cite{scipy}. 
+Plots are created using matplotlib~\cite{matplotlib}.
 The source code both for simulation and analysis can be reviewed at my
 GitHub server~\cite{ba_github} or more conveniently with the 
-IPython Notebook Viewer~\cite{notebook_viewer}.
+\textit{ipython notebook viewer}~\cite{notebook_viewer}.
 
 The analysis of the data obtained from simulations contains a number of 
 statistical measures. The data is taken from randomly chosen subsets of each population, 
@@ -987,13 +975,13 @@ obtained dividing the number of spikes by the time simulated.
 For a measure of irregularity of spike trains, the times difference
 between two successive spikes (the ISI) for all neurons that fired more than two times 
 are taken. Diving the standard deviation of ISI by its mean
-yields the corresponding quantity, the empiric CV of ISI. Both firing rate and CV of ISI 
+yields the corresponding quantity, the CV of ISI. Both firing rate and CV of ISI 
 are then averaged over the recorded subpopulation. 
 Measuring the synchrony of neurons within a population is achieved by 
 calculating a histogram of the spike times of the entire subpopulation
 with fixed bin width of $3$ ms (referred to as peristimulus time histogram, PSTH).
-The synchrony is then defined by calculating the Fano factor
-(\autoref{eq:Fano}) of the PSTH.
+The synchrony is then defined by calculating the Fano factor (equation
+\eqref{eq:Fano}) of the PSTH.
 A theoretical prediction in the framework of the mean field theory is not calculated. 
 However, to get a reference point, one can calculated the synchrony of an ensemble 
 of uncorrelated Poisson processes, corresponding to the case of asynchrony. 
@@ -1013,9 +1001,6 @@ that of the mean field model (bin width of 3 ms and inverse of rate $\sim 5$ Hz)
 
 The evaluation of membrane potentials of simulated neurons requires a specific treatment 
 for neurons residing in refractory period at the $V_\text{r} = -65$ mV. 
-Since the membrane potential predicted by the mean field theory does not 
-include those neurons, the respective fraction for the measured ones 
-has to be taken out. This is done as follows:
 Each neuron $i$ of population $a$ with firing rate $\nu_{a, i}$ measured over 
 a recording time $T$ spends a time of \:$T \tau_\text{rp} \,\nu_{a, i}$\: in refractory 
 period. If $T$ is divided into $n_T$ time bins, this corresponds to 
@@ -1039,20 +1024,17 @@ be taken in the case of the error function $\text{erf}(u)$:
 While for the analytical 
 function $|\text{erf}(u)| < 1$ on the entire domain $u \in \mathbb{R}$, 
 the numerical evaluation of 
-$\text{erf}(\pm u)$ yields exactly $\pm 1.0$ for large values $u > 0$.%
-\footnote{
-    For the used numerical implementation, this is the case for $u > 6.0$.
-}
+$\text{erf}(\pm u)$ yields exactly $\pm 1.0$ for large values $u > 0$. 
 For negative values of $u$, the factor 
 $(1 + \text{erf}(u))$ thus becomes zero.
 In order to avoid this numerical error, the series expansion of
-the respective integrand at $u = -\infty$ is applied whenever $u < -4$.
+the respective integrand at $u = -\infty$ is applied whenever $u < -4$. 
 For the integrand 
 \begin{equation}
     f(u) = e^{u^2}\left(1 + \text{erf}(u)\right)
     \label{eq:integrand_1}
 \end{equation}
-of the self consistency \autoref{eq:self_consistency_a}, 
+of the self consistency equation \eqref{eq:self_consistency_a}, 
 the corresponding Laurent series is given by
 \begin{equation}
     f_\text{Laurent}(u) = 
@@ -1061,7 +1043,7 @@ the corresponding Laurent series is given by
         \mathcal{O}\left( \frac{1}{u^9} \right) \,.
     \label{eq:expand_integrand_1}
 \end{equation}
-Similarly, for the CV of ISI, \autoref{eq:CV_ISI_mf}, the integrand 
+Similarly, for the CV of ISI, \eqref{eq:CV_ISI_mf}, the integrand 
 \begin{equation}
     g(u) = e^{u^2}\left(1 + \text{erf}(u)\right)^2
     \label{eq:integrand_2}
@@ -1076,20 +1058,18 @@ is approximated by
 \end{equation}
 In both cases, contributions of order $u^{-9}$ and higher are dropped. 
 
-A solution to \autoref{eq:self_consistency_a} is not necessarily found for any initial guess. 
+A solution to \eqref{eq:self_consistency_a} is not necessarily found for any initial guess. 
 In order to achieve convergence, two possibilities 
 can be applied: In the case of rates known from simulation, these serve as an initial guess. 
 A test with simulated rates from 20 independent simulations for 20 seconds each lead to convergence%
-\footnote{
-    Convergence is here defined by a maximum relative distance 
+\footnote{convergence is here defined by a maximum relative distance 
     $\|\boldsymbol\nu_{i + 1} - \boldsymbol\nu_i\| / \|\boldsymbol\nu_i\| \le 10^{-13}$ between two 
-    successively computed vectors $\boldsymbol\nu_i$ with entries $\nu_{i, a}$~\cite{scipy}
-}  
-most after a number of $42 \pm 12$ steps (mean and standard deviation). 
-The second solution entirely independent of simulation data is solving the simpler model 
-with only two populations corresponding to \autoref{eq:self_consistency} first.
+    successively computed vectors $\boldsymbol\nu_i$ with entries $\nu_{i, a}$~\cite{scipy}} % 
+after a number of $42 \pm 12$ steps (mean and standard deviation). 
+The second solution entirely independent of simulation data is solving the simplified model 
+with only two populations corresponding to equation \eqref{eq:self_consistency} first.
 %Testing showed that convergence is found for 
-%\marginpar{a much broader range} 
+%\emph{a much broader range} 
 %of initial guesses (data not shown).
 The model can then be split 
 into eight populations and all parameters can be iteratively transformed to the ones of the 
