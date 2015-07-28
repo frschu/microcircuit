@@ -289,14 +289,14 @@ class model:
         """Fluctuation of input in Brunel's model"""
         return np.sqrt(np.dot(self.mat_var, v) + self.var_ext)
 
-    def integrand(u):
-        """Integrand of self-consistency equation"""
-        if u < -4.0:
-            return -1. / np.sqrt(np.pi) * (1.0 / u - 1.0 / (2.0 * u**3) + 
-                                        3.0 / (4.0 * u**5) - 
-                                        15.0 / (8.0 * u**7))
-        else:
-            return np.exp(u**2) * (1. + erf(u))
+    #def integrand(u):
+        #"""Integrand of self-consistency equation"""
+        #if u < -4.0:
+            #return -1. / np.sqrt(np.pi) * (1.0 / u - 1.0 / (2.0 * u**3) + 
+                                        #3.0 / (4.0 * u**5) - 
+                                        #15.0 / (8.0 * u**7))
+        #else:
+            #return np.exp(u**2) * (1. + erf(u))
 
 
     def root_v0(self, v):
@@ -305,15 +305,16 @@ class model:
         Solve for root == 0.
         """
         from scipy.integrate import quad
-        from scipy.special import erf
+        from scipy.special import erfc, erfcx
         def integrand(u):
             """Integrand of self-consistency equation"""
-            if u < -4.0:
-                return -1. / np.sqrt(np.pi) * (1.0 / u - 1.0 / (2.0 * u**3) + 
-                                            3.0 / (4.0 * u**5) - 
-                                            15.0 / (8.0 * u**7))
-            else:
-                return np.exp(u**2) * (1. + erf(u))
+            return erfcx(-u)
+            #if u < -4.0:
+                #return -1. / np.sqrt(np.pi) * (1.0 / u - 1.0 / (2.0 * u**3) + 
+                                            ##3.0 / (4.0 * u**5) - 
+                                            ##15.0 / (8.0 * u**7))
+            #else:
+                #return np.exp(u**2) * (1. + erf(u))
 
 
         mu_v  = self.mu(v)
@@ -333,16 +334,17 @@ class model:
         Used to ease the process of solving.
         The calculations are done transposed to avoid unnecessary transposes (adding axes to mu and sd)
         """
-        from scipy.special import erf
+        from scipy.special import erf, erfcx
         def integrand(u_arr):
             """Integrand of self-consistency equation"""
-            integrand_all = np.zeros(u_arr.shape)
-            u_mask = u_arr < -4.0
-            u = u_arr[u_mask]
-            integrand_all[u_mask] = -1. / np.sqrt(np.pi) * (1.0 / u - 1.0 / (2.0 * u**3) + 
-                                            3.0 / (4.0 * u**5) - 
-                                            15.0 / (8.0 * u**7))
-            integrand_all[~u_mask] = np.exp(u_arr[~u_mask]**2) * (1. + erf(u_arr[~u_mask]))
+            integrand_all = erfcx(-u_arr)
+            #integrand_all = np.zeros(u_arr.shape)
+            #u_mask = u_arr < -4.0
+            #u = u_arr[u_mask]
+            #integrand_all[u_mask] = -1. / np.sqrt(np.pi) * (1.0 / u - 1.0 / (2.0 * u**3) + 
+                                            #3.0 / (4.0 * u**5) - 
+                                            #15.0 / (8.0 * u**7))
+            #integrand_all[~u_mask] = np.exp(u_arr[~u_mask]**2) * (1. + erf(u_arr[~u_mask]))
             return integrand_all
 
 

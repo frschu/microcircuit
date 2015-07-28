@@ -22,7 +22,7 @@ whereas specific numerical values of the parameters are shown in
         }
     \label{tab:model_description}
     \small
-    \begin{tabular}{b{3.1cm} p{8.5cm}} \toprule
+    \begin{tabular}{>{\raggedright\arraybackslash}b{3.1cm} p{8.5cm}<{}} \toprule
         \modelheadline{Model summary} \\
         Populations     &   8 cortical populations\\
         Topology        &   --\\
@@ -50,14 +50,14 @@ whereas specific numerical values of the parameters are shown in
 
         \modelheadline{Neurons and synapse model} \\
         Name            &   iaf neuron\\
-        Type            &   Leaky integrate-and-fire, exponential-shaped current inputs\\
+        Type            &   Leaky integrate-and-fire, exponential-shaped current inputs\\[0.2cm]
         Subthreshold dynamics of neuron~$i$
                         &   {$\!\begin{aligned} 
                                 \tau_\text{m} \,\dot{V_i}(t) 
                                     &= -(V_i(t) - E_\text{L}) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t)
                                         &\text{if}\quad& t > t^* + \tau_\text{rp} \\ 
                                 V_i(t)        
-                                    &= V_\text{r}  &\text{else}& \\[0.2cm]
+                                    &= V_\text{r}  &\text{else}& \\
                                 I_{\text{syn}, ij}(t) 
                                     &= w_{ij} \exp{\left(\frac{-t}{\tau_\text{syn}}\right)} \\[0.2cm]
                             \end{aligned}$}  \\
@@ -405,8 +405,8 @@ The large number of free parameters of the model and their chosen values are sum
     }
     \label{fig:syn_numbers}
 \end{figure}
-In order to verify that the model behaves reasonably, a number of basic parameters 
-is examined before stating more central results. As the implementation of the neuron model
+\paragraph{In order to verify} that the model behaves reasonably, we examine a number of basic parameters 
+before stating more central results. As the implementation of the neuron model
 is part of the NEST software and thus well established, the validation starts at the level 
 of connections. \autoref{fig:syn_numbers} shows the number of synapses for each pair 
 of pre- and postsynaptic population and 
@@ -454,8 +454,8 @@ in full agreement.
     \label{fig:syn_numbers_distribution}
 \end{figure}
 
-To further validate the model on a basic level, a look at a single neurons' membrane potentials 
-is taken. \autoref{fig:single_membrane_potential} shows the membrane 
+To further validate the model on a basic level, we take a look at a single neurons' membrane potentials 
+\autoref{fig:single_membrane_potential} shows the membrane 
 potentials of two neurons over the first 1.2 s of simulation together with a comparison of
 the normalized histograms of a larger subset of the 
 respective population. The neuron of the upper plots appertains to the population
@@ -466,7 +466,7 @@ sample neurons. Thus, for the further analysis, a transient period of 0.2 second
 data before further analysis. For the remaining time, the membrane potentials fluctuate 
 in a reasonable range with mean between resting potential $E_L = -65$ mV and threshold $\theta = -50$ mV, 
 hitting the threshold as small number of times. 
-Potjans and Diesmann state that
+\citeb{potjans2014} state that
 these two populations have comparably low / high rates, the excitatory one firing at 
 $\sim 1$ Hz, the inhibitory one at $\sim 7$ Hz~\cite{potjans2014}, 
 but linking this to the membrane potential distribution can be very misleading:
@@ -744,16 +744,13 @@ then leads to an expression for $\nu_0$:
     \end{split}
 \end{equation}
 where $\text{erf}$ is the error function. 
-This equation can be solved numerically for varying parameters as done by Brunel in order to 
-characterize the different states the system can be found in. 
+As done by \citeb{brunel2000}, this equation can be solved numerically for varying parameters to 
+characterize the different states the system can be found in.
 
-\marginpar{
-    This is where my own work starts. 
-    Should I use "I"? 
-    And/or should I make this clearer by using another subsection?
-}
-In order to transfer these results to the model of the neocortical microcircuit, 
-I adapt the contributions to the input have to be adapted for each population. Instead of 
+\paragraph{What has been introduced}so far serves as a basis for the theory newly derived for this
+thesis. In order to transfer results to the model of the neocortical microcircuit, 
+the contributions to the input have to be adapted for each population. 
+Instead of 
 parametrized $\mu_0$ and $\sigma_0$ in terms of the variables $C_E$, $J$, $g$ and $\gamma$, 
 a matrix notation as in \autoref{eq:synapse_numbers} is utilized: 
 Synapse numbers and weights are defined as $C_{ab}$ and $J_{ab}$, respectively, 
@@ -763,8 +760,8 @@ An external excitatory population with single neuron firing rate $\nu_\text{ext}
 is connected to a neuron in population $a$ by 
 $(C_\text{ext})_a$ synapses. Since all external populations in this study are 
 excitatory, the corresponding weight is simply $J$.
-Including these definitions, the mean input and fluctuation amplitude can 
-be written as 
+Including these definitions, we can write the mean input and fluctuation amplitude
+as
 \begin{align}
     \label{eq:mu_a}
     \mu_a        &= 
@@ -783,7 +780,7 @@ If the synaptic weights between pre- and postsynaptic population $a$ and $b$ are
 from a normal distribution with mean $J_{ab}$ and relative standard deviation $\Delta_{J, ab}$, 
 then the additional variance of the input is independent of the structural and temporal one
 of \autoref{eq:sigma_a} and can simply be added. Using the same relative standard deviation 
-$\Delta_J$ for all recurrent and external synapses, this amounts to multiplying the right 
+$\Delta_J$ for all recurrent and external synapses, we multiply the right 
 hand side of \autoref{eq:sigma_a} by the factor $(1 + {\Delta_J}^2)$.
 
 A further adjustment takes into account that the synapse type used in simulation does not
@@ -821,8 +818,8 @@ integral to the one of the $\delta$-kernel:
     \label{eq:match_k_e}
 \end{equation}
 introducing the normalization factor $a_\mu = 1 / \tau_\text{s} $. 
-In a second step, the normalized kernel is inserted
-in place of the $\delta$-kernel and this combination matched with the actual 
+In a second step, we insert the normalized kernel
+in place of the $\delta$-kernel and match this combination with the actual 
 exponential syn\-apse, integrating over the entire domain:
 \begin{equation}
     \int_{0}^{\infty} \tau_\text{m} \,J \,a_\mu\, k_e(t) \diff t 
@@ -836,7 +833,8 @@ which yields
 \end{equation}
 This is the synapse weight factor applied in the model.
 For the variance ${\sigma_a}^2$, the effect of the synapse model is not captured by $J^2$. 
-Hence, the effective factor ${J_\text{eff}}^2$ is introduced and obtained by an analogue procedure.
+Hence, we introduce the effective factor ${J_\text{eff}}^2$ and obtain it by an 
+analogue procedure.
 In this case, the square of the kernel $k_e(t)$ is normalized:%
 \marginpar{
 I'm not sure how well defined taking the integral of $\delta^2$ actually is...
@@ -878,12 +876,14 @@ This finally agrees with $[\mu^2] = [\sigma^2 \cdot t\,]$ (cf.~\autoref{eq:input
     [\mu] &= [\tau_\text{m} J \nu] = [V] \\
     \text{and}\quad 
     [\sigma^2] &= [\tau_\text{m} {J_\text{eff}}^2  \nu] = [V^2 / t]  \,.
-    \label{eq:units}
+    \label{eq:units_res}
 \end{align}
 
-Including both the variance of the synaptic weights as well as the calculated adaption 
-for the synapse type into the average input $\mu_a$ and variance ${\sigma_a}^2$ 
-can be conveniently written introducing the quantities
+Including both the variance of the synaptic weights as well as the adaption 
+for the synapse type,
+we can conveniently write
+the average input $\mu_a$ and variance ${\sigma_a}^2$ 
+introducing the quantities
 \begin{align}
     \label{eq:S_l}
     (M_\text{local})_{ab} 
@@ -910,9 +910,7 @@ The extended equations \eqref{eq:mu_a} and \eqref{eq:sigma_a} then read
 \end{align}
 
 
-
-
-With these parameters, one can now turn back to the self-consistency condition 
+With these parameters, we turn back to the self-consistency condition 
 of \autoref{eq:self_consistency}. Extending the model yields eight equations for the 
 firing rate $\nu_a$ of neurons in population~$a$, 
 \begin{equation}
@@ -944,11 +942,11 @@ trains. For neurons firing irregularly, the interspike intervals
 are distributed broadly. Hence, one parameter to measure irregularity is the coefficient 
 of variation (CV) of ISI, defined as
 \begin{equation}
-    \text{CV}_\text{ISI} = \frac{\sigma_\text{ISI}}{\mu_\text{ISI}} \,,
+    \text{CV}_\text{ISI} = \frac{\sigma_\text{ISI}}{\mu_\text{ISI}} \,.
     \label{eq:cv_isi}
 \end{equation}
-where $\sigma_\text{ISI}$ and $\mu_\text{ISI}$ are the standard deviation and mean of 
-the ISI. For the mean field theory introduced above, this quantity can be calculated
+Here, $\sigma_\text{ISI}$ and $\mu_\text{ISI}$ are the standard deviation and mean of 
+the ISI. This quantity can be calculated
 independently for each population. For the given parameters $\nu_a$, $\mu_a$ and 
 $\sigma_a$ as in \autoref{eq:self_consistency_a}, the corresponding 
 result of \citeb{brunel2000} is
@@ -961,7 +959,7 @@ result of \citeb{brunel2000} is
             e^{u^2} \left(1 + \text{erf}(u)\right)^2 \diff u  \,.
     \label{eq:CV_ISI_mf}
 \end{equation}
-The CV of ISI is also an experimentally accessable quantity. An example for observed 
+The CV of ISI is also an experimentally accessible quantity. An example for observed 
 values in neocortical neurons is given by \citeb{nawrot2008measurement}, who report values
 of $CV_{ISI} \sim 0.4 - 0.6$ in a task-related monkey experiment recording from 
 single neurons of the primary visual cortex.
@@ -986,7 +984,7 @@ The single neuron firing rate $\nu_\text{sim}$ is
 obtained dividing the number of spikes by the time simulated. 
 For a measure of irregularity of spike trains, the times difference
 between two successive spikes (the ISI) for all neurons that fired more than two times 
-are taken. Diving the standard deviation of ISI by its mean
+are taken. Dividing the standard deviation of ISI by its mean
 yields the corresponding quantity, the empiric CV of ISI. Both firing rate and CV of ISI 
 are then averaged over the recorded subpopulation. 
 Measuring the synchrony of neurons within a population is achieved by 
@@ -1039,45 +1037,33 @@ be taken in the case of the error function $\text{erf}(u)$:
 While for the analytical 
 function $|\text{erf}(u)| < 1$ on the entire domain $u \in \mathbb{R}$, 
 the numerical evaluation of 
-$\text{erf}(\pm u)$ yields exactly $\pm 1.0$ for large values $u > 0$.%
-\footnote{
-    For the used numerical implementation, this is the case for $u > 6.0$.
-}
+$\text{erf}(\pm u)$ yields exactly $\pm 1.0$ for large values $u > 0$.
 For negative values of $u$, the factor 
 $(1 + \text{erf}(u))$ thus becomes zero.
-In order to avoid this numerical error, the series expansion of
-the respective integrand at $u = -\infty$ is applied whenever $u < -4$.
-For the integrand 
+In order to avoid this arithmetic underflow, the scaled complementary error function 
 \begin{equation}
-    f(u) = e^{u^2}\left(1 + \text{erf}(u)\right)
-    \label{eq:integrand_1}
+    \text{erfcx}(u) := e^{u^2} (1 - \text{erf}(u)) 
+    \label{eq:erfcx}
 \end{equation}
-of the self consistency \autoref{eq:self_consistency_a}, 
-the corresponding Laurent series is given by
-\begin{equation}
-    f_\text{Laurent}(u) = 
-        \frac{1}{\sqrt{\pi}} 
-        \left( \frac{1}{u} - \frac{1}{2u^3} + \frac{3}{4u^5} - \frac{15}{8u^7} \right) +  
-        \mathcal{O}\left( \frac{1}{u^9} \right) \,.
-    \label{eq:expand_integrand_1}
-\end{equation}
-Similarly, for the CV of ISI, \autoref{eq:CV_ISI_mf}, the integrand 
-\begin{equation}
-    g(u) = e^{u^2}\left(1 + \text{erf}(u)\right)^2
-    \label{eq:integrand_2}
-\end{equation}
-is approximated by
-\begin{equation}
-    g_\text{Laurent}(u) = 
-    \frac{e^{-u^2}}{\sqrt{\pi}} 
-        \left( \frac{1}{u^2} - \frac{1}{u^4} + \frac{7}{4u^6} - \frac{9}{2u^7} \right) +  
-        \mathcal{O}\left( \frac{1}{u^9} \right) \,.
-    \label{eq:expand_integrand_2}
-\end{equation}
-In both cases, contributions of order $u^{-9}$ and higher are dropped. 
+is applied. That is,
+\begin{align}
+    \begin{split}
+        f(u) &= e^{u^2}\left(1 + \text{erf}(u)\right) \\
+             &= \text{erfcx}(-u)  
+        \label{eq:integrand_1}
+    \end{split}
+    \intertext{and}
+    \begin{split}
+        g(u) &= e^{u^2}\left(1 + \text{erf}(u)\right)^2 \\
+             &= e^{-u^2} {\text{erfcx}(-u)}^2
+        \label{eq:integrand_2}
+    \end{split}
+\end{align}
+for the integrands of the self-consistency equation \eqref{eq:self_consistency_a}
+and the CV of ISI, \autoref{eq:CV_ISI_mf}, respectively. 
 
 A solution to \autoref{eq:self_consistency_a} is not necessarily found for any initial guess. 
-In order to achieve convergence, two possibilities 
+To achieve convergence, two possibilities 
 can be applied: In the case of rates known from simulation, these serve as an initial guess. 
 A test with simulated rates from 20 independent simulations for 20 seconds each lead to convergence%
 \footnote{

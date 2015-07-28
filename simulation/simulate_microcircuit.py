@@ -32,7 +32,7 @@ import model_class; reload(model_class)
 verbose     = False                     # whether to print every connection made
 
 # ONLY PUT THIS IF YOU DONT WANT TO HAVE A FILE NAME AUTOMATICALLY ASSIGNED
-name    = "simulation_at_mf"
+name    = "simulate_ergocity"
 # whether to append the selected data_file (if it existist, otherwise might cause error!)
 append_data = False 
 
@@ -41,8 +41,8 @@ append_data = False
 #######################################################
 T0 = time.time()
 # Unchanged parameters
-neuron_model    = "iaf_psc_delta"  # "iaf_psc_delta" or "iaf_psc_exp"
-connection_rule = "fixed_indegree" # "fixed_total_number" or "fixed_indegree"
+neuron_model    = "iaf_psc_exp"  # "iaf_psc_delta" or "iaf_psc_exp"
+connection_rule = "fixed_total_number" # "fixed_total_number" or "fixed_indegree"
 model           = model_class.model(neuron_model=neuron_model,
                                     connection_rule=connection_rule)
 

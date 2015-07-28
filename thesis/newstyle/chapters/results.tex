@@ -101,13 +101,18 @@ Discussion, \autoref{sec:discussion}.
 \end{figure}
 
 \section{Mean field theory}
-In the following section, the results of the mean field theory are presented 
+In the following section, the results of the mean field theory are presented.
 by showing the predicted firing rates and utilizing these rates 
 to predict the previously introduced measure of irregularity
 as well as the distribution of membrane potentials. 
 These results are directly compared to 
 the corresponding quantities recorded from the spiking network 
 model simulation and analyzed in the previous section. 
+The average input $\mu$ to each neuron is examined by separating 
+the recurrent an external contribution. Finally, the possibility of  
+applying the mean field model as a predictive tool is illustrated 
+by calculating firing rates for varying relative inhibitory synapse 
+strength $g$ and external frequency $\nu_\text{ext}$. 
 
 The firing rates obtained by solving 
 \autoref{eq:self_consistency_a} are displayed in a bar plot in 
@@ -151,22 +156,32 @@ a Poisson process.
         firing rates and CV of ISI; absolute and relative to simulated quantities.}
     \label{tab:diff_fixed_total_number}
     \small
-    \begin{tabular}{p{2.4cm}| *{8}{x{0.87cm}}} \toprule
+    \begin{tabular}{p{2.4cm} *{8}{x{0.87cm}}} \toprule
     \rowcolor{TableColor}
     \spacedlowsmallcaps{Population}
         & \mc2c{L2/3} & \mc2c{L4} & \mc2c{L5} & \mc2c{L6}  \tn
         \rowcolor{TableColor}
-        & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} \tn \hline
+        & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} & \mc1c{e} & \mc1c{i} \tn %\hline
         %Population $a$       
         %& L2/3e & L2/3i & L4e & L4i & L5e & L5i & L6e & L6i  \tn[0.2cm]
+        \rule{0.0cm}{3ex} 
+        $ \nu_{\text{mf}, a}$ / Hz
+            &   0.82 &   3.02 &   4.64 &   6.12 &   7.14 &   8.92 &   1.04 &   8.09 \tn[0.2cm]
+        $ \nu_{\text{sim}, a}$ / Hz
+            &   0.92 &   3.00 &   4.40 &   5.84 &   7.70 &   8.65 &   1.10 &   7.84 \tn[0.2cm]
         $\Delta \nu_a$ / Hz
             &  -0.10 &   0.01 &   0.24 &   0.28 &  -0.56 &   0.27 &  -0.06 &   0.24 \tn[0.2cm]
         $\Delta \nu_a / \nu_{\text{sim}, a}$
-            &  -0.11 & 4e-3&   0.05 &   0.05 &  -0.07 &   0.03 &  -0.05 &   0.03 \tn[0.2cm]
+            &  -0.11 & 4e-3&   0.05 &   0.05 &  -0.07 &   0.03 &  -0.05 &   0.03 \tn[0.4cm]
+        $ \text{CV}_{\text{mf}, a}$
+            &   0.99 &   0.94 &   0.92 &   0.91 &   0.89 &   0.84 &   0.99 &   0.85 \tn[0.2cm]
+        $ \text{CV}_{\text{sim}, a}$
+            &   0.92 &   0.92 &   0.89 &   0.88 &   0.84 &   0.81 &   0.91 &   0.81 \tn[0.2cm]
         $\Delta \text{CV}_a$
             &   0.07 &   0.03 &   0.03 &   0.03 &   0.05 &   0.04 &   0.08 &   0.04 \tn[0.2cm]
         $\Delta \text{CV}_a / \text{CV}_{\text{sim}, a}$
             &   0.07 &   0.03 &   0.03 &   0.04 &   0.06 &   0.05 &   0.08 &   0.05 \tn[0.2cm]
+
         \bottomrule
     \end{tabular}
 \end{table}
@@ -200,9 +215,6 @@ of neurons coming out of refractory period is underestimated in some cases,
 visible for example in populations L2/3i and L4i where the mean distributions 
 show a step while the kink in the theoretical curves is hardly detectable. 
 
-%Furthermore, the predicted maximum is shifted towards the threshold (but note that
-%this does not imply higher firing rates -- in fact, the predicted rates are lower). 
-
 % Membrane potentials
 \begin{figure}[tb]
     \centering
@@ -223,6 +235,8 @@ show a step while the kink in the theoretical curves is hardly detectable.
     }
     \label{fig:membrane_potential}
 \end{figure}
+
+To illustrate the average input $\mu$ to a neuron, the values of the matrix $$ 
 
 %\section{Simulation closer to mean field theory }
 %In order to assess some of the discrepancies between the predictions of the mean field 

@@ -34,11 +34,18 @@ def basic_data(path_res_file):
             populations, layers, types, 
             n_populations, n_layers, n_types)
 
-def add_subplot(fig, n_rows_cols=(1, 1), index_row_col=(0, 0), rowspan=1, colspan=1):
+def add_subplot(fig, 
+        n_rows_cols=(1, 1), index_row_col=(0, 0), 
+        rowspan=1, colspan=1, 
+        width_ratios=None, 
+        axisbg=None):
     """Add subplot specific to figure."""
-    gridspec=plt.GridSpec(*n_rows_cols)
+    gridspec=plt.GridSpec(n_rows_cols[0], n_rows_cols[1], width_ratios=width_ratios)
     subplotspec=gridspec.new_subplotspec(index_row_col, rowspan=rowspan, colspan=colspan)
-    ax = fig.add_subplot(subplotspec)
+    if axisbg==None:
+        ax = fig.add_subplot(subplotspec)
+    else:
+        ax = fig.add_subplot(subplotspec, axisbg=axisbg)
     return ax
 
 def saving_fig(fig, figure_path, fig_name, verbose=True):

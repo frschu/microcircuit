@@ -1,6 +1,7 @@
 """style.py
 Contains standard style for figures.
 """
+import os
 from matplotlib.colors import colorConverter
 from matplotlib import rcParams
 try:
@@ -10,21 +11,11 @@ try:
 except:
     print('seaborn not installed')
 
-# Colors are layered: two types a four layers
-# Source: http://colorbrewer2.org/
-colors =   [
-            "#08519c",
-            "#9ecae1",
-            "#a63603",
-            "#fdae6b",
-            "#54278f",
-            "#bcbddc",
-            "#006d2c",
-            "#a1d99b"
-            ]
+save_fig    = True
+figure_path = os.path.join(".", "figures")
+plot_style  = ["pdf", "print"][1]
 
 # Choose parameters for pdf or print
-plot_style = ["pdf", "print"][1]
 if plot_style == "pdf":
     axes_color = "#bdbdbd" 
     text_color = "#636363"
@@ -39,17 +30,25 @@ elif plot_style == "print":
     latex_preamble      = [r'\usepackage[T1,small,euler-digits]{eulervm}']
     font_family         = 'serif'
 
+if save_fig:
+    x_factor = 3.4
+    linewidth  = 1.0
+    cross_size = 9 # pt, size of cross markers
+else:
+    x_factor = 8.
+    linewidth  = 2.0
+    cross_size = 12 # pt, size of cross markers
+
 # Figure size
 from  scipy.constants import golden_ratio as gr
-x_factor = 3.4
 figsize  = (gr * x_factor, 1. * x_factor)
 
 fontsize_labels         = 11    # pt, size used in latex document
 fontsize_labels_axes    = fontsize_labels
 fontsize_labels_title   = fontsize_labels
 fontsize_plotlabel      = fontsize_labels       # for labeling plots with 'A', 'B', etc.
-cross_size = 9 # pt, size of cross markers
 legend_ms  = 4  # scale of markers in legend
+
 
 # Adapt the matplotlib.rc
 rcParams['figure.figsize']      = figsize
@@ -72,9 +71,7 @@ rcParams['ytick.color']         = text_color
 rcParams['axes.labelcolor']     = text_color
 rcParams['axes.edgecolor']      = axes_color
 rcParams['axes.grid']           = False
-
-
-
+rcParams['lines.linewidth']     = linewidth
 
 tick_params = {
                 ## TICKS
@@ -109,3 +106,32 @@ def fixticks(ax):
     ax.spines['top'].set_visible(False)
     ax.yaxis.set_ticks_position('left')
     ax.xaxis.set_ticks_position('bottom')
+
+
+
+# Colors are layered: two types a four layers
+# Source: http://colorbrewer2.org/
+colors =   [
+            "#08519c",
+            "#9ecae1",
+            "#a63603",
+            "#fdae6b",
+            "#54278f",
+            "#bcbddc",
+            "#006d2c",
+            "#a1d99b"
+            ]
+
+# Colors are layered: two types a four layers
+# Source: http://colorbrewer2.org/
+colors =   [
+            "#08519c",
+            "#9ecae1",
+            "#a63603",
+            "#fdae6b",
+            "#54278f",
+            "#bcbddc",
+            "#006d2c",
+            "#a1d99b"
+            ]
+
