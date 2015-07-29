@@ -1,7 +1,7 @@
 \chapter{Introduction}
 \label{sec:intro}
 
-One of the central objectives of the current research in computational neuroscience
+\paragraph{One of the central} objectives of the current research in computational neuroscience
 is the understanding of the neocortex, the part of the mammalian brain 
 most frequently associated with higher cognitive functions%
 ~\cite{bear2007neuroscience}.
@@ -118,9 +118,10 @@ developed a mean field theory for the firing rates and characterized different s
 a generic model of two populations can exhibit. Most prominently, he established the 
 notion of a network state where neurons fire both irregularly in time and asynchronously. 
 This state, coined \textit{asynchronous irregular (AI) state}, is considered to be 
-analogous to what is found \textit{in vivo}, as its main features are observed in various 
-experimental studies
-\marginpar{(or are they? -- CITE)}.
+analogous to what is found in experiments observing the cortical activity in awake and 
+active animals.%
+\footnote{Cf. \citeb{el2007activated} for a discussion comparing 
+experimental data and theoretical predictions.}
 Although it is not in general clear to what level of complexity the theory can by extended, 
 it has been utilized in a number of studies with different 
 foci and shown to be a suitable tool.%
@@ -130,13 +131,13 @@ foci and shown to be a suitable tool.%
 } Finally, the developed mean field theory not only has the possibility to predict 
 firing rates, it may also be seen as a tool seeking a deeper understanding of 
 how information is processed within neural networks. A very fundamental
-question is that of whether information is encoded in firing rates 
+question is whether information is encoded in firing rates 
 or in exact spike times and correlations. Answering this basic question may be considered
 a milestone  towards more complex ones relating to such
 highly emergent phenomena as higher cognitive tasks or perception. 
 
-This study surrounds two central
-hypotheses. At first, an implementation of the microcircuit model by
+\paragraph{This study surrounds two}
+central hypotheses. At first, an implementation of the microcircuit model by
 Potjans and Diesmann in the framework of PyNEST is expected to reproduce the 
 same results as the available original implementation written in SLI. Due to
 internal differences in the application of random numbers, the demanded agreement 
@@ -149,13 +150,8 @@ A number of quantities are predicted by the theory and will
 be compared with the data obtained from simulations. As the spiking network model 
 and the mean field theory do not employ the same constituents, some 
 deviations are expected to stem from these differences. 
-%\marginpar{By adapting for these
-%differences in the spiking network model, the origin of part of the deviations 
-%will be indicated. 
-%Finally, the mean field model is shown to be a convenient tool for predictions
-%over a wide range of parameters in an example.}
 
-The thesis is structured as follows. The first section contains a detailed account 
+\paragraph{The thesis is structured} as follows. The first section contains a detailed account 
 of the spiking network model as well as a derivation of the mean field model 
 for eight neuron populations.  
 The results are then presented comparing the simulation results to 
@@ -164,11 +160,9 @@ those of the implementation of the original publication by
 of spike trains within one population. 
 This is followed by comparing simulation results to those
 obtained with the mean field model. 
-%\marginpar{In order to assess the differences between 
-%predicted and measured quantities, 
-%further simulations with parameters adjusted 
-%to the mean field model are evaluated.}
-The results of the previous sections are summarized and discussed in the final section. 
+An example varying the inhibitory synaptic strength shows
+that the mean field model is a convenient tool for predictions.
+The results are summarized and discussed in the final section. 
 
 
 

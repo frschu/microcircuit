@@ -11,14 +11,12 @@
 \section*{Abstract}
 In the search for understanding the basic functions of the neocortex, 
 linking the anatomical structure to population dynamics has been a mayor
-focus of research. Experimental data in form of local connectivity data
-and cell-type specific activity is increasing at a fast past but remains
-mainly inconclusive. Simultaneously, spiking network models using 
+focus of research. Experimental data regarding local connectivity
+and cell-type specific activity is increasing at a fast pace but remains
+mainly inconclusive. Simultaneously, spiking network models based on
 leaky integrate-and-fire neurons 
 are used for interpreting experimental data such as firing rates, 
 correlations or oscillations. 
-Many of these models are implemented in numerical 
-simulations for testing specific hypotheses.
 On the other hand, a deeper understanding is reached by 
 an analytical framework relying on a statistical description.
 A rate based mean field theory has been developed 
@@ -26,19 +24,26 @@ for neural networks of two populations
 by \citeb{brunel2000} and successfully applied to a number 
 spiking network models. However, for networks with many populations
 it is not a priori clear whether this description is adequate. 
-One important case is the modeling of the local cortical 
-microcircuit, featuring a laminar structure. 
-A full-scale spiking network model incorporating this characteristic
-was established by \citeb{potjans2014} in 2014, 
-integrating a large number of the experimental studies available and reproducing
-some of the main features of spiking activity observed \textit{in vivo}.
-In this work, the spiking network model of the microcircuit is reimplemented, 
+One important case considered in this work is the modeling of the neocortical networks. 
+These networks are organized in layers, a feature thought to be 
+crucial for the information processing 
+and thus for higher cognitive functions.
+A spiking network model
+of a substructure, termed as the local cortical microcircuit, and
+incorporating this characteristic
+was established by \citeb{potjans2014} in 2014. 
+To this end, they integrated a large number of the experimental studies 
+available and reproduced some of the main features of spiking activity 
+observed \textit{in vivo}.
+In this thesis, the spiking network model of the microcircuit is successfully reimplemented, 
 compared with the original one and further analyzed.
-Aiming for a more thorough understanding as well as a computationally less
-expensive tool, the existing mean field theory is extended to the given network. 
+Aiming for a more thorough understanding,
+the existing mean field theory is extended to a layered network of eight populations. 
 The predictions, namely single neuron firing rates, 
 membrane potential distributions as well as the irregularity of spike trains, 
-are tested against simulated data. 
+are are shown to agree with the simulated counterparts.
+Finally, the developed mean field theory is shown to be a convenient tool
+exploring the network's activity for changing parameters. 
 %\emph{Finally, in order to test 
 %the dependence of a number of parameters, a simulation adapted to the 
 %mean field theory is contrasted with the previous results.}
@@ -47,8 +52,45 @@ are tested against simulated data.
 
 \pdfbookmark[1]{Zusammenfassung}{Zusammenfassung}
 \pagebreak
+\begin{otherlanguage}{ngerman}
 \section*{Zusammenfassung}
-Kurze Zusammenfassung des Inhaltes in deutscher Sprache\dots
+
+Bei der Erforschung des Neokortex ist die Verbindung zwischen Struktur und 
+Funktion der zentrale Ansatz der Computational Neuroscience. 
+Trotz wachsender Zahl an experimentellen Ergebnissen zu 
+Konnektivitäten und zellspezifischer Aktivität gibt es noch kein zusammenhängendes 
+Bild darüber, wie die wichtigsten Funktionen zustande kommen. 
+Gepulste neuronale Netze (SNN -- spiking neural networks) mit leaky integrate-and-fire
+Neuronen liefern einen wichtigen Ansatz, um die experimentellen Daten, 
+wie etwa Feuerraten, Korrelationen oder Oszillationen, zu verstehen. Gleichzeitig wird 
+versucht, ein umfassenderes Verständnis mit Hilfe von statistischen Modellen 
+zu erlangen. Von \citeb{brunel2000} wurde eine ratenbasierte Molekularfeldnäherung für
+Netwerke aus zwei Populationen entwickelt und bis dato auf einige SNNs angewandt. 
+Es ist jedoch nicht klar, in wie weit diese Beschreibung auf komplexere Netzwerke
+verallgemeinerbar ist. Ein wichtiger Fall, der in dieser Arbeit betrachtet wird, 
+sind Modelle neokortikaler Netzwerke. Diese sind in Schichten aufgebaut -- 
+ein Eigenschaft, die als maßgeblich für die Informationsverarbeitung und damit für 
+höhere kognitive Fähigkeiten gilt, welche in diesem Teil des Gehirns zustandekommen. 
+Ein SNN für den lokalen kortikalen Schaltkreis, eine 
+Unterstruktur des Neocortex, wurde von \citeb{potjans2014} entwickelt. Dieses
+enthält die laminare Struktur. Für die Konnektivitätsmatrix des Modells 
+wurde eine Vielzahl experimenteller Studien ausgewertet, und schließlich wurden
+einige wichtige Merkmale von \textit{in vivo} gemessenen Daten reproduziert. 
+In dieser Arbeit wird das Modell neu implementiert, mit dem Original verglichen 
+und weitergehen untersucht. 
+Um das Modell besser zu verstehen wird die 
+Molekularfeldtheorie auf ein geschichtetes Netzwerk aus acht Populationen erweitert. 
+Beim Vergleich von vorgesagten und gemessenen Daten wird gezeigt, dass die Theorie
+gut mit der Simulation übereinstimmt. Speziell werden dafür die Feuerraten, die Membranpotentiale
+und die Unregelmäßigkeit der Neuronenaktivität untersucht. Schließlich wird 
+gezeigt, dass sich die Molekularfeldtheorie auch als nützliches Werkzeug zur weiteren Untersuchung 
+bei veränderten Netzwerkparametern eignet. 
+
+\end{otherlanguage}
+
+
+
+
 
 
 \endgroup			

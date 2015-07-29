@@ -1,0 +1,42 @@
+%*******************************************************
+% Little Dirty Titlepage
+%*******************************************************
+\begin{titlepage}
+	% if you want the titlepage to be centered, uncomment and fine-tune the line below (KOMA classes environment)
+	\begin{addmargin}[-1cm]{-3cm}
+    \spacedallcaps{\mySubtitle} \\ \medskip
+    \begin{tabular}{m{10cm}}
+        \\\hline \\
+    \end{tabular}
+
+    \begin{center}
+        \large  
+        \hfill
+
+        \begingroup
+            \color{Maroon}\spacedallcaps{\myTitle} \\ \bigskip
+        \endgroup
+
+        \large
+        \hfill \\
+        \spacedallcaps{\myName}
+
+        \vfill
+
+        \includegraphics[width=8cm]{figures/diagram_title.png} \\ \medskip
+    
+        \vfill
+        %\mySubtitle \\ \medskip   
+        %\myDegree \\
+        %\myDepartment \\                            
+        \myFaculty \\
+        \myUni \\ \bigskip
+
+        \myTime\ %-- \myVersion
+
+        \vfill                      
+
+    \end{center}  
+  \end{addmargin}       
+\end{titlepage}   
+\thispagestyle{empty}

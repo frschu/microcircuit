@@ -2,7 +2,7 @@
 \label{sec:discussion}
 
 % Spiking network
-The reimplementation of Potjans and Diesmann's spiking network simulation  
+\paragraph{The reimplementation} of Potjans and Diesmann's spiking network simulation  
 confirmed the expectation: The original model's results were reproduced 
 well within the statistical fluctuations. The fluctuations of the calculated population 
 means between different instantiations of the model are 
@@ -31,7 +31,7 @@ might not be negligible for the spike rate. This has to be taken
 into account when interpreting the results of the mean field model. 
 
 % Mean field theory
-Introducing the mean field theory for the simulated spiking network 
+\paragraph{Introducing the mean field theory} for the simulated spiking network 
 turned out to be remarkably successful. 
 The formal extension 
 from the original model of two populations has been a rather small step, 
@@ -50,7 +50,7 @@ One reason for this underestimation could be the negligence of correlation:
 Larger correlations among excitatory input can lead to higher fluctuations 
 and thus higher spiking rates~\cite{staude2010higher}. This 
 assertion has to be taken with care, though, as correlation in inhibitory 
-populations can cancel the effect \marginpar{(citation!! Sadra emphasized that)}. 
+populations may cancel the effect as shown e.\,g. by \citeb{renart2010asynchronous}. 
 
 % MF: CV of ISI
 The prognosis for the irregularity of spike trains, measured by the coefficient of
@@ -66,16 +66,17 @@ distribution covering higher CV of ISI is not represented well (see \citeb{nawro
 details). This is especially critical for the populations with low rates (L2/3e, L6e), 
 which indeed do show the largest deviations.
 What cannot be accounted for by this bias would indicate a lower irregularity than that 
-of the respective stationary Gaussian process, pointing towards temporal correlations
+of the respective stationary Gaussian process. This points towards temporal correlations
 introduced for example by the synapse model beyond the effects accounted for
 (see e.\,g. \citeb{brunel1999fast} for the case of $\alpha$ synapses in a simpler context). 
 
 % MF: Membrane potentials
 The third and last measure predicted by the mean field model, the distribution of 
-membrane potentials, agrees well with the obtained simulation data, too. 
+membrane potentials, also agrees well with the obtained simulation data. 
 Both the shape and position of the distribution are reproduced.
 The kink at the resting potential $V_\text{r}$ due to neurons exiting the 
-refractory period is reproduced but less pronounced than the measured one, indicating that the diffusion
+refractory period is reproduced but less pronounced than the measured one. 
+This indicates that the diffusion
 away from this point is slower than assumed. 
 The maxima of the predicted distributions are slightly 
 shifted towards the resting potential. 
@@ -93,9 +94,16 @@ Even if the membrane potential spends most time close to the resting potential,
 a large number of excitatory spikes arriving in a short time would lead to a quick rise and
 firing without affecting the distribution significantly.  
 
+% MF: test
+The example for applying the mean field range for a range of different inhibitory 
+synapse strengths $g$ showed that it is a convenient tool for predicting 
+network behavior. This is especially of use since simulating a network is tied 
+to high computational costs and waiting time. When applying the model in this manner, 
+the underlying assumptions have to be kept in mind in order to not leave the 
+range of validity. 
 
 % Summary of results, explanations and shortcomings
-In summary, the hypothesis for the analytical ansatz is confirmed: 
+\paragraph{In summary,} the hypothesis for the analytical ansatz is confirmed: 
 The considered activity measures of the simulated spiking network model of the neocortex 
 can be predicted by a mean field theory assuming uncorrelated Gaussian input.
 Possible explanations for the remaining deviations are (i) correlations between neurons, 
@@ -126,8 +134,8 @@ correlations effect the observed rates.
 
 % Outlook
 The presented combination of the spiking network model and the mean field approach
-could serve as a framework to tackle further questions. 
-The implementation in PyNEST could work as a convenient basis for extensions 
+serves as a framework to tackle further questions. 
+The implementation in PyNEST works as a convenient basis for extensions 
 such as the inclusion of newly available experimental data.
 Furthermore, different neuron populations, 
 especially concerning different interneuron classes, may be included, 
