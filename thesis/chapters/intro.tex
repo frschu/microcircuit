@@ -1,119 +1,143 @@
-\section{Introduction}
+\chapter{Introduction}
 \label{sec:intro}
 
-One of the central objectives of the current research in computational neuroscience
+\paragraph{One of the central} objectives of the current research in computational neuroscience
 is the understanding of the neocortex, the part of the mammalian brain 
-most frequently associated with higher cognitive functions.%
-~\cite{lui2011development}
-A very promising approach is the general idea of linking function to 
-the structure. Important insights into the cortical architecture
+most frequently associated with higher cognitive functions%
+~\cite{bear2007neuroscience}.
+The approach of linking the function of the brain to its structure faces a large 
+difficulty: Due to the vast number of details over a large number of scales, 
+it is not clear what level of abstraction is adequate for a specific phenomenon. 
+A promising choice is to focus on substructures of the neocortex, as some of the experimental
+findings of the past suggest: 
+Important insights into the cortical architecture
 date back to the beginning of the 20th century, when 
-the anatomist Brodmann~\cite{brodmann1909vergleichende} 
+the anatomist \citeb{brodmann1909vergleichende} 
 discovered two key features found in all mammals:
-the functional organization in regions such as motor, 
-sensory and association areas as well as the subdivision into six horizontal 
-layers. The layers are distinguished by both neuron types and neuronal connections, 
-and are thought to have different roles in processing information. \emph{(CITE)}
-In 1957, almist fifty years after Brodmann's discoveries, 
-Mountcastle put forward another relevant suggestion~\cite{mountcastle1957modality}:
+a subdivision into cytoarchitecturally distinguishable regions 
+as well as the subdivision into six horizontal 
+layers. Many of Brodmann's areas are now known to coincide with functional areas 
+as well, with the best studied example being area 17 corresponding to V1 of the
+visual cortex~\cite{bear2007neuroscience}. The layers are 
+distinguished by both neuron types and neuronal connections,  
+and are thought to have different roles in processing information.
+In V1, for example, the visual input enters via three different pathways which 
+are further associated with the analysis of object motion, shape and color, respectively%
+~\cite{bear2007neuroscience}.
+In 1957, almost fifty years after Brodmann's discoveries, 
+\citeb{mountcastle1957modality}
+put forward another suggestion central for todays view on the neocortex:
 According to his hypothesis of columnar functional organization, neurons with horizontal 
 distances of more than 500 $\mu$m do not share common sensory receptive fields.
-Although to the date this theorized canonical microcircuit is still not found experimentally%
-\footnote{
--- and the very idea of it being a functional unit strongly debated. See e.~g.~%
-\cite{horton2005cortical} for a review.
-}, it remains the most widely adopted hypothesis for explaining information processing 
-within the cortex~\cite{defelipe2012neocortical}.
+On one side, this theorized canonical microcircuit is still not found experimentally
+and the very idea of it being a functional unit strongly debated (see e.\,g.~%
+\citeb{horton2005cortical} for a review). The groundbreaking work of \citeb{hubel1962receptive}
+on information processing in the visual system during the 1960s and 1970s, on the other hand, 
+contributed much to the establishment of the notion of columnar organization. 
+Until today it remains a widely adopted hypothesis for explaining information processing 
+within the cortex~\cite{defelipe2012neocortical}.   
 
 Even though computational neuroscience relies heavily on experimental data, the distinguishing 
 aspect of the discipline is the usage of mathematical models for analysis and predictions. 
 One set of these models is concerned with the behavior of large scale networks with spiking 
-neurons as the basic constituents. More than a century ago, the very simple but powerful
-integrate-and-fire model was put forward by Lapicque~\cite{lapicque1907recherches}, 
-modeling a spiking neuron by a simple circuit 
+neurons as the basic constituents. A paradigmatic model neuron has been introduced by 
+\citeb{hodgkin1952quantitative} in 1952 on the basis of examining the squid giant axon. 
+Their model describes the generation of action potentials on the basis of voltage-gated ion channels. 
+Remarkably, however, it is a much simpler model which is been chosen over the biologically 
+more realistic Hodgkin--Huxley model: 
+Almost fifty years earlier and not yet aware of the physiological details of action potential
+generation, \citeb{lapicque1907recherches} put forward the integrate-and-fire model.
+He modelled a spiking neuron by a simple circuit 
 with parallel resistor and capacitor and a threshold at which a prototypical spike 
 is emitted. The extension by including a leaky term 
 mimics diffusion of ions through the membrane.
-Remarkably, this model has not much changed until today -- indeed, it has even been shown 
+this model has not much changed until today -- indeed, it has even been shown 
 to be the superior choice over biologically much more realistic models in many cases%
 ~\cite{brette2015most}.
 The model neurons are linked by synapses to form a spiking network model. Often, the choice 
 of a synapse model is an equally simple basic model, implying either instant changes 
 of the membrane potential at the arrival of the spike (voltage based or $\delta$-synapses) or an
-injection of current following a specific curve in time (e.~g. exponential or $\alpha$-synapses). 
+injection of current following a specific curve in time (e.\,g. exponential or $\alpha$-synapses). 
 While the prior choice is easier to handle analytically, the latter is often preferred as the 
 biologically more realistic choice. 
 Despite the simplicity of its basic components, the networks can show a highly complex behaviour
 and may be strongly dependent on a specific choice of parameters. 
 Specifically, modeling a network, one has to take into account the possibility of 
-diverging activity in the case of too much excitation. A common choice suggested both 
+runaway activity in the case of too much excitation. A common choice suggested both 
 by stability arguments as well as experimental evidence is to construct networks 
 including inhibitory populations. In accordance with anatomical estimates, 
 the excitatory populations are frequently much larger.%
 \footnote{
-    The estimates for the cortex are $80 \%$ excitatory and $20 \%$ inhibitory neurons.\cite{brunel2000}
+    The estimates for the cortex are roughly $80\,\%$ excitatory and $20\,\%$ inhibitory neurons.\cite{brunel2000}
 }
 The stability is then reached 
 by assigning larger weights to the inhibitory synapses until balance or dominating inhibition
 is reached. 
 As the resulting mathematical models are often too complex to be described 
 solely analytical, many studies rely heavily on numerical simulations. 
-Apart from the exponential growth in computational power, this set of tools is 
+Apart from computational power both becoming less costly and more powerful, this set of tools is 
 also becoming increasingly convenient due to development on the software side. 
-One important framework in this area is the NEST neural simulation tool, initially developed
-by Diesmann and Gewaltig~\cite{NEST}. Simulations are defined in the stack-based simulation 
-language SLI, but since 2008 an interface for the Python programming language%
-\cite{python} is in used.
+One important example in this area is the NEST neural simulation tool, initially developed
+by \citeb{NEST}. Simulations are defined in the stack-based simulation 
+language SLI, but since 2008 an interface for the Python programming language~%
+\cite{python} is available.
 
 In order to consolidate experimental data with the abstract models,
-the available anatomical studies have to be carefully compiled.
+the available anatomical studies have to be taken into account and 
+in many cases made comparable in the first place.
 This has been done for a spiking network model of the neocortical microcircuit
-that is at the center of this thesis:
-A recent work of Potjans and Diesmann~\cite{potjans2014} 
-includes both laminar and columnar organization and utilizes a various studies 
+that supplied the basis for this thesis:
+A recent work of \citeb{potjans2014} 
+includes both laminar and columnar organization and utilizes numerous studies 
 estimating the number of synapses between different populations in order to construct an
-integrated connectivity map.
+integrated connectivity map.%
+\footnote{ 
+The experimental studies utilized in the study both for connectivity and firing 
+stem from various animal models, showing that the data available is still sparse
+and interpretation of the results has to be done with cautiously.
+}
 The network represents a column with a
 surface of 1.0 $\text{mm}^2$ containing eight populations of neurons organized in four layers%
 \footnote{
-    Two of the six layers are subsumed into one, the uppermost layer is omitted as it
-does not contain a significant number of cells~\cite{potjans2014}
-}, each with an excitatory and an inhibitory population. 
+    Two of the six layers are subsumed into one, the uppermost layer, is omitted.
+    This latter one is also called the molecular layer because it does not contain a significant number of 
+cells~\cite{bear2007neuroscience}.
+}, each with an excitatory and an inhibitory population, subsuming different neuron
+types under these two. 
 The synapses connecting the neurons are drawn randomly with probabilities according to 
 the connectivity map. A central result of this study was the reproduction of 
 firing rates measured in a variety animal models. 
 
 Parallel to the development of increasingly sophisticated spiking network models, 
 an analytical framework describing populations of integrate-and-fire neurons has 
-been developed. While a number of results have been published some thirty to forty years ago
-(e.~g.~\cite{ricciardi2013diffusion} and~\cite{tuckwell2005introduction}), a mayor landmark
-in this field has been introduced by Brunel at the verge of the current century~\cite{brunel2000}. 
+been developed. While a number of results have been published thirty to forty years ago
+(e.\,g.~\citeb{ricciardi2013diffusion} and~\citeb{tuckwell2005introduction}), a mayor landmark
+in this field has been introduced by \citeb{brunel2000} at the verge of the current century.
 Using a diffusion approximation and assuming uncorrelated input to each neuron, he
 developed a mean field theory for the firing rates and characterized different states
 a generic model of two populations can exhibit. Most prominently, he established the 
 notion of a network state where neurons fire both irregularly in time and asynchronously. 
 This state, coined \textit{asynchronous irregular (AI) state}, is considered to be 
-analogous to what is found \textit{in vivo}, as its main features are observed in various 
-experimental studies
-\emph{(Cite experimental study with AI state!)}.
+analogous to what is found in experiments observing the cortical activity in awake and 
+active animals.%
+\footnote{Cf. \citeb{el2007activated} for a discussion comparing 
+experimental data and theoretical predictions.}
 Although it is not in general clear to what level of complexity the theory can by extended, 
 it has been utilized in a number of studies with different 
 foci and shown to be a suitable tool.%
 \footnote{
-    See for example~\cite{sadeh2015orientation} for an application 
+    See for example~\citeb{sadeh2015orientation} for an application 
     regarding orientation selectivity.
 } Finally, the developed mean field theory not only has the possibility to predict 
 firing rates, it may also be seen as a tool seeking a deeper understanding of 
 how information is processed within neural networks. A very fundamental
-question is that of whether information is encoded in firing rates 
-or in exact spike times and correlations. Without a clear picture even at this basic
-conceptional level, there seems to be little hope of uncovering the 
-complex interplay that leads to such highly emergent phenomena as higher cognitive tasks 
-or perception. 
+question is whether information is encoded in firing rates 
+or in exact spike times and correlations. Answering this basic question may be considered
+a milestone  towards more complex ones relating to such
+highly emergent phenomena as higher cognitive tasks or perception. 
 
-Turning back from the regime of these very ambitious and long term prospects to 
-one of more reachable and suitable ambitions, this study surrounds two central
-hypotheses. At first, an implementation of the microcircuit model by
+\paragraph{This study surrounds two}
+central hypotheses. At first, an implementation of the microcircuit model by
 Potjans and Diesmann in the framework of PyNEST is expected to reproduce the 
 same results as the available original implementation written in SLI. Due to
 internal differences in the application of random numbers, the demanded agreement 
@@ -121,31 +145,24 @@ will only be of statistical quality. The measures used for the validation
 are common quantities for the characterization of the network 
 activity and will also enter in the next section of this study. 
 The second part is built upon the proposition that the mean field theory 
-can be applied in the case of the
-microcircuit model. A number of quantities are predicted by the theory and will 
+can be extended and applied to the microcircuit model. 
+A number of quantities are predicted by the theory and will 
 be compared with the data obtained from simulations. As the spiking network model 
 and the mean field theory do not employ the same constituents, some 
 deviations are expected to stem from these differences. 
-\emph{By adapting for these
-differences in the spiking network model, the origin of part of the deviations 
-will be indicated. 
-Finally, the mean field model is shown to be a convenient tool for predictions
-over a wide range of parameters in an example.}
 
-The thesis is structured as follows. The first section contains a detailed account 
+\paragraph{The thesis is structured} as follows. The first section contains a detailed account 
 of the spiking network model as well as a derivation of the mean field model 
 for eight neuron populations.  
 The results are then presented comparing the simulation results to 
-those of the implementation of the original publication by Potjans and 
-Diesmann~\cite{potjans2014} as well as a closer look on the statistical properties 
+those of the implementation of the original publication by 
+\citeb{potjans2014} as well as a closer look on the statistical properties 
 of spike trains within one population. 
 This is followed by comparing simulation results to those
 obtained with the mean field model. 
-\emph{In order to assess the differences between 
-predicted and measured quantities, 
-further simulations with parameters adjusted 
-to the mean field model are evaluated.}
-The results of the previous sections are summarized and discussed in the final section. 
+An example varying the inhibitory synaptic strength shows
+that the mean field model is a convenient tool for predictions.
+The results are summarized and discussed in the final section. 
 
 
 

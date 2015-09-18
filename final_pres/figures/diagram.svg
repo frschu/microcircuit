@@ -13,7 +13,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="diagram_colored_print.svg"
+   sodipodi:docname="diagram.svg"
    inkscape:export-filename="/users/schuessler/uni/microcircuit/thesis/figures/diagram_colored_print.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
@@ -30,9 +30,9 @@
      inkscape:window-height="1155"
      id="namedview424"
      showgrid="false"
-     inkscape:zoom="1"
-     inkscape:cx="194.83382"
-     inkscape:cy="88.682805"
+     inkscape:zoom="5.6568542"
+     inkscape:cx="165.3659"
+     inkscape:cy="184.66042"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
@@ -46,7 +46,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1025,15 +1025,6 @@
          style="fill:#dc3c00;fill-rule:evenodd;stroke:#dc3c00;stroke-width:0.625;stroke-linejoin:round"
          id="path7495" />
     </marker>
-    <filter
-       color-interpolation-filters="sRGB"
-       id="filter7833"
-       inkscape:collect="always">
-      <feGaussianBlur
-         id="feGaussianBlur7835"
-         stdDeviation="0.15746089"
-         inkscape:collect="always" />
-    </filter>
     <marker
        style="overflow:visible"
        id="Arrow2MendnJ3"
@@ -1564,7 +1555,7 @@
      id="text3226"
      y="102.96881"
      x="221.27342"
-     style="font-size:13.5px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#323232;fill-opacity:1;stroke:none;font-family:URW Palladio L;-inkscape-font-specification:URW Palladio L Medium"
+     style="font-size:13.50000000000000000px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#323232;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
      xml:space="preserve"><tspan
        id="tspan3230"
        y="102.96881"
@@ -1580,7 +1571,8 @@
        id="tspan3230-9"
        y="146.30952"
        x="221.91154"
-       sodipodi:role="line">L4</tspan></text>
+       sodipodi:role="line"
+       style="-inkscape-font-specification:Sans;font-family:Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">L4</tspan></text>
   <text
      sodipodi:linespacing="125%"
      id="text3226-4"
@@ -1591,7 +1583,8 @@
        id="tspan3230-4"
        y="188.99188"
        x="221.91154"
-       sodipodi:role="line">L5</tspan></text>
+       sodipodi:role="line"
+       style="-inkscape-font-specification:Sans;font-family:Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">L5</tspan></text>
   <text
      sodipodi:linespacing="125%"
      id="text3226-15"
@@ -1602,7 +1595,8 @@
        id="tspan3230-5"
        y="231.86304"
        x="221.91154"
-       sodipodi:role="line">L6</tspan></text>
+       sodipodi:role="line"
+       style="-inkscape-font-specification:Sans;font-family:Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">L6</tspan></text>
   <rect
      ry="3.9818139"
      y="80.137909"
@@ -1773,7 +1767,9 @@
        id="tspan3230-7"
        y="281.36374"
        x="84.069542"
-       sodipodi:role="line">exc.</tspan></text>
+       sodipodi:role="line"><tspan
+   style="-inkscape-font-specification:Sans;font-family:Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
+   id="tspan3290">exc</tspan>.</tspan></text>
   <text
      sodipodi:linespacing="125%"
      id="text3226-3-4"
@@ -1784,7 +1780,9 @@
        id="tspan3230-7-6"
        y="281.56326"
        x="151.90408"
-       sodipodi:role="line">inh.</tspan></text>
+       sodipodi:role="line"><tspan
+   style="-inkscape-font-specification:Sans;font-family:Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
+   id="tspan3292">inh</tspan>.</tspan></text>
   <text
      sodipodi:linespacing="125%"
      id="text3226-17"
@@ -1795,7 +1793,8 @@
        id="tspan3230-1"
        y="66.342102"
        x="221.91154"
-       sodipodi:role="line">L1</tspan></text>
+       sodipodi:role="line"
+       style="-inkscape-font-specification:Sans;font-family:Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">L1</tspan></text>
   <path
      sodipodi:nodetypes="ccccc"
      inkscape:connector-curvature="0"
@@ -1826,7 +1825,7 @@
      id="text3226-17-5"
      y="28.032207"
      x="-96.801033"
-     style="font-size:13.75px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#323232;fill-opacity:1;stroke:none;font-family:URW Palladio L;-inkscape-font-specification:URW Palladio L Medium"
+     style="font-size:13.75000000000000000px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#323232;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
      xml:space="preserve"><tspan
        id="tspan3230-1-3"
        y="28.032207"
@@ -1890,11 +1889,11 @@
      style="opacity:0.8;fill:none;stroke:#a1d99b;stroke-width:1.15042007;stroke-opacity:1;marker-end:url(#DotM-831kw)" />
   <path
      transform="matrix(1.15042,0,0,1.15042,-0.5121942,5.424383)"
-     sodipodi:nodetypes="cc"
+     sodipodi:nodetypes="csc"
      inkscape:connector-curvature="0"
      id="path5719-3-1"
-     d="M 138.52352,85.979272 C 162.1666,164.46727 154.66276,132.63527 77.024027,149.45327"
-     style="opacity:0.8;fill:none;stroke:#9ecae1;stroke-width:1;stroke-opacity:1;marker-end:url(#DotM-83tgD);filter:url(#filter7833)" />
+     d="m 138.52352,85.979272 c 23.29345,77.327338 16.35436,47.573318 -58.101083,62.759298 -1.11755,0.22794 -2.250312,0.466 -3.39841,0.7147"
+     style="opacity:0.80000000000000004;fill:none;stroke:#9ecae1;stroke-width:1;stroke-opacity:1;marker-end:url(#DotM-83tgD);" />
   <path
      sodipodi:nodetypes="cc"
      inkscape:connector-curvature="0"
@@ -2045,17 +2044,6 @@
      id="path5719-3-5-2"
      d="M 78.694119,108.2849 C 56.737443,132.06178 45.67482,167.14269 76.431392,185.75649"
      style="opacity:0.8;fill:none;stroke:#08519c;stroke-width:0.96074003;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow2MendkQ)" />
-  <text
-     sodipodi:linespacing="125%"
-     id="text3226-3-6"
-     y="18.597784"
-     x="7.1115341"
-     style="font-size:13.5px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#323232;fill-opacity:1;stroke:none;font-family:URW Palladio L;-inkscape-font-specification:URW Palladio L Medium"
-     xml:space="preserve"><tspan
-       id="tspan3230-7-1"
-       y="18.597784"
-       x="7.1115341"
-       sodipodi:role="line">A</tspan></text>
   <path
      style="fill:none;stroke:#f8ffff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0.57476633"
      d="m 1.4142135,335.4532 -0.044194,0"
@@ -2071,5 +2059,16 @@
        id="tspan3230-7-2"
        y="300.84097"
        x="116.73797"
-       sodipodi:role="line">Population</tspan></text>
-</svg>
+       sodipodi:role="line"
+       style="-inkscape-font-specification:Sans;font-family:Sans;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">Population</tspan></text>
+  <flowRoot
+     xml:space="preserve"
+     id="flowRoot3280"
+     style="fill:black;stroke:none;stroke-opacity:1;stroke-width:1px;stroke-linejoin:miter;stroke-linecap:butt;fill-opacity:1;font-family:OpenSymbol;font-style:normal;font-weight:normal;font-size:40px;line-height:125.99999904999999956%;letter-spacing:0px;word-spacing:0px;-inkscape-font-specification:OpenSymbol;font-stretch:normal;font-variant:normal"><flowRegion
+       id="flowRegion3282"><rect
+         id="rect3284"
+         width="563"
+         height="420"
+         x="-192"
+         y="-17" /></flowRegion><flowPara
+       id="flowPara3286" /></flowRoot></svg>

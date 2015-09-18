@@ -1,0 +1,555 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  Presentation of Bachelor thesis. 
+%%  A network model of the neocortex accounting for its laminar structure
+%%  Friedrich Schuessler
+%%  September 2015
+
+\documentclass[xcolor=x11names,compress]{beamer}
+\usepackage[utf8]{inputenc} 
+\usepackage[T1]{fontenc}
+\usepackage{cmbright}
+
+%% General document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx}
+\usepackage{caption}  
+\usepackage{subcaption}     % subfloats
+
+\usepackage{tikz}
+
+\usepackage[style=authoryear]{biblatex}
+\usetikzlibrary{decorations.fractals}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Beamer Layout %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\useoutertheme[subsection=false,shadow]{miniframes}
+\setbeamerfont{title like}{shape=\scshape}
+\setbeamerfont{frametitle}{shape=\scshape}
+
+\setbeamercolor*{lower separation line head}{bg=DeepSkyBlue4} 
+\setbeamercolor*{normal text}{fg=black,bg=white} 
+\setbeamercolor*{alerted text}{fg=red} 
+\setbeamercolor*{example text}{fg=black} 
+\setbeamercolor*{structure}{fg=black} 
+
+\usenavigationsymbolstemplate{}
+\setbeamercolor*{palette tertiary}{fg=black,bg=black!10} 
+\setbeamercolor*{palette quaternary}{fg=black,bg=black!10} 
+
+\setbeamercovered{dynamic} % enable pause
+
+\renewcommand{\(}{\begin{columns}}
+\renewcommand{\)}{\end{columns}}
+\newcommand{\<}[1]{\begin{column}{#1}}
+\renewcommand{\>}{\end{column}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\useoutertheme{infolines} % authors, etc.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliography{presentation.bib}
+
+\DeclareGraphicsExtensions{.pdf,.png,.jpg, .eps}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% My own definitions
+\usepackage{color, colortbl}  
+\definecolor{TableColor}{HTML}{A1D99B}
+
+% Math stuff
+\newcommand*\diff{\mathop{}\!\text{d}}
+\newcommand*\Diff[1]{\mathop{}\!\text{d^#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\begin{frame}{}
+\title[Neocortex]{A network model of the neocortex accounting for its laminar structure}
+\author{
+Friedrich Schüßler}
+\date{\normalsize September 21, 2015}
+%\date{\today}
+\titlepage
+
+\centering 
+Supervisor: Prof. Jens Timmer
+\end{frame}
+
+\begin{frame}{Table of contents}
+    \tableofcontents
+\end{frame}
+
+\AtBeginSection[]{
+\begin{frame}{Table of contents}
+    \tableofcontents[currentsection]
+\end{frame}
+}
+
+\section{Introduction}
+\label{sec:introduction}
+
+\begin{frame}[J]{Central goals of the thesis}
+    \begin{block}<1->
+        {Spiking network model of the neocortex}
+        \footnotesize
+        Tobias C Potjans and Markus Diesmann. 
+        The cell-type specific cortical microcircuit:
+        Relating structure and activity in a full-scale spiking network model.
+        \textit{Cerebral cortex}, 24(3): 785-806, 2014.
+    \end{block}
+    \vfill
+    \begin{block}<2->
+        {Mean field theory for the neocortical model}
+        \footnotesize
+        Nicolas Brunel.
+        Dynamics of sparsely connected networks of excitatory and inhibitory spiking 
+        neurons. 
+        \textit{Journal of computational neuroscience}, 8(3):183-208, 2000.
+    \end{block}
+\end{frame}
+
+\section{Spiking network model}
+\label{sec:spiking_network_model}
+
+\begin{frame}{Layered structure}
+    \begin{columns}[T] % contents are top vertically aligned
+    \begin{column}[T]{5cm} % each column can also be its own environment
+        \begin{block}{8 Populations of size $N_a$}
+        \end{block}
+        \vfill
+        \begin{block}<2->{Synapse numbers $C_{ab}$}
+        \end{block}
+    \end{column}
+    \begin{column}[T]{5cm} % alternative top-align that's better for graphics
+        \includegraphics<1-1>[width=1.\linewidth]{../figures/diagram_pre}
+        \includegraphics<2->[width=1.\linewidth]{../figures/diagram}
+    \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[t]{Membrane dynamics}
+\only<1->{
+    \begin{equation*}
+        \tau_\text{m} \,\frac{\text{d} V_i(t)}{\text{d} t} 
+                = -(V_i(t) - E_\text{L}) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t)
+    \end{equation*}
+    with \\~\\
+    \begin{tabular}{>{$}p{2.5cm}<{$} l}
+        V_i(t)         &  Membrane potential \\ 
+        \tau_\text{m}  &  Membrane time constant \\
+        E_\text{L}     &  Leaky rest potential \\
+        C_\text{m}     &  Membrane capacity    \\
+        I_i(t)         &  Input current        
+    \end{tabular}
+}
+\vfill
+\only<2->{
+    If $V_i(t)$ reaches the threshold $\theta$:
+    \begin{equation*}
+        V_i(t) = V_r \quad \text{for a refractory time $\tau_\text{rp}$}
+    \end{equation*}
+    
+}
+\end{frame}
+
+\begin{frame}[t]{Synapse dynamics}
+\only<1->{
+    Single spike
+    \begin{equation*}
+    I_{\text{syn}}(t) = w \exp{\left(\frac{-t}{\tau_\text{syn}}\right)}	
+    \end{equation*}
+    \begin{tabular}{>{$}p{2.5cm}<{$} l}
+        w               & Synaptic strength \\
+        \tau_\text{syn} & Synaptic time constant 
+    \end{tabular}
+}
+\vfill
+\only<2->{
+    Total current
+    \begin{equation*}
+        I_i(t) = 
+            \sum_j w_{ij} \sum_k 
+            \exp\left(\frac{t - t_j^k - d_{ij}}{\tau_\text{syn}}\right) 
+    \end{equation*}
+    \begin{tabular}{>{$}p{2.5cm}<{$} l}
+        d_{ij}               & Delay \\
+    \end{tabular}
+}
+\end{frame}
+
+\begin{frame}[t]{Membrane dynamics}
+    \center
+    \includegraphics[width=0.8\linewidth]{../figures/single_membrane_potential}
+\end{frame}
+
+
+\section{Mean field theory}
+\label{sec:mean_field_theory}
+
+\begin{frame}[t]{Underlying spiking network model}
+\only<1->{
+    Membrane potential
+    \begin{equation*}
+    \tau_\text{m} \,\frac{\text{d} V_i(t)}{\text{d} t} 
+            = -(V_i(t) - E_\text{L}) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t)
+    \end{equation*}
+    }
+\vfill
+\only<2->{
+    Incoming spikes as Dirac delta-functions
+    \begin{equation*}
+        \frac{\tau_\text{m}}{C_\text{m}} I_i(t) = 
+            \tau_\text{m} \sum_j J_{ij} \sum_k \delta(t - t_j^k - d_{ij}) 
+    \end{equation*}
+    }
+\end{frame}
+
+\begin{frame}[t]{Statistical description}
+\only<1->{
+    \begin{equation*}
+        \frac{\tau_\text{m}}{C_\text{m}} \, I_i(t) = 
+            \mu(t) + \sigma(t) \sqrt{\tau_\text{m}} \eta_i(t) 
+    \end{equation*}
+    \begin{tabular}{>{$}p{2.5cm}<{$} l}
+        \mu(t)          &  Average input \\ 
+        \sigma(t)       &  Amplitude of fluctuation \\
+        \eta_i(t)       &  Gaussian white noise
+    \end{tabular}
+}
+\vfill
+\only<2->{
+    Uncorrelated input:
+    \begin{equation*}
+        \langle \eta_i(t) \: \eta_j(t') \rangle = \delta_{ij} \: \delta(t - t')	
+    \end{equation*}
+}
+\vfill
+\only<3->{
+    $\mu(t)$ and $\sigma^2(t)$ are linearly dependent on the firing rate $\nu(t)$ as 
+    well as the external rate $\nu_\text{ext}$.
+}
+\end{frame}
+
+\begin{frame}[t]{Membrane potential distribution}
+\only<1->{
+    Description by a Fokker--Planck equation:
+    \begin{equation*}
+        \tau_\text{m} \, \frac{\partial P(V, t)}{\partial t} 
+           \: = \: \frac{\sigma^2(t)}{2}  \: \frac{\partial^2 P(V, t)}{\partial V^2} 
+             \: + \: \frac{\partial }{\partial V}  [(V- \mu(t)) P(V, t)] 
+    \end{equation*}
+}
+\vfill
+\only<2->{
+    Interpreting $P(V)$ as a probability distribution:
+    \begin{equation*}
+        \int_{-\infty}^{\theta} \! P(V, t) \diff V  + p_r(t) = 1 \, ,
+    \end{equation*}
+    where 
+    \begin{equation*}
+        p_r(t) := \int_{t - \tau_\text{rp}}^{t} \! \nu(u) \diff u 
+                = \nu_0 \tau_\text{rp}  
+    \end{equation*}
+    is the probability of neurons being the in refractory period.
+}
+\end{frame}
+
+
+
+\begin{frame}[t]{Self-consistency equation for 8 populations}
+\only<1->{
+    \begin{equation*}
+        \frac{1}{\nu_{a}} = \tau_{rp} 
+            + \tau_\text{m} \sqrt{\pi}
+                \int_{\frac{V_\text{r} - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+                    e^{u^2} \left(1 + \text{erf}(u)\right) \diff u  
+    \end{equation*}
+}
+\vfill
+\only<2->{
+    Statistical input in terms of synapse numbers $C_{ab}$:
+    \begin{align*}
+        \mu_a        &= 
+            \tau_\text{m} \sum_{b \,\in \,\text{pop.}} C_{ab} \, J_{ab} \, \nu_b 
+            + \tau_\text{m} (C_\text{ext})_a \, J \, \nu_\text{ext} \, ; \\
+        {\sigma_a}^2 &= 
+            \tau_\text{m} \sum_{b \,\in \,\text{pop.}} C_{ab} \, {J_{ab}}^2  \, \nu_b
+            + \tau_\text{m} (C_\text{ext})_a \,J^{\,2} \,\nu_\text{ext}
+    \end{align*}
+}
+\end{frame}
+
+\begin{frame}[t]{Irregularity}
+\only<1->{
+    Coefficient of variation of interspike intervals
+    \begin{equation*}
+        \text{CV}_\text{ISI} = \frac{\sigma_\text{ISI}}{\mu_\text{ISI}} 
+    \end{equation*}
+}
+\vfill
+\only<2->{
+    Predicted by the model:
+    \begin{equation*}
+        \text{CV}_\text{ISI}^2 
+            = 2 \pi \left(\frac{\nu_a}{\tau_\text{m}}\right)^2
+                \int_{\frac{V_\text{r} - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+                e^{x^2}  
+                \int_{-\infty}^{x} 
+                e^{u^2} \left(1 + \text{erf}(u)\right)^2 
+                \diff u \, 
+                \diff x 
+    \end{equation*}
+}
+\end{frame}
+
+
+\section{Results}
+\label{sec:results}
+
+\begin{frame}[t]{Implementation of spiking network model}
+    \center
+    \includegraphics[width=0.8\linewidth]{../figures/raster_plot}
+\end{frame}
+
+\begin{frame}[t]{Statistical comparison}
+    \begin{columns}[T] % contents are top vertically aligned
+    \begin{column}[T]{4cm} % each column can also be its own environment
+        \begin{block}{%
+        Firing rate: \\ Spikes per time
+            }
+        \end{block}
+        \vfill
+        \begin{block}{%
+        Irregularity: \\ CV of ISI 
+            }
+        \end{block}
+        \vfill
+        \begin{block}{%
+        Synchrony: \\ 
+        Fano factor $\frac{\sigma^2}{\mu}$ of peristimulus time histogram (PSTH)
+            }
+        \end{block}
+    \end{column}
+    \begin{column}[T]{6cm} % alternative top-align that's better for graphics
+        \center
+        \includegraphics[width=1.0\linewidth]{../figures/spontaneous_activity}
+    \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[t]{Single neurons activity}
+    \center
+    \includegraphics[width=0.8\linewidth]{../figures/single_neuron_activity}
+\end{frame}
+
+\begin{frame}[t]{Mean field vs. simulation}
+    \center
+    \includegraphics[width=0.8\linewidth]{../figures/compare_sim_mf_fixed_total_number}
+\end{frame}
+
+\begin{frame}[t]{Mean field vs. simulation}
+    \center
+    \includegraphics[width=0.5\linewidth]{../figures/membrane_potential}
+\end{frame}
+
+\begin{frame}[t]{Applying mean field theory}
+    Prediction of firing rates for varying inhibitory synaptic strength $g$
+    \center
+    \includegraphics[width=0.8\linewidth]{../figures/simulate_change_g}
+\end{frame}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+\begin{frame}[t]{Conclusion}
+    \begin{block}<1->{Implementation successful}
+        \begin{itemize}
+            \item 
+        Results of Potjans and Diesmann reproduced
+        \end{itemize}
+    \end{block}
+    \vfill
+    \begin{block}<2->{Mean field model yields good results}
+        \begin{itemize}
+            \item 
+        Close agreement with simulated quantities
+        \end{itemize}
+    \end{block}
+    \vfill
+    \begin{block}<3->{Mean field model also applicable as a tool}
+        \begin{itemize}
+            \item 
+        Computationally much less expensive than simulation
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+\begin{frame}[t]{Outlook}
+    \begin{block}<1->{Extension to distinct neuron populations}
+    \end{block}
+    \vfill
+    \begin{block}<2->{Application to cortical computation, e.\,g. orientation selectivity}
+    \end{block}
+    \vfill
+    \begin{block}<3->{Temporal dynamics for rate based coding}
+    \end{block}
+\end{frame}
+
+
+\begin{frame}[t]{Acknowledgements}
+    \begin{block}{Thanks to}
+        \begin{itemize}
+            \item Jens Timmer 
+            \item Stefan Rotter
+            \item Benjamin Merkt 
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+
+\section{Appendix}
+\label{sec:appendix}
+
+% Population sizes
+\begin{frame}[t]{Population sizes and synapse numbers}
+    \begin{columns}[T] % contents are top vertically aligned
+    \begin{column}[T]{3cm} % each column can also be its own environment
+        \includegraphics[width=1.2\linewidth]{../figures/population_size}
+    \end{column}
+    \begin{column}[T]{6cm} % alternative top-align that's better for graphics
+        \includegraphics[width=1.1\linewidth]{../figures/synapse_numbers}
+    \end{column}
+    \end{columns}
+\end{frame}
+    
+
+% mu and sigma in Brunel's model
+\begin{frame}[t]{Single neuron firing rate in Brunel's model}
+    Mean input:
+\begin{equation*}
+    \begin{split}
+        \mu(t)          &= \mu_l(t) + \mu_\text{ext} \\
+        \text{with} \qquad \mu_l(t)        &= C_E \, J (1 - \gamma g) \nu(t - d) \tau_\text{m} \\
+        \text{and~~\,} \qquad \mu_\text{ext}  &= C_E J \nu_\text{ext} \tau_\text{m} \,.
+    \end{split}
+\end{equation*}
+\vfill
+    Amplitude of fluctuations:
+\begin{equation*}
+    \begin{split}
+        \sigma^2(t)     &= {\sigma_l}^2(t) + {\sigma_\text{ext}}^2 \\
+        \text{with} \qquad      {\sigma_l}^2(t)       
+                        &= C_E \, J^2 (1 + \gamma g^2) \nu(t - d) \tau_\text{m} \\
+            \text{and~~\,}  \qquad    
+        {\sigma_\text{ext}}^2  &= C_E J^2 \nu_\text{ext} \tau_\text{m} \,.
+    \end{split}
+\end{equation*}
+\end{frame}
+
+% Stationary solution to Fokker--Planck equation
+\begin{frame}[t]{Stationary solution}
+    Constraints
+\begin{align*}
+    P(\theta, t) &= 0  \\
+    \frac{\partial P(\theta, t)}{\partial V}    
+        &= - \frac{2 \nu(t) \tau_\text{m}}{\sigma^2(t)}  \\
+    \frac{\partial P(V_\text{r}^+, t)}{\partial V} \: -  \: \frac{\partial P(V_\text{r}^-, t)}{\partial V} 
+        &= - \frac{2 \nu(t - \tau_\text{rp}) \tau_\text{m}}{\sigma^2(t)} \\
+\lim_{V \to -\infty} P(V, t) = 0 \, ;
+\quad  & \quad
+    \lim_{V \to -\infty} V P(V, t) = 0 \,.
+\end{align*}
+    \vfill
+    Solution
+    \begin{equation*}
+        P_0(V) = 2 \frac{\nu_0 \tau_\text{m}}{\sigma_0} 
+            \exp{\left(- \frac{(V - \mu_0)^2}{{\sigma_0}^2} \right)}
+            \int_{\frac{V - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
+                \Theta \left(u - \frac{V_\text{r} - \mu_0}{\sigma_0} \right) e^{u^2} \diff u  
+    \end{equation*}
+
+\end{frame}
+
+% Adaptations to mean field model: synapse model
+\begin{frame}[t]{Adapting for synapse model}
+\only<1->{
+    Effective weight for mean input $\mu$:
+    \begin{align*}
+        RI_e(t)         &= 
+            \frac{\tau_\text{m}}{C_\text{m}} \,w \,e^{\frac{t}{\tau_\text{m}}} 
+            \qquad &\text{exponential synapse}\\
+        RI_\delta(t)    &= 
+            \tau_\text{m} \, J \,\delta(t)
+            \qquad &\text{delta synapse}
+    \end{align*}
+}
+\only<2->{
+    Matching the kernels (with $k_e(t) = e^{\frac{t}{\tau_\text{m}}}$):
+    \begin{equation*}
+        \int_{0}^{\infty}\delta(t)\diff t 
+            = 1 
+            = \int_{0}^{\infty} a_\mu k_e(t)\diff t  
+            = a_\mu \tau_\text{s} 
+    \end{equation*}
+}
+\only<3->{
+    Matching the synapses:
+    \begin{align*}
+        \int_{0}^{\infty} \tau_\text{m} \,J \,a_\mu\, k_e(t) \diff t 
+            &= \int_{0}^{\infty} \frac{\tau_\text{m} }{C_\text{m}} \,w\, k_e(t)\diff t  \\
+        \Rightarrow \qquad
+        J   &= \frac{w \, \tau_\text{s}}{C_\text{m}} 
+    \end{align*}
+}
+\end{frame}
+
+\begin{frame}[t]{Adapting for synapse model}
+Effective weight for fluctuations $\sigma^2(t)$
+\only<1->{
+    Matching squared kernels:
+    \begin{align*}
+        1   &= {a_\sigma}^2 \int_{0}^{\infty}(k_e(t))^2\diff t  \\
+            &= {a_\sigma}^2 \, \frac{\tau_\text{s} }{2} \\
+    \Rightarrow \qquad
+    {a_\sigma}^2 &= 2 / \tau_\text{s} 
+    \end{align*}
+}
+\only<2->{
+    Matching squared synapses:
+    \begin{align*}
+    \int_{0}^{\infty} \left(\tau_\text{m} \,J \,a_\sigma\, k_e(t)\right)^2 \diff t 
+        &= \int_{0}^{\infty} 
+        \left(\frac{\tau_\text{m} }{C_\text{m}} \,w\, k_e(t)\right)^2\diff t 
+    \\
+    \Rightarrow \qquad
+    {J_\text{eff}}^2 
+        &=  \frac{w^2}{{C_\text{m}}^2} \,\frac{\tau_\text{s} }{2}  
+    \end{align*}
+}
+\end{frame}
+
+
+\begin{frame}[t]{Adapting for synapse model}
+Resulting equation for $\mu_a$ and $\sigma_a$:
+\begin{align*}
+    \mu_a        &= 
+        \sum_{b \,\in \,\text{pop.}}  (M_\text{local})_{ab} \: \nu_b 
+        + (M_\text{ext})_{a} \: \nu_\text{ext} \, ; \\
+    {\sigma_a}^2 &= 
+        \sum_{b \,\in \,\text{pop.}} (S_\text{local})_{ab} \: \nu_b
+        + (S_\text{ext})_{a}  \:\nu_\text{ext}\,.
+\end{align*}
+where
+\begin{align*}
+    (M_\text{local})_{ab} 
+        &:= \tau_\text{m} \, C_{ab} \,J_{ab} \,;\\ 
+    (M_\text{ext})_{a} 
+        &:= \tau_\text{m} \, (C_\text{ext})_a \,J \,;\\
+    (S_\text{local})_{ab} 
+        &:= \tau_\text{m} \,(1 + {\Delta_J}^2) \,C_{ab} \,({J_\text{eff}}^2)_{ab} \,;\\
+    (S_\text{ext})_{a} 
+        &:= \tau_\text{m} \,(1 + {\Delta_J}^2) \,(C_\text{ext})_a \,{J_\text{eff}}^2 
+\end{align*}
+\end{frame}
+
+    
+\end{document}
