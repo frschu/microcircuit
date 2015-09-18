@@ -12,11 +12,11 @@ except:
     print('seaborn not installed')
 
 save_fig    = True
-figure_path = os.path.join(".", "figures")
-plot_style  = ["pdf", "print"][1]
+plot_style  = ["pdf", "print", "presentation"][2]
 
 # Choose parameters for pdf or print
 if plot_style == "pdf":
+    figure_path = os.path.join(".", "figures")
     axes_color = "#bdbdbd" 
     text_color = "#636363"
     # Font
@@ -24,11 +24,22 @@ if plot_style == "pdf":
     rcParams['text.latex.preamble'] = latex_preamble
     font_family         = 'sans-serif'
 elif plot_style == "print":
+    figure_path = os.path.join(".", "figures")
+    axes_color = "#bdbdbd" 
     axes_color = "#959595" 
     text_color = "#363636"
     # Font
     latex_preamble      = [r'\usepackage[T1,small,euler-digits]{eulervm}']
     font_family         = 'serif'
+elif plot_style == "presentation":
+    figure_path = os.path.join("..", "presentation", "figures")
+    axes_color = "#bdbdbd" 
+    axes_color = "#959595" 
+    text_color = "#363636"
+    # Font
+    latex_preamble      = [r'\usepackage[cmbright]{sfmath}']
+    rcParams['text.latex.preamble'] = latex_preamble
+    font_family         = 'sans-serif'
 
 if save_fig:
     x_factor = 3.4
@@ -109,18 +120,6 @@ def fixticks(ax):
 
 
 
-# Colors are layered: two types a four layers
-# Source: http://colorbrewer2.org/
-colors =   [
-            "#08519c",
-            "#9ecae1",
-            "#a63603",
-            "#fdae6b",
-            "#54278f",
-            "#bcbddc",
-            "#006d2c",
-            "#a1d99b"
-            ]
 
 # Colors are layered: two types a four layers
 # Source: http://colorbrewer2.org/
