@@ -1,12 +1,10 @@
 \defcounter {refsection}{0}\relax 
-\beamer@slide {sec:introduction}{4}
-\defcounter {refsection}{0}\relax 
-\beamer@slide {sec:spiking_network_model}{7}
-\defcounter {refsection}{0}\relax 
-\beamer@slide {sec:mean_field_theory}{16}
+\beamer@slide {sec:theory}{7}
 \defcounter {refsection}{0}\relax 
 \beamer@slide {sec:results}{28}
 \defcounter {refsection}{0}\relax 
-\beamer@slide {sec:conclusion}{40}
+\beamer@slide {sec:conclusion}{37}
 \defcounter {refsection}{0}\relax 
-\beamer@slide {sec:appendix}{48}
+\beamer@slide {sec:appendix}{45}
+\defcounter {refsection}{0}\relax 
+\beamer@slide {eq:P_V_a}{48}

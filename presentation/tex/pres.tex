@@ -84,12 +84,11 @@ Supervisor: Prof. Jens Timmer
 \end{frame}
 }
 
-\section{Introduction}
-\label{sec:introduction}
+\section{Central goals}
 
 \begin{frame}[J]{Central goals of the thesis}
     \begin{block}<1->
-        {Implement spiking network model of the neocortex}
+        {Implement a spiking network model of the neocortex}
         \vspace{0.2cm}
         \footnotesize
         Tobias C Potjans and Markus Diesmann. \\
@@ -99,7 +98,7 @@ Supervisor: Prof. Jens Timmer
     \end{block}
     \vfill
     \begin{block}<2->
-        {Develop mean field theory for the neocortical model}
+        {Develop a mean field theory for the neocortical model}
         \vspace{0.2cm}
         \footnotesize
         Nicolas Brunel. \\
@@ -109,8 +108,10 @@ Supervisor: Prof. Jens Timmer
     \end{block}
 \end{frame}
 
-\section{Spiking network model}
-\label{sec:spiking_network_model}
+
+\section{Theory}
+\label{sec:theory}
+
 
 \begin{frame}{Layered structure}
     \begin{columns}[T] % contents are top vertically aligned
@@ -120,10 +121,14 @@ Supervisor: Prof. Jens Timmer
         \vfill
         \begin{block}<2->{Synapse numbers $C_{ab}$}
         \end{block}
+        \vfill
+        \begin{block}<3->{External input of frequency $\nu_\text{ext}$}
+        \end{block}
     \end{column}
     \begin{column}[T]{5cm} % alternative top-align that's better for graphics
         \includegraphics<1-1>[width=1.\linewidth]{../figures/diagram_pre}
-        \includegraphics<2->[width=1.\linewidth]{../figures/diagram}
+        \includegraphics<2-2>[width=1.\linewidth]{../figures/diagram_conn}
+        \includegraphics<3->[width=1.\linewidth]{../figures/diagram}
     \end{column}
     \end{columns}
 \end{frame}
@@ -134,7 +139,6 @@ Supervisor: Prof. Jens Timmer
         \tau_\text{m} \,\frac{\text{d} V_i(t)}{\text{d} t} 
                 = -(V_i(t) - E_\text{L}) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t)
     \end{equation*}
-    with \\~\\
     \begin{tabular}{>{$}p{2.5cm}<{$} l}
         V_i(t)         &  Membrane potential \\ 
         \tau_\text{m}  &  Membrane time constant \\
@@ -146,10 +150,10 @@ Supervisor: Prof. Jens Timmer
 \vfill
 \only<2->{
     If $V_i(t)$ reaches the threshold $\theta$:
-    \begin{equation*}
-        V_i(t) = V_r \quad \text{for a refractory time $\tau_\text{rp}$}
-    \end{equation*}
-    
+    \begin{itemize}
+        \item Spike is emitted;
+        \item $V_i(t) = V_r$ \quad for a refractory time $\tau_\text{rp}$.
+    \end{itemize}
 }
 \end{frame}
 
@@ -178,33 +182,29 @@ Supervisor: Prof. Jens Timmer
 }
 \end{frame}
 
-\begin{frame}[t]{Examples}
-    \begin{columns}[T] % contents are top vertically aligned
-    \begin{column}[T]{5cm} % each column can also be its own environment
+\begin{frame}[t]{Example}
+    %\begin{columns}[T] % contents are top vertically aligned
+    %\begin{column}[T]{5cm} % each column can also be its own environment
         \only<1->{
-            Over time
-            \includegraphics[height=0.7\textheight]{../figures/single_membrane_potential}
+            \includegraphics[height=0.8\textheight]{../figures/single_membrane_potential}
         }
-    \end{column}
-    \begin{column}[T]{5cm} % alternative top-align that's better for graphics
-        \only<2->{
-            Distribution
-            \includegraphics[height=0.7\textheight]{../figures/single_membrane_potential_distribution}
-        }
-    \end{column}
-    \end{columns}
+    %\end{column}
+    %\begin{column}[T]{5cm} % alternative top-align that's better for graphics
+        %\only<2->{
+            %Distribution
+            %\includegraphics[height=0.7\textheight]{../figures/single_membrane_potential_distribution}
+        %}
+    %\end{column}
+    %\end{columns}
 \end{frame}
 
 
-\section{Mean field theory}
-\label{sec:mean_field_theory}
-
-\begin{frame}[t]{Underlying spiking network model}
+\begin{frame}[t]{Mean field theory}
 \only<1->{
-    Membrane potential
+    Underlying spiking network model
     \begin{equation*}
     \tau_\text{m} \,\frac{\text{d} V_i(t)}{\text{d} t} 
-            = -(V_i(t) - E_\text{L}) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t)
+            = -V_i(t) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t)
     \end{equation*}
     }
 \vfill
@@ -219,6 +219,13 @@ Supervisor: Prof. Jens Timmer
 
 \begin{frame}[t]{Statistical description}
 \only<1->{
+    Sparse network: 
+    \qquad $\epsilon = C / N \rightarrow 0$
+}
+\\
+\vspace{0.8cm}
+\only<2->{
+    Input current:
     \begin{equation*}
         \frac{\tau_\text{m}}{C_\text{m}} \, I_i(t) = 
             \mu(t) + \sigma(t) \sqrt{\tau_\text{m}} \eta_i(t) 
@@ -227,18 +234,18 @@ Supervisor: Prof. Jens Timmer
         \mu(t)          &  Average input \\ 
         \sigma(t)       &  Amplitude of fluctuation \\
         \eta_i(t)       &  Gaussian white noise
-    \end{tabular}
+    \end{tabular} \\
 }
-\vfill
-\only<2->{
-    Uncorrelated input:
-    \qquad $ \langle \eta_i(t) \: \eta_j(t') \rangle = \delta_{ij} \: \delta(t - t')$
-}
-\vfill
+\vspace{0.8cm}
 \only<3->{
-    $\mu(t)$ and $\sigma^2(t)$ are linearly dependent on the firing rate $\nu(t)$ as 
-    well as the external rate $\nu_\text{ext}$.
+    Uncorrelated input:
+    \qquad $ \langle \eta_i(t) \: \eta_j(t') \rangle = \delta_{ij} \: \delta(t - t')$ 
 }
+%\vspace{0.5cm}
+%\only<3->{
+    %$\mu(t)$ and $\sigma^2(t)$ are linearly dependent on the firing rate $\nu(t)$ as 
+    %well as the external rate $\nu_\text{ext}$.
+%}
 \end{frame}
 
 \begin{frame}[t]{Fokker--Planck equation}
@@ -253,12 +260,11 @@ Supervisor: Prof. Jens Timmer
 \only<2->{
     Interpreting $P(V)$ as a probability distribution:
     \begin{equation*}
-        \int_{-\infty}^{\theta} \! P(V, t) \diff V  + p_r(t) = 1 \, ,
+        \int_{-\infty}^{\theta} \! P(V) \diff V  + p_r = 1 \, ,
     \end{equation*}
     where 
     \begin{equation*}
-        p_r(t) := \int_{t - \tau_\text{rp}}^{t} \! \nu(u) \diff u 
-                = \nu_0 \tau_\text{rp}  
+        p_r = \nu_0 \tau_\text{rp}  
     \end{equation*}
     is the probability of neurons being the in refractory period.
 }
@@ -289,28 +295,23 @@ Supervisor: Prof. Jens Timmer
 }
 \end{frame}
 
-\begin{frame}[t]{Irregularity}
+\begin{frame}[t]{Predictions}
 \only<1->{
+    Firing rates $\nu_a$
+}
+\vfill
+\only<2->{
+    Membrane potential distribution $P_a(V)$
+}
+\vfill
+\only<3->{
     Coefficient of variation of interspike intervals
     \begin{equation*}
         \text{CV}_\text{ISI} = \frac{\sigma_\text{ISI}}{\mu_\text{ISI}} 
     \end{equation*}
 }
-\vfill
-\only<2->{
-    Predicted by the model:
-    \begin{equation*}
-        \text{CV}_\text{ISI}^2 
-            = 2 \pi \left(\frac{\nu_a}{\tau_\text{m}}\right)^2
-                \int_{\frac{V_\text{r} - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
-                e^{x^2}  
-                \int_{-\infty}^{x} 
-                e^{u^2} \left(1 + \text{erf}(u)\right)^2 
-                \diff u \, 
-                \diff x 
-    \end{equation*}
-}
 \end{frame}
+
 
 
 \section{Results}
@@ -319,16 +320,12 @@ Supervisor: Prof. Jens Timmer
 \begin{frame}[t]{Implementation of spiking network model}
     \begin{columns}[T] % contents are top vertically aligned
     \begin{column}[T]{5cm} % each column can also be its own environment
-        \only<1->{
             PyNest
             \includegraphics[width=1.0\linewidth]{../figures/raster_plot}
-        }
     \end{column}
     \begin{column}[T]{5cm} % alternative top-align that's better for graphics
-        \only<2->{
             SLI
             \includegraphics[width=1.0\linewidth]{../figures/raster_plot_sli}
-        }
     \end{column}
     \end{columns}
 \end{frame}
@@ -346,7 +343,7 @@ Supervisor: Prof. Jens Timmer
         }
     \end{column}
     \begin{column}[T]{3cm} % alternative top-align that's better for graphics
-        \only<3->{
+        \only<2->{
             \includegraphics[height=0.8\textheight]{../figures/spon_act_synchrony}
         }
     \end{column}
@@ -354,12 +351,7 @@ Supervisor: Prof. Jens Timmer
 \end{frame}
 
 \begin{frame}[t]{Single neuron activity}
-    \only<1->{
-        \includegraphics[height=0.4\textheight]{../figures/single_neuron_activity_rates} \\
-    }
-    \only<2->{
-        \includegraphics[height=0.4\textheight]{../figures/single_neuron_activity_irregularity}
-    }
+        \includegraphics[height=0.8\textheight]{../figures/single_neuron_activity_rates} 
 \end{frame}
 
 \begin{frame}[t]{Mean field vs. simulation}
@@ -391,7 +383,7 @@ Supervisor: Prof. Jens Timmer
 \section{Conclusion}
 \label{sec:conclusion}
 
-\begin{frame}[t]{Conclusion}
+\begin{frame}[t]{Summary}
     \begin{block}<1->{Implementation successful}
         \begin{itemize}
             \item 
@@ -498,6 +490,30 @@ Supervisor: Prof. Jens Timmer
                 \Theta \left(u - \frac{V_\text{r} - \mu_0}{\sigma_0} \right) e^{u^2} \diff u  
     \end{equation*}
 
+\end{frame}
+
+%Backup CV of ISI predicted
+\begin{frame}[t]{Predicted $P(V)$ and CV of ISI}
+Membrane potential distribution:
+\begin{equation*}
+    P_a(V) = 2 \frac{\nu_a \tau_\text{m}}{\sigma_a} 
+        \exp{\left(- \frac{(V - \mu_a)^2}{{\sigma_a}^2} \right)}
+        \int_{\frac{V - \mu_a}{\sigma_a}}^{\frac{\theta - \mu_a}{\sigma_a}} \! 
+            \Theta \left(u - \frac{V_\text{r} - \mu_a}{\sigma_a} \right) e^{u^2} \diff u  \,.
+    \label{eq:P_V_a}
+\end{equation*}
+\vfill
+Irregularity:
+\begin{equation*}
+    \text{CV}_\text{ISI}^2 
+        = 2 \pi \left(\frac{\nu_a}{\tau_\text{m}}\right)^2
+            \int_{\frac{V_\text{r} - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+            e^{x^2}  
+            \int_{-\infty}^{x} 
+            e^{u^2} \left(1 + \text{erf}(u)\right)^2 
+            \diff u \, 
+            \diff x 
+\end{equation*}
 \end{frame}
 
 % Adaptations to mean field model: synapse model
