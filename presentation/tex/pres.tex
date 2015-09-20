@@ -133,32 +133,40 @@ Supervisor: Prof. Jens Timmer
     \end{columns}
 \end{frame}
 
-\begin{frame}[t]{Membrane dynamics}
-\only<1->{
-    \begin{equation*}
-        \tau_\text{m} \,\frac{\text{d} V_i(t)}{\text{d} t} 
-                = -(V_i(t) - E_\text{L}) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t)
-    \end{equation*}
-    \begin{tabular}{>{$}p{2.5cm}<{$} l}
-        V_i(t)         &  Membrane potential \\ 
-        \tau_\text{m}  &  Membrane time constant \\
-        E_\text{L}     &  Leaky rest potential \\
-        C_\text{m}     &  Membrane capacity    \\
-        I_i(t)         &  Input current        
-    \end{tabular}
-}
-\vfill
-\only<2->{
-    If $V_i(t)$ reaches the threshold $\theta$:
-    \begin{itemize}
-        \item Spike is emitted;
-        \item $V_i(t) = V_r$ \quad for a refractory time $\tau_\text{rp}$.
-    \end{itemize}
-}
+\begin{frame}{Membrane dynamics}
+    \begin{columns}[T] % contents are top vertically aligned
+    \begin{column}[T]{7cm} % each column can also be its own environment
+    \only<1->{
+        \begin{equation*}
+            \tau_\text{m} \,\frac{\text{d} V_i(t)}{\text{d} t} 
+                    = - V_i(t) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t)
+        \end{equation*}
+        \begin{tabular}{>{$}p{1.0cm}<{$} l}
+            V_i(t)         &  Membrane potential \\ 
+            \tau_\text{m}  &  Membrane time constant \\
+            C_\text{m}     &  Membrane capacity    \\
+            I_i(t)         &  Input current        
+        \end{tabular} \\
+    }
+    \vspace{1cm}
+    \only<2->{
+        If $V_i(t)$ reaches the threshold $\theta$:
+        \begin{itemize}
+            \item Spike is emitted
+            \item $V_i(t) = V_r$ \quad for refractory period $\tau_\text{rp}$
+        \end{itemize}
+    }
+    \end{column}
+    \begin{column}[T]{3cm} % alternative top-align that's better for graphics
+        \only<1->{
+            \includegraphics[height=0.7\textheight]{../figures/RC_circuit}
+        }
+    \end{column}
+    \end{columns}
 \end{frame}
 
-\begin{frame}[t]{Synapse dynamics}
-\only<1->{
+\begin{frame}{Synapse dynamics}
+%\only<1->{
     Single spike
     \begin{equation*}
     I_{\text{syn}}(t) = w \exp{\left(\frac{-t}{\tau_\text{syn}}\right)}	
@@ -167,26 +175,32 @@ Supervisor: Prof. Jens Timmer
         w               & Synaptic strength \\
         \tau_\text{syn} & Synaptic time constant 
     \end{tabular}
-}
-\vfill
-\only<2->{
-    Total current
-    \begin{equation*}
-        I_i(t) = 
-            \sum_j w_{ij} \sum_k 
-            \exp\left(\frac{t - t_j^k - d_{ij}}{\tau_\text{syn}}\right) 
-    \end{equation*}
-    \begin{tabular}{>{$}p{2.5cm}<{$} l}
-        d_{ij}               & Delay \\
-    \end{tabular}
-}
+%}
+%\vfill
+%\only<2->{
+    %Total current
+    %\begin{equation*}
+        %I_i(t) = 
+            %\sum_j w_{ij} \sum_k 
+            %\exp\left(\frac{t - t_j^k - d_{ij}}{\tau_\text{syn}}\right) 
+    %\end{equation*}
+    %\begin{tabular}{>{$}p{2.5cm}<{$} l}
+        %d_{ij}               & Delay \\
+    %\end{tabular}
+%}
 \end{frame}
 
-\begin{frame}[t]{Example}
+\begin{frame}{Example}
     %\begin{columns}[T] % contents are top vertically aligned
     %\begin{column}[T]{5cm} % each column can also be its own environment
-        \only<1->{
+        \only<1-1>{
             \includegraphics[height=0.8\textheight]{../figures/single_membrane_potential}
+        }
+        \only<2-2>{
+            \includegraphics[height=0.8\textheight]{../figures/single_membrane_potential_spikes}
+        }
+        \only<3->{
+            \includegraphics[height=0.8\textheight]{../figures/single_membrane_potential_spikes2}
         }
     %\end{column}
     %\begin{column}[T]{5cm} % alternative top-align that's better for graphics
@@ -198,24 +212,6 @@ Supervisor: Prof. Jens Timmer
     %\end{columns}
 \end{frame}
 
-
-\begin{frame}[t]{Mean field theory}
-\only<1->{
-    Underlying spiking network model
-    \begin{equation*}
-    \tau_\text{m} \,\frac{\text{d} V_i(t)}{\text{d} t} 
-            = -V_i(t) + \frac{\tau_\text{m}}{C_\text{m}} I_i(t)
-    \end{equation*}
-    }
-\vfill
-\only<2->{
-    Incoming spikes as Dirac delta-functions
-    \begin{equation*}
-        \frac{\tau_\text{m}}{C_\text{m}} I_i(t) = 
-            \tau_\text{m} \sum_j J_{ij} \sum_k \delta(t - t_j^k - d_{ij}) 
-    \end{equation*}
-    }
-\end{frame}
 
 \begin{frame}[t]{Statistical description}
 \only<1->{
@@ -248,6 +244,11 @@ Supervisor: Prof. Jens Timmer
 %}
 \end{frame}
 
+\begin{frame}{}
+    \huge Can firing rates be connected to the membrane potential distribution? 
+\end{frame}
+
+
 \begin{frame}[t]{Fokker--Planck equation}
 \only<1->{
     \begin{equation*}
@@ -258,19 +259,9 @@ Supervisor: Prof. Jens Timmer
 }
 \vfill
 \only<2->{
-    Interpreting $P(V)$ as a probability distribution:
-    \begin{equation*}
-        \int_{-\infty}^{\theta} \! P(V) \diff V  + p_r = 1 \, ,
-    \end{equation*}
-    where 
-    \begin{equation*}
-        p_r = \nu_0 \tau_\text{rp}  
-    \end{equation*}
-    is the probability of neurons being the in refractory period.
+    \includegraphics[height=0.6\textheight]{../figures/solution} 
 }
 \end{frame}
-
-
 
 \begin{frame}[t]{Self-consistency equation}
 \only<1->{
@@ -492,6 +483,29 @@ Supervisor: Prof. Jens Timmer
 
 \end{frame}
 
+% Self-consistency equation -- derivation
+\begin{frame}[t]{Self-consistency equation -- derivation}
+    Solution
+    \begin{equation*}
+        P_0(V) = 2 \frac{\nu_0 \tau_\text{m}}{\sigma_0} 
+            \exp{\left(- \frac{(V - \mu_0)^2}{{\sigma_0}^2} \right)}
+            \int_{\frac{V - \mu_0}{\sigma_0}}^{\frac{\theta - \mu_0}{\sigma_0}} \! 
+                \Theta \left(u - \frac{V_\text{r} - \mu_0}{\sigma_0} \right) e^{u^2} \diff u  
+    \end{equation*} 
+    \begin{equation*}
+        \int_{-\infty}^{\theta} \! P_0(V) \diff V  + p_r = 1 \, ,
+    \end{equation*}
+    where \qquad $p_r = \nu_0 \tau_\text{rp}$. \\
+\vspace{1cm}
+    \begin{equation*}
+        \Rightarrow \qquad
+        \frac{1}{\nu_{a}} = \tau_{rp} 
+            + \tau_\text{m} \sqrt{\pi}
+                \int_{\frac{V_\text{r} - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
+                    e^{u^2} \left(1 + \text{erf}(u)\right) \diff u  
+    \end{equation*}
+\end{frame}
+
 %Backup CV of ISI predicted
 \begin{frame}[t]{Predicted $P(V)$ and CV of ISI}
 Membrane potential distribution:
@@ -514,6 +528,23 @@ Irregularity:
             \diff u \, 
             \diff x 
 \end{equation*}
+\end{frame}
+
+% Different synapse models
+\begin{frame}[t]{Different synapse dynamics}
+    Current based synapses (spiking network model):
+    \begin{equation*}
+        I_i(t) = 
+            \sum_j w_{ij} \sum_k 
+            \exp\left(\frac{t - t_j^k - d_{ij}}{\tau_\text{syn}}\right) 
+    \end{equation*}
+    
+    \vspace{1cm}
+    Voltage based synapses (mean field theory):
+    \begin{equation*}
+        \frac{\tau_\text{m}}{C_\text{m}} I_i(t) = 
+            \tau_\text{m} \sum_j J_{ij} \sum_k \delta(t - t_j^k - d_{ij}) 
+    \end{equation*}
 \end{frame}
 
 % Adaptations to mean field model: synapse model
