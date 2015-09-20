@@ -245,7 +245,7 @@ Supervisor: Prof. Jens Timmer
 \end{frame}
 
 \begin{frame}{}
-    \huge Can firing rates be connected to the membrane potential distribution? 
+    \includegraphics[height=0.8\textheight]{../figures/rate_distribution}
 \end{frame}
 
 
@@ -323,19 +323,14 @@ Supervisor: Prof. Jens Timmer
 
 \begin{frame}[t]{Statistical comparison}
     \begin{columns}[T] % contents are top vertically aligned
-    \begin{column}[T]{4.0cm} % alternative top-align that's better for graphics
+    \begin{column}[T]{5.0cm} % alternative top-align that's better for graphics
         \only<1->{
             \includegraphics[height=0.8\textheight]{../figures/spon_act_rates}
         }
     \end{column}
-    \begin{column}[T]{3cm} % alternative top-align that's better for graphics
+    \begin{column}[T]{4.5cm} % alternative top-align that's better for graphics
         \only<2->{
             \includegraphics[height=0.8\textheight]{../figures/spon_act_irregularity}
-        }
-    \end{column}
-    \begin{column}[T]{3cm} % alternative top-align that's better for graphics
-        \only<2->{
-            \includegraphics[height=0.8\textheight]{../figures/spon_act_synchrony}
         }
     \end{column}
     \end{columns}
@@ -348,12 +343,18 @@ Supervisor: Prof. Jens Timmer
 \begin{frame}[t]{Mean field vs. simulation}
     \begin{columns}[T] % contents are top vertically aligned
     \begin{column}[T]{5.5cm} % each column can also be its own environment
-        \only<1->{
+        \only<1-1>{
+        \includegraphics[height=0.7\textheight]{../figures/compare_sim_mf_fixed_total_number_rates}
+        }
+        \only<2-2>{
+        \includegraphics[height=0.7\textheight]{../figures/compare_sim_mf_fixed_total_number_rates2}
+        }
+        \only<3->{
         \includegraphics[height=0.7\textheight]{../figures/compare_sim_mf_fixed_total_number_rates}
         }
     \end{column}
     \begin{column}[T]{4.5cm} % alternative top-align that's better for graphics
-        \only<2->{
+        \only<3->{
         \includegraphics[height=0.7\textheight]{../figures/compare_sim_mf_fixed_total_number_irregularity}
         }
     \end{column}
@@ -362,11 +363,11 @@ Supervisor: Prof. Jens Timmer
 
 \begin{frame}[t]{Mean field vs. simulation}
     \center
-    \includegraphics[height=0.8\textheight]{../figures/membrane_potential}
+    \includegraphics[height=0.8\textheight]{../figures/membrane_potential_single}
 \end{frame}
 
 \begin{frame}[t]{Applying mean field theory}
-    Prediction of firing rates for varying inhibitory synaptic strength $g$
+    Varying inhibitory synaptic strength $g$
     \center
     \includegraphics[height=0.7\textheight]{../figures/simulate_change_g}
 \end{frame}
@@ -377,31 +378,28 @@ Supervisor: Prof. Jens Timmer
 \begin{frame}[t]{Summary}
     \begin{block}<1->{Implementation successful}
         \begin{itemize}
-            \item 
-        Results of Potjans and Diesmann reproduced
+            \item         Results of Potjans and Diesmann reproduced
         \end{itemize}
     \end{block}
     \vfill
     \begin{block}<2->{Mean field model yields good results}
         \begin{itemize}
-            \item 
-        Close agreement with simulated quantities
+            \item Deviations due to neglecting correlations?
         \end{itemize}
     \end{block}
     \vfill
     \begin{block}<3->{Mean field model also applicable as a tool}
         \begin{itemize}
-            \item 
-        Computationally much less expensive than simulation
+            \item         Computationally much less expensive than simulation
         \end{itemize}
     \end{block}
 \end{frame}
 
 \begin{frame}[t]{Outlook}
-    \begin{block}<1->{Extension to distinct neuron populations}
+    \begin{block}<1->{Extension to more distinct neuron populations}
     \end{block}
     \vfill
-    \begin{block}<2->{Application to cortical computation, e.\,g. orientation selectivity}
+    \begin{block}<2->{Application to cortical computation, e.\,g. in the visual cortex}
     \end{block}
     \vfill
     \begin{block}<3->{Temporal dynamics for rate based coding}
@@ -420,8 +418,10 @@ Supervisor: Prof. Jens Timmer
 \end{frame}
 
 
-\section{Appendix}
-\label{sec:appendix}
+ 
+\begin{frame}{}
+    \huge Appendix
+\end{frame}
 
 % Population sizes
 \begin{frame}[t]{Population sizes and synapse numbers}
@@ -628,6 +628,23 @@ where
         &:= \tau_\text{m} \,(1 + {\Delta_J}^2) \,(C_\text{ext})_a \,{J_\text{eff}}^2 
 \end{align*}
 \end{frame}
+
+% Comparing synchrony
+\begin{frame}[t]{Comparing synchrony}
+    \begin{columns}[T] % contents are top vertically aligned
+    \begin{column}[T]{5.5cm} % alternative top-align that's better for graphics
+        \only<1->{
+            Synchrony = Fano factor ($\frac{\sigma^2}{\mu}$) of PSTH
+        }
+    \end{column}
+    \begin{column}[T]{4.5cm} % alternative top-align that's better for graphics
+        \only<2->{
+            \includegraphics[height=0.8\textheight]{../figures/spon_act_synchrony}
+        }
+    \end{column}
+    \end{columns}
+\end{frame}
+
 
     
 \end{document}
