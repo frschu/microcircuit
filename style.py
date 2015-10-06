@@ -12,7 +12,7 @@ except:
     print('seaborn not installed')
 
 save_fig    = True
-plot_style  = ["pdf", "print", "presentation"][2]
+plot_style  = ["pdf", "print", "presentation", "poster"][3]
 
 # Choose parameters for pdf or print
 if plot_style == "pdf":
@@ -33,6 +33,15 @@ elif plot_style == "print":
     font_family         = 'serif'
 elif plot_style == "presentation":
     figure_path = os.path.join("..", "presentation", "figures")
+    axes_color = "#bdbdbd" 
+    axes_color = "#959595" 
+    text_color = "#363636"
+    # Font
+    latex_preamble      = [r'\usepackage[cmbright]{sfmath}']
+    rcParams['text.latex.preamble'] = latex_preamble
+    font_family         = 'sans-serif'
+elif plot_style == "poster":
+    figure_path = os.path.join("..", "poster", "figures")
     axes_color = "#bdbdbd" 
     axes_color = "#959595" 
     text_color = "#363636"
