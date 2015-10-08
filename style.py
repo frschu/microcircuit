@@ -14,6 +14,12 @@ except:
 save_fig    = True
 plot_style  = ["pdf", "print", "presentation", "poster"][3]
 
+# Figure size
+# Only specify height in inch. Width is calculated from golden ratio.
+height = 3.4   # inch
+linewidth  = 1.0
+cross_size = 9 # pt, size of cross markers
+
 # Choose parameters for pdf or print
 if plot_style == "pdf":
     figure_path = os.path.join(".", "figures")
@@ -49,19 +55,20 @@ elif plot_style == "poster":
     latex_preamble      = [r'\usepackage[cmbright]{sfmath}']
     rcParams['text.latex.preamble'] = latex_preamble
     font_family         = 'sans-serif'
-
-if save_fig:
-    x_factor = 3.4
-    linewidth  = 1.0
+    # Figure size
+    #        cm  / 2.54 cm * 1.0 inch  
+    height = 9.5 / 2.54     # inch
+    linewidth  = 0.8
     cross_size = 9 # pt, size of cross markers
-else:
-    x_factor = 8.
+
+if not save_fig:
+    height = 8.
     linewidth  = 2.0
     cross_size = 12 # pt, size of cross markers
 
 # Figure size
 from  scipy.constants import golden_ratio as gr
-figsize  = (gr * x_factor, 1. * x_factor)
+figsize  = (gr * height, 1. * height)
 
 fontsize_labels         = 11    # pt, size used in latex document
 fontsize_labels_axes    = fontsize_labels
