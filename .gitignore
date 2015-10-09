@@ -93,8 +93,5 @@ data/
 *.hdf5
 *.log
 
-# PDF
-*.pdf
-
 # Pictures
 *.png
