@@ -139,7 +139,7 @@
   % Format of textbox
   textborder=roundedsmall,
   % Format of text header
-  eyecatcher=false,
+  eyecatcher=true,
   headerborder=open, 
   headerheight=0.1\textheight,
   headershape=smallrounded,
@@ -151,11 +151,12 @@
   linewidth=2pt
   }
   % Eye Catcher
-  {\includegraphics[width=10em]{D1077}} % No eye catcher for this poster. (eyecatcher=no above). If an eye catcher is present, the title is centered between eye-catcher and logo.
+  {\includegraphics[height=8em]{unisiegel}} % No eye catcher for this poster. (eyecatcher=no above). If an eye catcher is present, the title is centered between eye-catcher and logo.
   % Title
   {\sf %Sans Serif
   %\bf% Serif
-      A Mean Field Theory for a layered Network Model of the Neocortex
+    A Mean Field Theory for a \\[0.1cm]
+    Layered Network Model of the Neocortex
 \vspace{0.3em}}
   % Authors
   {\sf %Sans Serif
@@ -171,7 +172,7 @@
     \makebox[8em][r]{%
       \begin{minipage}{16em}
         \hfill
-        \includegraphics[height=10em]{unisiegel}
+        \includegraphics[height=6em]{bcf_logo}
       \end{minipage}
     }
   }
@@ -191,16 +192,16 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \headerbox{MOTIVATION}{name=motivation, column=0, span=2}{
     \begin{multicols}{2}
-    Current research on the function and activity of the neocortex relies heavily
-    on numerical simulations of spiking network models. Recent models include one
-    of the outstanding anatomical features of the neocortex: its arrangement in 
-    various layers. Although they are able to 
-    reproduce experimental measures, it is often unclear what
-    specific mechanisms are important for the network activity and how sensitive the 
-    model is to changes in parameters. The presented mean field model is one 
-    way to tackle these aspects: It predicts the network activity assuming 
-    uncorrelated input to each neuron and can be utilized as an 
-    effective tool for scanning large portions of the parameter space. 
+    Current research on the relations between structure, activity and function of 
+    the neocortex relies heavily on numerical simulations of spiking network models.
+    Recent models include one of the hallmarks of neocortical anatomy: its arrangement 
+    in several neuronal layers. Although numerical simulations can reproduce 
+    experimental measurements of activity, it remains unclear which network mechanisms 
+    govern the observed network activity, and how sensitive the model is to its various 
+    parameters. The presented mean field model represents an efficient way to tackle 
+    these aspects: It predicts the network activity assuming uncorrelated input to each 
+    neuron, and it can be employed as an effective tool for scanning large portions of 
+    the parameter space. 
     \end{multicols}
 }
 
@@ -211,9 +212,11 @@
     \vspace{0.2cm}
     8 populations are arranged in 4 layers, each containing an excitatory and 
     inhibitory population. Neuron and synapse numbers are estimated from 
-    experimental data by Potjans and Diesmann~\cite{potjans2014}. Synapses are drawn randomly until 
-    a fixed number is reached. Both synapse weights and delays are drawn from Gaussian
-    distributions. There's no plasticity. Each neuron receives independent Poissonian 
+    anatomical stainings, see ~\cite{potjans2014} for details. 
+    Synapses are drawn randomly until a fixed number is reached. 
+    Both synapse weights and delays are drawn from appropriate Gaussian
+    distributions. All synapses are static.
+    Each neuron receives independent Poissonian 
     spikes as input. Both spike times and membrane potentials are measured. 
 
     \begin{multicols}{3}
@@ -256,31 +259,33 @@
     Each spike of neuron $j$ elicits an exponentially decaying current in the
     postsynaptic neuron~$i$.  
     The amplitude is set by the synaptic weight $w_{ij}$. 
-    The total incoming current is a sum over all synapses:
+    The total incoming current is a linear sum over all synapses:
     \begin{equation}
         I_i(t) = 
             \sum_j w_{ij} \sum_k 
-            \exp\left(\frac{t - t_j^k - d_{ij}}{\tau_\text{syn}}\right) ,
+            \exp\left(\frac{t - t_j^k - d_{ij}}{\tau_\text{syn}}\right) 
+                \Theta(t - t^k_j - d_{ij})\,,
         \label{eq:input_current}
     \end{equation}
-    where $t^k_j$ is the spike time of the $k$-th spike of neuron $j$.
+    where $t^k_j$ is the spike time of the $k$-th spike of neuron $j$ and 
+    $\Theta(t)$ is the Heaviside function.
 }
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\headerbox{MEAN FIELD THEORY}{name=meanfield, column=0, span=1, below=network}{
+\headerbox{MEAN FIELD THEORY}{name=meanfield, column=0, span=1, above=bottom}{
     \centerline{\uppercase{Statistical input}}
     The mean field model based on Brunel's work~\cite{brunel2000} predicts firing 
     rates for spiking network models of 
     leaky integrate-and-fire neurons (Equation \eqref{eq:lif-neuron}).
     For a sparsely connected network with uncorrelated input to the neurons, 
     the input current $I_i(t)$ to neuron $i$ in population $a$ can be described by 
-    the stochastic equation
+    the stochastic differential equation
     \begin{align}
         \frac{\tau_\text{m}}{C_\text{m}} \, I_i(t) &= 
             \mu_a(t) + \sigma_a(t) \sqrt{\tau_\text{m}} \eta_i(t) \\
     \intertext{
-    with average part $\mu$ and amplitude $\sigma$
+    with mean $\mu$ and variance density $\sigma^2$
     of the Gaussian white noise $\eta_i$ :
     }
         \mu_a        &= 
@@ -298,21 +303,21 @@
     Transformation via
     \begin{enumerate}
         \item 
-        $\Rightarrow$ Fokker--Planck equation for membrane potential distributions; 
+        $\Rightarrow$ Fokker-Planck equation for membrane potential distributions; 
         \item 
-        $\Rightarrow$ stationary solution to Fokker--Planck equation;
+        $\Rightarrow$ stationary solution to Fokker-Planck equation;
         \item 
         $\Rightarrow$ normalization condition for probability distributions
     \end{enumerate}
-    leads to a self-consistency equation for the firing rates $\nu_a$ of each population:
+    leads to self-consistency equations for the firing rates $\nu_a$ of each population,
     \begin{equation}
         \frac{1}{\nu_{a}} = \tau_{rp} 
             + \tau_\text{m} \sqrt{\pi}
             \int_{\frac{V_\text{r} - \mu_{a}}{\sigma_{a}}}^{\frac{\theta - \mu_{a}}{\sigma_{a}}} 
-            e^{u^2} \left(1 + \text{erf}(u)\right) \diff u \,.
+            e^{u^2} \left(1 + \text{erf}(u)\right) \diff u \,,
         \label{eq:self-consistency}
     \end{equation}
-    The equations are coupled via the integral boundaries. Solutions are found
+    which are coupled via the integration boundaries. Solutions are found
     numerically. 
 }
 
@@ -323,9 +328,9 @@
     \centerline{\uppercase{Network activity}}
     \vspace{0.1cm}
     \begin{multicols}{2}
-        ~\\~\\
+        ~\\
         \includegraphics[height=4cm]{network_activity}  
-        \columnbreak \\
+        %\columnbreak 
         Raster plot:
         \vspace{-\topsep}
         \begin{itemize}
@@ -334,11 +339,11 @@
             \item Asynchronous and irregular activity
             \item Little synchronization e.\,g. in L2/3e
         \end{itemize}
-        Box plot:
+        Box plot of single neuron firing rates:
         \vspace{-\topsep}
         \begin{itemize}
             \setlength\itemsep{0.01cm}
-            \item Single neuron firing rates
+            %\item Single neuron firing rates
             \item Large fluctuations around the means (white stars)                
         \end{itemize}
     \end{multicols}
@@ -349,11 +354,11 @@
         ~\\~\\
         \includegraphics[height=4.0cm]{results}  
         \columnbreak \\
-        Firing rates and Irregulariy:
+        Firing rates and Irregularity:
         \vspace{-\topsep}
         \begin{itemize}
             \setlength\itemsep{0.01cm}
-            \item Compared to 20 independet simulations
+            \item Compared to simulations of 20 different network realizations
             \item Irregularity = 
                 coefficient of variation of interspike intervals (ISI) = 
             $\frac{\sigma_\text{ISI}}{\mu_\text{ISI}}$
@@ -363,7 +368,7 @@
         \begin{itemize}
             \setlength\itemsep{0.01cm}
             \item Predictions (smooth curves) are solutions of 
-                Fokker--Planck eq.
+                Fokker-Planck eq.
             \item Steps at $E_L = -65$\,mV: neurons coming out of refractory period
         \end{itemize}
     \end{multicols}
@@ -371,18 +376,18 @@
     \vspace{0.3cm}
     \centerline{\uppercase{Exploring the parameter space}}
     \begin{multicols}{2}
-        ~\\
+        ~\\[0.3cm]
         \includegraphics[height=4cm]{change_parameters} 
         \columnbreak \\
-        Firing rates for varying network parameters:
+        Predicted firing rates for networks with different parameters:
         \vspace{-\topsep}
         \begin{itemize}
             \setlength\itemsep{0.01cm}
             \item $g$: governs ratio of inhibition over excitation
             \item $\nu_\text{ext}$: base rate of the external Poisson process
-            \item previous work point: dashed lines
-            \item no convergence for $g < 3$
-            \item simulating the data would have taken days, predicting took seconds
+            \item Operating point in previous work: dashed lines
+            %\item No convergence for $g < 3$
+            \item Simulating the data would have taken days, predicting took seconds
         \end{itemize}
     \end{multicols}
 \end{minipage}
@@ -392,11 +397,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \headerbox{CONCLUSION}{name=conclusion, column=1, span=1, below=results}{
     \begin{itemize}
+            \setlength\itemsep{0.01cm}
         \item The mean field theory predicts firing rates and irregularity 
             to a high accuracy (relative errors below 10\,\%). 
-        \item Deviations may be due to neglecting correlations.
+        \item Deviations may be due to neglecting correlations, or due to the 
+            diffusion approximation assuming infinitesimally small PSCs.
         \item The theory can be applied as a convenient computational tool
-            (large advantages in terms of computational time over simulations).
+            (greatly reduced numerical effort as compared to simulations, 
+            quasi-analytical description).
     \end{itemize}
 }
 
@@ -419,11 +427,11 @@
     \begin{tabular}{>{$}p{1.0cm}<{$} p{4.5cm}}
         \multicolumn{2}{l}{\uppercase{Mean field theory}}\\ [0.04cm]
         \multicolumn{2}{l}{Recurrent (populations $a$ and $b$):}\\
-        C_{ab}          & Synapse number\\ 
+        C_{ab}          & Number of synapses\\ 
         J_{ab}          & Synaptic weight\\ 
         \nu_a           & Single neuron firing rate\\
         \multicolumn{2}{l}{External:}\\
-        C^\text{ext}_{a}& Synapse numbers\\ 
+        C^\text{ext}_{a}& Number of synapses\\ 
         J               & Synaptic weight *\\ 
         \nu_\text{ext}  & Rate of Poisson process
     \end{tabular} 
@@ -434,7 +442,7 @@
     * Synapses are modeled differently: 
     Whereas the spiking network model uses current based exponential synapses
     (as in Equation \eqref{eq:input_current}), 
-    the mean field theory is originally developed for voltage based delta synapses
+    the mean field theory is originally developed for synapses with delta-currents
     (each synapse elicits a fixed change in voltage instantaneously).
     To account for the difference, $J$ is adapted.
     \end{tabular} 
@@ -442,7 +450,7 @@
     
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\headerbox{REFERENCES}{name=references,column=1,above=bottom}{
+\headerbox{REFERENCES}{name=references,column=1, above=bottom}{
     \smaller
     \bibliographystyle{ieee}
     \renewcommand{\section}[2]{\vskip 0.05em}
@@ -454,7 +462,7 @@
             {D}ynamics of sparsely connected networks of excitatory and inhibitory 
             spiking neurons.
         \newblock 
-        \textit{{J}ournal of computational neuroscience}, 2000
+        \textit{{J}ournal of {C}omputational {N}euroscience}, 2000
       \bibitem{potjans2014}
         T.~Potjans and M.~Diesmann.
         \newblock 
