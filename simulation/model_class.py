@@ -138,12 +138,12 @@ class model:
         if not self.neuron_model=="iaf_psc_delta":
             self.model_params["tau_syn_ex"] = net.tau_syn_ex # excitatory synaptic time constant (ms)
             self.model_params["tau_syn_in"] = net.tau_syn_in # inhibitory synaptic time constant (ms)
-        self.tau_syn_ex = net.tau_syn_ex * 1e-3             # s
-        self.tau_syn_in = net.tau_syn_in * 1e-3             # s
+        self.tau_syn_ex = net.tau_syn_ex             # ms
+        self.tau_syn_in = net.tau_syn_in             # ms
         self.tau_syn    = np.tile([self.tau_syn_ex, self.tau_syn_in], (self.n_populations, self.n_layers))
         # Rescaling for model calculations: these values are not used in the simulation!
-        self.tau_m  = self.model_params["tau_m"] * 1e-3          # s
-        self.t_ref  = self.model_params["t_ref"] * 1e-3          # s
+        self.tau_m  = self.model_params["tau_m"]                 # ms
+        self.t_ref  = self.model_params["t_ref"]                 # ms
         self.E_L    = self.model_params["E_L"]                   # mV
         self.V_r    = self.model_params["V_reset"] - self.E_L    # mV
         self.theta  = self.model_params["V_th"] - self.E_L       # mV
@@ -168,15 +168,15 @@ class model:
         delta_tau       = self.tau_syn - self.tau_m
         ratio_tau       = self.tau_m / self.tau_syn
         PSC_over_PSP    = self.C_m * delta_tau / (self.tau_m * self.tau_syn * \
-            (ratio_tau**(self.tau_m / delta_tau) - ratio_tau**(self.tau_syn / delta_tau))) * 1e-3
+            (ratio_tau**(self.tau_m / delta_tau) - ratio_tau**(self.tau_syn / delta_tau))) 
         # Actual weights have to be adapted: from peak PSP to PSC (and back...)
         if self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
             self.weights    = self.J_ab  * PSC_over_PSP     # neuron populations
         elif self.neuron_model=="iaf_psc_delta":
-            self.weights    = self.J_ab * PSC_over_PSP * (self.tau_syn_ex * 1e3) / self.C_m
+            self.weights    = self.J_ab * PSC_over_PSP * (self.tau_syn_ex) / self.C_m
             # This might be an overkill / doing things twice...
         elif self.neuron_model=="iaf_psc_alpha": # PSCs calculated from PSP amplitudes
-            self.weights = self.J_ab * np.exp(1) / (self.tau_syn_ex * 1e3) / self.C_m
+            self.weights = self.J_ab * np.exp(1) / (self.tau_syn_ex) / self.C_m
         else:
             raise Exception("Neuron model should be iaf_psc_ - {delta, exp, alpha}!")
 
@@ -216,9 +216,9 @@ class model:
         if self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
             self.weight_ext = self.J_ext * PSC_over_PSP[0, 0] 
         elif self.neuron_model=="iaf_psc_delta":
-            self.weight_ext = self.J_ext * PSC_over_PSP[0, 0] * (self.tau_syn_ex * 1e3) / self.C_m
+            self.weight_ext = self.J_ext * PSC_over_PSP[0, 0] * self.tau_syn_ex / self.C_m
         elif self.neuron_model=="iaf_psc_alpha": # PSCs calculated from PSP amplitudes
-            self.weight_ext = self.J_ext * np.exp(1) / (self.tau_syn_ex * 1e3) / self.C_m
+            self.weight_ext = self.J_ext * np.exp(1) / self.tau_syn_ex / self.C_m
 
         # optional additional thalamic input (Poisson)
         self.n_th           = net.n_th      # size of thalamic population
@@ -230,9 +230,9 @@ class model:
         if self.neuron_model=="iaf_psc_exp": # PSCs calculated from PSP amplitudes
             self.weight_th = self.J_th * PSC_over_PSP[0, 0] 
         elif self.neuron_model=="iaf_psc_delta":
-            self.weight_th = self.J_th * PSC_over_PSP[0, 0] * (self.tau_syn_ex * 1e3) / self.C_m
+            self.weight_th = self.J_th * PSC_over_PSP[0, 0] * self.tau_syn_ex / self.C_m
         elif self.neuron_model=="iaf_psc_alpha": # PSCs calculated from PSP amplitudes
-            self.weight_th = self.J_th * np.exp(1) / (self.tau_syn_ex * 1e3) / self.C_m
+            self.weight_th = self.J_th * np.exp(1) / self.tau_syn_ex / self.C_m
 
         
         # connection probabilities for thalamic input
@@ -264,19 +264,19 @@ class model:
             self.J_mu_ext   = self.weight_ext   
             self.J_sd_ext   = self.weight_ext
         elif self.neuron_model=="iaf_psc_exp":
-            self.J_mu       = self.weights    * self.tau_syn * 1e3   / self.C_m
-            self.J_sd       = self.weights    * np.sqrt(self.tau_syn * 1e3 / 2.) / self.C_m
-            self.J_mu_ext   = self.weight_ext * self.tau_syn_ex * 1e3 / self.C_m
-            self.J_sd_ext   = self.weight_ext * np.sqrt(self.tau_syn_ex * 1e3 / 2.) / self.C_m
+            self.J_mu       = self.weights    * self.tau_syn   / self.C_m
+            self.J_sd       = self.weights    * np.sqrt(self.tau_syn / 2.) / self.C_m
+            self.J_mu_ext   = self.weight_ext * self.tau_syn_ex / self.C_m
+            self.J_sd_ext   = self.weight_ext * np.sqrt(self.tau_syn_ex / 2.) / self.C_m
         elif self.neuron_model=="iaf_psc_alpha":
-            self.J_mu       = self.weights    * (self.tau_syn * 1e3)**2          / self.C_m
-            self.J_sd       = self.weights    * (self.tau_syn * 1e3)**(3./2.)    / (self.C_m * 2.)
-            self.J_mu_ext   = self.weight_ext * (self.tau_syn_ex * 1e3)**2       / self.C_m
-            self.J_sd_ext   = self.weight_ext * (self.tau_syn_ex * 1e3)**(3./2.) / (self.C_m * 2.)
-        self.mat_mu     = self.tau_m * self.J_mu        * self.C_ab
-        self.mu_ext     = self.tau_m * self.J_mu_ext    * self.C_aext * self.rate_ext
-        self.mat_var    = self.tau_m * (1 + self.weight_rel_sd ** 2) * self.J_sd**2     * self.C_ab
-        self.var_ext    = self.tau_m * (1 + self.weight_rel_sd ** 2) * self.J_sd_ext**2 * self.C_aext * self.rate_ext
+            self.J_mu       = self.weights    * self.tau_syn**2          / self.C_m
+            self.J_sd       = self.weights    * self.tau_syn**(3./2.)    / (self.C_m * 2.)
+            self.J_mu_ext   = self.weight_ext * self.tau_syn_ex**2       / self.C_m
+            self.J_sd_ext   = self.weight_ext * self.tau_syn_ex**(3./2.) / (self.C_m * 2.)
+        self.mat_mu     = self.tau_m * 1e-3 * self.J_mu        * self.C_ab
+        self.mu_ext     = self.tau_m * 1e-3 * self.J_mu_ext    * self.C_aext * self.rate_ext
+        self.mat_var    = self.tau_m * 1e-3 * (1 + self.weight_rel_sd ** 2) * self.J_sd**2     * self.C_ab
+        self.var_ext    = self.tau_m * 1e-3 * (1 + self.weight_rel_sd ** 2) * self.J_sd_ext**2 * self.C_aext * self.rate_ext
 
     ######################################################
     # Methods                                           ##
@@ -288,16 +288,6 @@ class model:
     def sd(self, v):
         """Fluctuation of input in Brunel's model"""
         return np.sqrt(np.dot(self.mat_var, v) + self.var_ext)
-
-    #def integrand(u):
-        #"""Integrand of self-consistency equation"""
-        #if u < -4.0:
-            #return -1. / np.sqrt(np.pi) * (1.0 / u - 1.0 / (2.0 * u**3) + 
-                                        #3.0 / (4.0 * u**5) - 
-                                        #15.0 / (8.0 * u**7))
-        #else:
-            #return np.exp(u**2) * (1. + erf(u))
-
 
     def root_v0(self, v):
         """The integral equations to be solved
@@ -324,7 +314,8 @@ class model:
         bounds      = np.array([low, up]).T
 
         integral    = np.array([quad(integrand, lower, upper)[0] for lower, upper in bounds])
-        root        = - 1. / v + self.t_ref + np.sqrt(np.pi) * self.tau_m * integral
+        root        = - 1. / v + self.t_ref * 1e-3 \
+                      + np.sqrt(np.pi) * self.tau_m * 1e-3 * integral
         return root
 
 
@@ -354,83 +345,13 @@ class model:
         up  = (self.theta - mu_v) / sd_v    # reduced threshold
         f_low   = integrand(low)
         f_up    = integrand(up)
-        jac_mat_1   = self.tau_m * np.sqrt(np.pi) * self.mat_mu
-        jac_mat_2   = self.tau_m * np.sqrt(np.pi) * self.mat_var / (2. * sd_v**2)
+        jac_mat_1   = self.tau_m * 1e-3 * np.sqrt(np.pi) * self.mat_mu
+        jac_mat_2   = self.tau_m * 1e-3 * np.sqrt(np.pi) * self.mat_var / (2. * sd_v**2)
 
         jac_T =  np.diag(1. / v**2) - \
                  jac_mat_1.T * (f_up - f_low) + \
                  jac_mat_2.T * (f_up * up - f_low * low)
         return jac_T.T
-
-
-    def root_v0_siegert(self, v):
-        """The integral equations to be solved
-        Returns the array 'root', each entry corresponding to one population.
-        Solve for root == 0.
-        
-        This is a different version. Might be more stable numerically.
-        """
-        from scipy.integrate import quad
-        from scipy.special import erf
-        def enum(arr1, *args):
-            i_range = range(len(arr1))
-            return zip(i_range, arr1 ,*args)
-
-        max_err = 1e-16
-        def integral1(mu, sigma, y_r, y_theta):
-            """Integral for mu < theta"""
-            def integrand(u):
-                if u == 0:
-                    return np.exp(-y_theta**2) * 2 * (y_theta - y_r)
-                else:
-                    return np.exp(-(u - y_theta)**2) * (1.0 - np.exp(2 * (y_r - y_theta) * u)) / u
-        
-            lower_bound = y_theta
-            err_dn = 1.
-            while err_dn > max_err and lower_bound > 1e-16:
-                err_dn = integrand(lower_bound)
-                if err_dn > max_err:            
-                    lower_bound /= 2
-        
-            upper_bound = y_theta
-            err_up = 1.
-            while err_up > max_err:
-               err_up = integrand(upper_bound)
-               if err_up > max_err:
-                   upper_bound *= 2
-        
-            return np.exp(y_theta**2) * quad(integrand, lower_bound, upper_bound)[0] 
-         
-        def integral2(mu, sigma, y_r, y_theta):
-            """Integral for mu > theta"""
-            def integrand(u):
-                if u == 0:
-                    return 2 * (y_theta - y_r)
-                else:
-                    return (np.exp(2 * y_theta * u - u**2) - np.exp(2 * y_r * u - u**2)) / u
-        
-            upper_bound = 1.0
-            err = 1.0
-            while err > max_err:
-                err = integrand(upper_bound)
-                upper_bound *= 2
-        
-            return quad(integrand, 0.0, upper_bound)[0] 
-       
-        mus         = self.tau_m * (np.dot(self.mat_mu, v) + self.mu_ext)
-        sigmas      = np.sqrt(self.tau_m * (np.dot(self.mat_var, v) + self.var_ext))
-        y_rs        = (self.V_r - mus) / sigmas
-        y_thetas    = (self.theta - mus) / sigmas
-        
-        integrals    = np.zeros(len(v))
-        for i, mu, sigma, y_r, y_theta in enum(mus, sigmas, y_rs, y_thetas):
-            if mu <= self.theta * 0.95:
-                integrals[i] = integral1(mu, sigma, y_r, y_theta)
-            else:
-                integrals[i] = integral2(mu, sigma, y_r, y_theta)
-
-        root        = - 1. / v + self.t_ref + self.tau_m * integrals
-        return root
 
     def prob_V(self, V_array, mu, sd, v):
         """Membrane potential probability distribution P(V_m) according to Brunel"""
@@ -443,5 +364,5 @@ class model:
         up  = (self.theta - mu) / sd
         integral    = quad(P_integrand, low, up)[0]
         
-        P_V_array = 2 * v * self.tau_m / sd * np.exp(- ((V_array - self.E_L) - mu)**2 / sd**2) * integral
+        P_V_array = 2 * v * self.tau_m * 1e-3 / sd * np.exp(- ((V_array - self.E_L) - mu)**2 / sd**2) * integral
         return step(-(V_array - self.E_L) + self.theta) * P_V_array
