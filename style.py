@@ -31,7 +31,6 @@ if plot_style == "pdf":
     font_family         = 'sans-serif'
 elif plot_style == "print":
     figure_path = os.path.join(".", "figures")
-    axes_color = "#bdbdbd" 
     axes_color = "#959595" 
     text_color = "#363636"
     # Font
@@ -39,7 +38,6 @@ elif plot_style == "print":
     font_family         = 'serif'
 elif plot_style == "presentation":
     figure_path = os.path.join("..", "presentation", "figures")
-    axes_color = "#bdbdbd" 
     axes_color = "#959595" 
     text_color = "#363636"
     # Font
@@ -47,8 +45,7 @@ elif plot_style == "presentation":
     rcParams['text.latex.preamble'] = latex_preamble
     font_family         = 'sans-serif'
 elif plot_style == "poster":
-    figure_path = os.path.join("..", "poster", "figures")
-    axes_color = "#bdbdbd" 
+    figure_path = os.path.join("..", "poster", "figures") 
     axes_color = "#959595" 
     text_color = "#363636"
     # Font
